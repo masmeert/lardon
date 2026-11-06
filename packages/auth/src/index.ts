@@ -3,6 +3,7 @@ import { expo } from "@better-auth/expo";
 import type { Database } from "@lardon/db";
 import * as schema from "@lardon/db/schema/auth";
 import { betterAuth } from "better-auth";
+import { emailOTP } from "better-auth/plugins";
 
 export type AuthConfig = {
   BETTER_AUTH_URL: string;
@@ -10,12 +11,9 @@ export type AuthConfig = {
   CORS_ORIGIN: string;
 };
 
-export type AuthEmail = {
-  kind: "verify-email" | "reset-password";
-  to: string;
-  name: string;
-  url: string;
-};
+export type AuthEmail =
+  | { kind: "verify-email" | "reset-password"; to: string; name: string; url: string }
+  | { kind: "sign-in-code"; to: string; code: string };
 
 export type AuthHooks = {
   sendEmail(email: AuthEmail): Promise<void>;
@@ -58,7 +56,17 @@ export function createAuth(env: AuthConfig, database: Database, hooks: AuthHooks
         httpOnly: true,
       },
     },
-    plugins: [expo()],
+    plugins: [
+      expo(),
+      emailOTP({
+        storeOTP: "hashed",
+        sendVerificationOTP: async ({ email, otp, type }) => {
+          if (type === "sign-in") {
+            await hooks.sendEmail({ kind: "sign-in-code", to: email, code: otp });
+          }
+        },
+      }),
+    ],
   });
 }
 

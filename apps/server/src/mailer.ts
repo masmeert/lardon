@@ -40,6 +40,15 @@ const authEmailContent = {
 } as const;
 
 export function authEmail(email: AuthEmail): Email {
+  if (email.kind === "sign-in-code") {
+    return {
+      to: email.to,
+      subject: `${email.code} is your Lardon code`,
+      text: `Enter this code in the Lardon app to sign in:\n\n${email.code}\n\nIt expires in 5 minutes. If you didn't ask for it, you can ignore this email.\n`,
+      html: `<p>Enter this code in the Lardon app to sign in:</p><p style="font-size:28px;font-weight:600;letter-spacing:6px">${email.code}</p><p>It expires in 5 minutes. If you didn't ask for it, you can ignore this email.</p>`,
+    };
+  }
+
   const content = authEmailContent[email.kind];
   const escapedUrl = email.url.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
   const escapedName = email.name.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
