@@ -40,7 +40,18 @@ const AuthenticationLive = Layer.effect(
 
     return Authentication.fromBetterAuth(
       createAuth(ENV, database.client, {
-        sendEmail: (email) => Effect.runPromise(mailer.send(authEmail(email))),
+        sendEmail: (email) =>
+          Effect.runPromise(
+            mailer
+              .send(authEmail(email))
+              .pipe(
+                Effect.andThen(
+                  ENV.LOG_SIGN_IN_CODES === "true" && email.kind === "sign-in-code"
+                    ? Effect.logInfo(`Sign-in code for ${email.to}: ${email.code}`)
+                    : Effect.void,
+                ),
+              ),
+          ),
         beforeDeleteUser: (userId) => Effect.runPromise(accounts.wipe(userId)),
       }),
     );

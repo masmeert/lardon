@@ -22,6 +22,7 @@ export const server = Cloudflare.Worker("server", {
     SYNC_BACKEND: Cloudflare.DurableObject("SyncBackendDO"),
     EMAIL: Cloudflare.Email.SendEmail("Email"),
     EMAIL_FROM: Config.String("EMAIL_FROM"),
+    LOG_SIGN_IN_CODES: Alchemy.ALCHEMY_DEV.pipe(Config.map((isDev) => (isDev ? "true" : "false"))),
     AUTH_RATE_LIMIT: Cloudflare.RateLimit("AUTH_RATE_LIMIT", {
       namespaceId: 1001,
       simple: { limit: 20, period: 60 },
