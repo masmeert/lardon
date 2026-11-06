@@ -1,6 +1,6 @@
 ---
 import Logo from "@lardon/brand/assets/logo.svg";
-import { operator } from "@lardon/brand";
+import { operator, studioUrl } from "@lardon/brand";
 
 interface Props {
   class: string;
@@ -12,7 +12,15 @@ const { class: className } = Astro.props;
 <footer class="overflow-hidden bg-accent-dark text-card/80">
   <div class:list={["mx-auto w-full px-6 pt-10 pb-12", className]}>
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <p class="text-sm">© {new Date().getFullYear()} {operator.tradeName}</p>
+      <p class="text-sm">
+        © {new Date().getFullYear()}{" "}
+        <a
+          href={studioUrl}
+          class="underline underline-offset-2 hover:text-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-card/60"
+        >
+          {operator.tradeName}
+        </a>
+      </p>
       <nav aria-label="Footer" class="flex flex-wrap gap-x-5 gap-y-1 text-sm">
         <a
           href={`mailto:${operator.contactEmail}`}

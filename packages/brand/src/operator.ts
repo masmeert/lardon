@@ -8,3 +8,5 @@ export const operator = {
 };
 
 export const websiteUrl = "https://lardon.app";
+
+export const studioUrl = "https://brol.software";

@@ -1,4 +1,4 @@
-import { colors, operator, websiteUrl } from "@lardon/brand";
+import { colors, operator, studioUrl, websiteUrl } from "@lardon/brand";
 
 export function EmailFooter() {
   return (
@@ -15,7 +15,10 @@ export function EmailFooter() {
           style={{ padding: "40px 24px 48px", color: colors.card, fontSize: 14, lineHeight: 1.6 }}
         >
           <p style={{ margin: 0 }}>
-            © {new Date().getFullYear()} {operator.tradeName}
+            © {new Date().getFullYear()}{" "}
+            <a href={studioUrl} style={{ color: colors.card, textDecoration: "underline" }}>
+              {operator.tradeName}
+            </a>
           </p>
           <p style={{ margin: "8px 0 0", lineHeight: 2 }}>
             {[
