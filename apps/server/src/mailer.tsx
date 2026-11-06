@@ -1,5 +1,8 @@
 import type { AuthEmail } from "@lardon/auth";
 import { Context, Effect } from "effect";
+import { renderToString } from "hono/jsx/dom/server";
+
+import { SignInCodeEmail } from "./emails/sign-in-code-email";
 
 export type Email = { to: string; subject: string; text: string; html: string };
 
@@ -45,7 +48,7 @@ export function authEmail(email: AuthEmail): Email {
       to: email.to,
       subject: `${email.code} is your Lardon code`,
       text: `Enter this code in the Lardon app to sign in:\n\n${email.code}\n\nIt expires in 5 minutes. If you didn't ask for it, you can ignore this email.\n`,
-      html: `<p>Enter this code in the Lardon app to sign in:</p><p style="font-size:28px;font-weight:600;letter-spacing:6px">${email.code}</p><p>It expires in 5 minutes. If you didn't ask for it, you can ignore this email.</p>`,
+      html: renderToString(<SignInCodeEmail code={email.code} />),
     };
   }
 
