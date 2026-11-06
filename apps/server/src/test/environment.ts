@@ -91,6 +91,7 @@ const ImageStorageTest = Layer.effect(
 
           return source !== undefined;
         }),
+      delete: (key) => Effect.sync(() => void images.delete(key)),
       deleteAll: (prefix) =>
         Effect.sync(() => {
           for (const key of images.keys()) if (key.startsWith(prefix)) images.delete(key);

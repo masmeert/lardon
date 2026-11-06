@@ -8,6 +8,7 @@ export class ImageStorage extends Context.Service<
     put(key: string, bytes: Uint8Array, contentType: string): Effect.Effect<void>;
     get(key: string): Effect.Effect<StoredImage | null>;
     copy(sourceKey: string, targetKey: string): Effect.Effect<boolean>;
+    delete(key: string): Effect.Effect<void>;
     deleteAll(prefix: string): Effect.Effect<void>;
   }
 >()("lardon/server/ImageStorage") {
@@ -40,6 +41,7 @@ export class ImageStorage extends Context.Service<
 
         return true;
       }),
+      delete: (key) => Effect.promise(() => bucket.delete(key)),
       deleteAll: Effect.fn("ImageStorage.deleteAll")(function* (prefix: string) {
         let cursor: string | undefined;
 

@@ -1,4 +1,4 @@
-import { Schema, State, makeSchema } from "@livestore/livestore";
+import { type MaterializerContextQuery, Schema, State, makeSchema } from "@livestore/livestore";
 
 import { Nutrition, SectionKind, recipeEvents } from "./events";
 
@@ -22,7 +22,6 @@ export const recipeTables = {
       createdById: State.SQLite.text(),
       createdAt: State.SQLite.integer({ schema: Schema.DateFromMillis }),
       updatedAt: State.SQLite.integer({ schema: Schema.DateFromMillis }),
-      deletedAt,
     },
     indexes: [{ name: "recipes_updatedAt", columns: ["updatedAt"] }],
   }),
@@ -77,10 +76,14 @@ function touchRecipe(recipeId: string, updatedAt: Date) {
   };
 }
 
+function recipeExists(context: { query: MaterializerContextQuery }, recipeId: string) {
+  return context.query(recipeTables.recipes.select("id").where({ id: recipeId })).length > 0;
+}
+
 const materializers = State.SQLite.materializers(recipeEvents, {
   "v1.RecipeCreated": ({ recipeId, ingredientSections, stepSections, createdAt, ...recipe }) => [
     recipeTables.recipes
-      .insert({ ...recipe, id: recipeId, createdAt, updatedAt: createdAt, deletedAt: null })
+      .insert({ ...recipe, id: recipeId, createdAt, updatedAt: createdAt })
       .onConflict("id", "ignore"),
     ...ingredientSections.flatMap(({ sectionId, position, title, ingredients }) => [
       recipeTables.recipeSections
@@ -150,20 +153,24 @@ const materializers = State.SQLite.materializers(recipeEvents, {
     touchRecipe(recipeId, updatedAt),
   ],
 
-  "v1.RecipeDeleted": ({ recipeId, deletedAt }) =>
-    recipeTables.recipes.update({ deletedAt }).where({ id: recipeId }),
-
-  "v1.RecipeRestored": ({ recipeId, updatedAt }) => [
-    recipeTables.recipes.update({ deletedAt: null }).where({ id: recipeId }),
-    touchRecipe(recipeId, updatedAt),
+  "v1.RecipeDeleted": ({ recipeId }) => [
+    recipeTables.steps.delete().where({ recipeId }),
+    recipeTables.ingredients.delete().where({ recipeId }),
+    recipeTables.recipeSections.delete().where({ recipeId }),
+    recipeTables.recipes.delete().where({ id: recipeId }),
   ],
 
-  "v1.RecipeSectionAdded": ({ recipeId, sectionId, kind, title, position, updatedAt }) => [
-    recipeTables.recipeSections
-      .insert({ id: sectionId, recipeId, kind, title, position })
-      .onConflict("id", "ignore"),
-    touchRecipe(recipeId, updatedAt),
-  ],
+  "v1.RecipeErased": () => [],
+
+  "v1.RecipeSectionAdded": ({ recipeId, sectionId, kind, title, position, updatedAt }, context) =>
+    recipeExists(context, recipeId)
+      ? [
+          recipeTables.recipeSections
+            .insert({ id: sectionId, recipeId, kind, title, position })
+            .onConflict("id", "ignore"),
+          touchRecipe(recipeId, updatedAt),
+        ]
+      : [],
 
   "v1.RecipeSectionRenamed": ({ recipeId, sectionId, title, updatedAt }) => [
     recipeTables.recipeSections.update({ title }).where({ id: sectionId }),
@@ -180,12 +187,15 @@ const materializers = State.SQLite.materializers(recipeEvents, {
     touchRecipe(recipeId, deletedAt),
   ],
 
-  "v1.IngredientAdded": ({ recipeId, ingredientId, updatedAt, ...ingredient }) => [
-    recipeTables.ingredients
-      .insert({ ...ingredient, id: ingredientId, recipeId })
-      .onConflict("id", "ignore"),
-    touchRecipe(recipeId, updatedAt),
-  ],
+  "v1.IngredientAdded": ({ recipeId, ingredientId, updatedAt, ...ingredient }, context) =>
+    recipeExists(context, recipeId)
+      ? [
+          recipeTables.ingredients
+            .insert({ ...ingredient, id: ingredientId, recipeId })
+            .onConflict("id", "ignore"),
+          touchRecipe(recipeId, updatedAt),
+        ]
+      : [],
 
   "v1.IngredientUpdated": ({ recipeId, ingredientId, updatedAt, ...changes }) =>
     Object.keys(changes).length === 0
@@ -205,12 +215,15 @@ const materializers = State.SQLite.materializers(recipeEvents, {
     touchRecipe(recipeId, deletedAt),
   ],
 
-  "v1.StepAdded": ({ recipeId, sectionId, stepId, position, text, updatedAt }) => [
-    recipeTables.steps
-      .insert({ id: stepId, recipeId, sectionId, position, text })
-      .onConflict("id", "ignore"),
-    touchRecipe(recipeId, updatedAt),
-  ],
+  "v1.StepAdded": ({ recipeId, sectionId, stepId, position, text, updatedAt }, context) =>
+    recipeExists(context, recipeId)
+      ? [
+          recipeTables.steps
+            .insert({ id: stepId, recipeId, sectionId, position, text })
+            .onConflict("id", "ignore"),
+          touchRecipe(recipeId, updatedAt),
+        ]
+      : [],
 
   "v1.StepEdited": ({ recipeId, stepId, text, updatedAt }) => [
     recipeTables.steps.update({ text }).where({ id: stepId }),

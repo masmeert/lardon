@@ -26,15 +26,9 @@ export type RecipeDocument = {
   imageKey: string | null;
 };
 
-export const recipes$ = queryDb(
-  recipeTables.recipes.where({ deletedAt: null }).orderBy("updatedAt", "desc"),
-  { label: "recipes" },
-);
-
-export const deletedRecipes$ = queryDb(
-  recipeTables.recipes.where({ deletedAt: { op: "!=", value: null } }).orderBy("deletedAt", "desc"),
-  { label: "deletedRecipes" },
-);
+export const recipes$ = queryDb(recipeTables.recipes.orderBy("updatedAt", "desc"), {
+  label: "recipes",
+});
 
 export function recipe$(recipeId: string) {
   return queryDb(recipeTables.recipes.where({ id: recipeId }).first({ behaviour: "undefined" }), {
@@ -70,7 +64,7 @@ export function readRecipeDocument(
 ): RecipeDocument | null {
   const recipe = store.query(recipe$(recipeId));
 
-  if (!recipe || recipe.deletedAt) return null;
+  if (!recipe) return null;
   const sections = store.query(recipeSections$(recipeId));
   const ingredients = store.query(recipeIngredients$(recipeId));
   const steps = store.query(recipeSteps$(recipeId));

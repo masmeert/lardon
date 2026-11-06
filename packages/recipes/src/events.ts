@@ -168,9 +168,9 @@ export const recipeEvents = {
     schema: Schema.Struct({ recipeId: Id, deletedAt: Schema.DateFromString }),
   }),
 
-  recipeRestored: Events.synced({
-    name: "v1.RecipeRestored",
-    schema: Schema.Struct({ recipeId: Id, updatedAt: Schema.DateFromString }),
+  recipeErased: Events.synced({
+    name: "v1.RecipeErased",
+    schema: Schema.Struct({ recipeId: Id }),
   }),
 
   recipeSectionAdded: Events.synced({

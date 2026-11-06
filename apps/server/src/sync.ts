@@ -3,6 +3,7 @@ import { RecipeSyncPayload } from "@lardon/recipes/sync-payload";
 import {
   type Env,
   type ForwardedHeaders,
+  PERSISTENCE_FORMAT_VERSION,
   handleSyncRequest,
   makeDurableObject,
   matchSyncRequest,
@@ -15,9 +16,13 @@ import { set, withLogger } from "evlog/effect";
 import { Authentication } from "./authentication";
 import { ENV } from "./env.server";
 import { Families } from "./families";
+import { ImageStorage } from "./image-storage";
 import { serverRuntime } from "./layers";
 import { RateLimits, tooManyRequests } from "./rate-limits";
+import { eraseDeletedRecipes, staleImageKeys, trackRecipeEvents } from "./recipe-erasure";
 import { inEuropeanUnion } from "./recipe-store-backend";
+
+const syncBackendStates = new Map<string, DurableObjectState>();
 
 function authorizeRecipeStore(
   phase: "connect" | "push" | "pull",
@@ -89,12 +94,50 @@ export class SyncBackendDO extends makeDurableObject({
       );
       throw rejection;
     }
+
+    const state = syncBackendStates.get(
+      inEuropeanUnion(ENV.SYNC_BACKEND).idFromName(storeId).toString(),
+    );
+
+    if (!state) throw new Error(`The sync backend for ${storeId} isn't running in this isolate.`);
+
+    if (trackRecipeEvents(state.storage.sql, message.batch)) {
+      state.storage.kv.put("storeId", storeId);
+      await state.storage.setAlarm(Date.now() + 5_000);
+    }
   },
   onPull: async (_message, { storeId, headers, payload }) => {
     await authorizeRecipeStore("pull", headers, payload, storeId);
   },
 }) {
   declare readonly ctx: DurableObjectState;
+
+  constructor(...args: ConstructorParameters<ReturnType<typeof makeDurableObject>>) {
+    super(...args);
+    syncBackendStates.set(this.ctx.id.toString(), this.ctx);
+  }
+
+  async alarm() {
+    const storage = this.ctx.storage;
+    const storeId = storage.kv.get<string>("storeId");
+
+    if (storeId === undefined) return;
+    const eventlog = `eventlog_${PERSISTENCE_FORMAT_VERSION}_${storeId.replaceAll(/[^a-zA-Z0-9]/g, "_")}`;
+
+    await serverRuntime.runPromise(
+      Effect.gen(function* () {
+        const imageKeys = staleImageKeys(storage.sql, eventlog, storeId);
+        const images = yield* ImageStorage;
+        yield* Effect.forEach(imageKeys, (imageKey) => images.delete(imageKey), { discard: true });
+
+        const erasedRecipeIds = storage.transactionSync(() =>
+          eraseDeletedRecipes(storage.sql, eventlog),
+        );
+
+        yield* set({ erasedRecipes: erasedRecipeIds.length, deletedImages: imageKeys.length });
+      }).pipe(withLogger("sync.erase", { fields: { storeId } })),
+    );
+  }
 
   async deleteStore() {
     for (const socket of this.ctx.getWebSockets()) {

@@ -17,20 +17,14 @@ import {
   removeRecipeSection,
   removeRecipeTag,
   renameRecipeSection,
-  restoreRecipe,
   setRecipeImage,
   setRecipeNutrition,
   updateIngredient,
   updateRecipeDetails,
 } from "../commands";
 import { recipeEvents } from "../events";
-import {
-  deletedRecipes$,
-  readRecipeDocument,
-  recipe$,
-  recipeSections$,
-  recipes$,
-} from "../queries";
+import { readRecipeDocument, recipe$, recipeSections$, recipes$ } from "../queries";
+import { recipeTables } from "../schema";
 import { createTestStore } from "./store";
 
 function sectionIds(store: Awaited<ReturnType<typeof createTestStore>>, recipeId: string) {
@@ -53,7 +47,6 @@ describe("recipe commands", () => {
       title: "Pancakes",
       createdById: "alice",
       tags: [],
-      deletedAt: null,
     });
     expect(readRecipeDocument(store, recipeId)).toEqual({
       title: "Pancakes",
@@ -224,17 +217,64 @@ describe("recipe commands", () => {
     ]);
   });
 
-  it("soft-deletes and restores recipes", async () => {
+  it("deletes recipes for good, including edits that arrive afterwards", async () => {
     const store = await createTestStore();
-    const recipeId = createRecipe(store, { title: "Pie", createdById: "alice" });
+    const kept = createRecipe(store, { title: "Soup", createdById: "alice" });
+
+    const recipeId = createRecipe(store, {
+      title: "Pie",
+      createdById: "alice",
+      ingredients: [
+        {
+          title: "Crust",
+          ingredients: [{ quantity: null, unit: null, name: "flour", note: null }],
+        },
+      ],
+      steps: [{ title: null, steps: [{ text: "Bake." }] }],
+    });
+
+    const {
+      ingredients: [ingredientSectionId],
+      steps: [stepSectionId],
+    } = sectionIds(store, recipeId);
 
     deleteRecipe(store, recipeId);
-    expect(store.query(recipes$)).toEqual([]);
-    expect(store.query(deletedRecipes$).map((recipe) => recipe.id)).toEqual([recipeId]);
-    expect(readRecipeDocument(store, recipeId)).toBeNull();
+    store.commit(
+      recipeEvents.recipeSectionAdded({
+        recipeId,
+        sectionId: "late-section",
+        kind: "steps",
+        title: "Late",
+        position: "a5",
+        updatedAt: new Date(),
+      }),
+      recipeEvents.ingredientAdded({
+        recipeId,
+        sectionId: ingredientSectionId!,
+        ingredientId: "late-ingredient",
+        position: "a5",
+        quantity: null,
+        unit: null,
+        name: "butter",
+        note: null,
+        updatedAt: new Date(),
+      }),
+      recipeEvents.stepAdded({
+        recipeId,
+        sectionId: stepSectionId!,
+        stepId: "late-step",
+        position: "a5",
+        text: "Cool.",
+        updatedAt: new Date(),
+      }),
+    );
 
-    restoreRecipe(store, recipeId);
-    expect(store.query(recipes$).map((recipe) => recipe.id)).toEqual([recipeId]);
+    expect(store.query(recipes$).map((recipe) => recipe.id)).toEqual([kept]);
+    expect(store.query(recipe$(recipeId))).toBeUndefined();
+    expect(readRecipeDocument(store, recipeId)).toBeNull();
+    expect(store.query(recipeTables.recipeSections.where({ recipeId }))).toEqual([]);
+    expect(store.query(recipeTables.ingredients.where({ recipeId }))).toEqual([]);
+    expect(store.query(recipeTables.steps.where({ recipeId }))).toEqual([]);
   });
 
   it("copies and moves recipes between stores", async () => {
@@ -253,7 +293,7 @@ describe("recipe commands", () => {
     expect(personal.query(recipe$(copyId!))?.title).toBe("Stew (copy)");
 
     const movedId = moveRecipe(personal, family, recipeId, "bob");
-    expect(personal.query(recipe$(recipeId))?.deletedAt).not.toBeNull();
+    expect(personal.query(recipe$(recipeId))).toBeUndefined();
     expect(family.query(recipe$(movedId!))).toMatchObject({ title: "Stew", createdById: "bob" });
     expect(readRecipeDocument(family, movedId!)?.ingredients).toEqual(
       readRecipeDocument(personal, copyId!)?.ingredients,

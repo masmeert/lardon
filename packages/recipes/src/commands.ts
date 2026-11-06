@@ -154,10 +154,6 @@ export function deleteRecipe(store: RecipeStore, recipeId: string) {
   store.commit(recipeEvents.recipeDeleted({ recipeId, deletedAt: new Date() }));
 }
 
-export function restoreRecipe(store: RecipeStore, recipeId: string) {
-  store.commit(recipeEvents.recipeRestored({ recipeId, updatedAt: new Date() }));
-}
-
 export function addRecipeSection(
   store: RecipeStore,
   recipeId: string,
