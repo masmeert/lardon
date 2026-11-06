@@ -1,3 +1,6 @@
+const { createHash } = require("node:crypto");
+const { readFileSync } = require("node:fs");
+const path = require("node:path");
 const { withVarlockMetroConfig } = require("@varlock/expo-integration/metro-config");
 const { getDefaultConfig } = require("expo/metro-config");
 const { withUniwindConfig } = require("uniwind/metro");
@@ -5,6 +8,11 @@ const { wrapWithReanimatedMetroConfig } = require("react-native-reanimated/metro
 
 /** @type {import('expo/metro-config').MetroConfig} */
 const config = getDefaultConfig(__dirname);
+
+config.cacheVersion = createHash("sha256")
+  .update(process.env.APP_ENV ?? "development")
+  .update(readFileSync(path.join(__dirname, ".env.schema"), "utf8"))
+  .digest("hex");
 
 // Alchemy writes runtime state here; block it to avoid Metro refresh loops.
 const blockList = config.resolver.blockList ?? [];
