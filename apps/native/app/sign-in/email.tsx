@@ -57,7 +57,7 @@ export default function EmailScreen() {
       <View className="flex-1 gap-5 px-6 pt-10">
         <View className="gap-1">
           <Text className="text-xl font-medium text-foreground">What's your email?</Text>
-          <Text className="text-[15px] leading-[22px] text-muted">
+          <Text className="text-[15px] leading-5.5 text-muted">
             We'll send you a 6-digit code to sign in. No password to remember.
           </Text>
         </View>

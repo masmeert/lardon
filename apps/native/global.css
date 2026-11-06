@@ -67,6 +67,7 @@
   --font-medium: "HankenGrotesk_500Medium";
   --font-semibold: "HankenGrotesk_600SemiBold";
   --font-bold: "HankenGrotesk_700Bold";
+  --font-handwritten: "ReenieBeanie_400Regular";
 }
 
 @theme inline static {

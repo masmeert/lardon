@@ -1,4 +1,5 @@
 import "@/global.css";
+import { ReenieBeanie_400Regular } from "@expo-google-fonts/reenie-beanie";
 import {
   HankenGrotesk_400Regular,
   HankenGrotesk_500Medium,
@@ -25,6 +26,7 @@ function StackLayout() {
     HankenGrotesk_500Medium,
     HankenGrotesk_600SemiBold,
     HankenGrotesk_700Bold,
+    ReenieBeanie_400Regular,
   });
 
   const areFontsReady = fontsLoaded || fontError !== null;

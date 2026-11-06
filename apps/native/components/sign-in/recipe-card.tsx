@@ -1,6 +1,6 @@
-import { cn, Typography } from "heroui-native";
+import { cn } from "heroui-native";
 import { useEffect } from "react";
-import { View } from "react-native";
+import { Text, View } from "react-native";
 import Animated, {
   Easing,
   interpolate,
@@ -12,24 +12,20 @@ import Animated, {
 } from "react-native-reanimated";
 
 type Props = {
-  emoji: string;
-  name: string;
-  cookingTime: string;
-  tint: string;
+  recipe: { emoji: string; title: string; ingredients: readonly string[] };
+  ruledLineCount: number;
+  isFeatured: boolean;
   className: string;
-  emojiClassName: string;
   rotationDeg: number;
   floatDistancePt: number;
   floatPeriodMs: number;
 };
 
 export function RecipeCard({
-  emoji,
-  name,
-  cookingTime,
-  tint,
+  recipe,
+  ruledLineCount,
+  isFeatured,
   className,
-  emojiClassName,
   rotationDeg,
   floatDistancePt,
   floatPeriodMs,
@@ -65,15 +61,46 @@ export function RecipeCard({
   return (
     <Animated.View
       style={floatStyle}
-      className={cn("rounded-3xl bg-surface p-2 shadow-surface", className)}
+      className={cn(
+        "overflow-hidden rounded-md border-[0.5px] border-border bg-[#FFFDF6] pb-3 pl-8 pr-3 pt-3 shadow-surface",
+        className,
+      )}
     >
-      <View className={cn("aspect-square items-center justify-center rounded-2xl", tint)}>
-        <Typography className={emojiClassName}>{emoji}</Typography>
+      <View className="absolute bottom-0 left-6 top-0 w-px bg-danger/40" />
+      <Text
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        className={cn(
+          "pr-1.5 font-handwritten text-foreground",
+          isFeatured ? "text-[34px] leading-9" : "text-[25px] leading-7.5",
+        )}
+      >
+        {recipe.title}
+      </Text>
+      <View className="mt-1">
+        {Array.from({ length: ruledLineCount }, (_, index) => (
+          <View
+            key={index}
+            className={cn(
+              "-ml-8 -mr-3 justify-end border-b border-accent-soft pl-8 pr-3",
+              isFeatured ? "h-6.5" : "h-5.5",
+            )}
+          >
+            <Text
+              numberOfLines={1}
+              className={cn(
+                "font-handwritten text-foreground/70",
+                isFeatured ? "text-[25px] leading-6.5" : "text-[20px] leading-5.5",
+              )}
+            >
+              {recipe.ingredients[index] ?? ""}
+            </Text>
+          </View>
+        ))}
       </View>
-      <Typography numberOfLines={1} className="mt-2 px-1 text-sm font-medium text-foreground">
-        {name}
-      </Typography>
-      <Typography className="px-1 pb-1 text-xs text-muted">{cookingTime}</Typography>
+      <Text className={cn("absolute bottom-2 right-2.5", isFeatured ? "text-4xl" : "text-2xl")}>
+        {recipe.emoji}
+      </Text>
     </Animated.View>
   );
 }
