@@ -37,6 +37,8 @@ export default function SignInScreen() {
       .then(
         async (credential) => {
           if (!credential.identityToken) {
+            logRequestFailure("Apple authorization", new Error("Apple returned no identity token"));
+
             return "MISSING_TOKEN";
           }
 
@@ -56,10 +58,17 @@ export default function SignInScreen() {
 
           return signInError ? (signInError.code ?? "UNKNOWN") : undefined;
         },
-        (appleError) =>
-          Schema.is(Schema.Struct({ code: Schema.Literal("ERR_REQUEST_CANCELED") }))(appleError)
-            ? undefined
-            : "UNKNOWN",
+        (appleError) => {
+          if (
+            Schema.is(Schema.Struct({ code: Schema.Literal("ERR_REQUEST_CANCELED") }))(appleError)
+          ) {
+            return undefined;
+          }
+
+          logRequestFailure("Apple authorization", appleError);
+
+          return "UNKNOWN";
+        },
       )
       .catch((error) => {
         logRequestFailure("Apple sign-in", error);
