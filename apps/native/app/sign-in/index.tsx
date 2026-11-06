@@ -9,6 +9,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { InlineError } from "@/components/inline-error";
 import { Hero } from "@/components/sign-in/hero";
+import { LegalFooter } from "@/components/sign-in/legal-footer";
 import { authClient } from "@/lib/auth-client";
 
 export default function SignInScreen() {
@@ -150,6 +151,8 @@ export default function SignInScreen() {
           </Button>
         </View>
       </View>
+
+      <LegalFooter />
     </View>
   );
 }
