@@ -215,6 +215,9 @@ importers:
       '@lardon/config':
         specifier: workspace:*
         version: link:packages/config
+      '@oxlint/plugins':
+        specifier: 1.89.0
+        version: 1.89.0
       '@types/node':
         specifier: 'catalog:'
         version: 26.6.6
