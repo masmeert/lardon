@@ -9,16 +9,16 @@ export type RecipeDocument = {
   servingsUnit: string | null;
   prepTimeMinutes: number | null;
   cookTimeMinutes: number | null;
-  ingredients: {
+  ingredients: ReadonlyArray<{
     title: string | null;
-    ingredients: {
+    ingredients: ReadonlyArray<{
       quantity: number | null;
       unit: string | null;
       name: string;
       note: string | null;
-    }[];
-  }[];
-  steps: { title: string | null; steps: { text: string }[] }[];
+    }>;
+  }>;
+  steps: ReadonlyArray<{ title: string | null; steps: ReadonlyArray<{ text: string }> }>;
   nutrition: Nutrition | null;
   tags: readonly string[];
   notes: string | null;

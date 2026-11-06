@@ -83,7 +83,7 @@ class PdfLayout {
         output += WIN_ANSI_FALLBACKS[character];
       } else {
         const base = character.normalize("NFKD").replace(/[\u0300-\u036f]/g, "");
-        if ([...base].every((part) => this.supportedCodePoints.has(part.codePointAt(0)!))) {
+        if (Array.from(base).every((part) => this.supportedCodePoints.has(part.codePointAt(0)!))) {
           output += base;
         } else if (/\p{Extended_Pictographic}|\p{M}|\u200d|\ufe0f/u.test(character)) {
           output += DROPPED_CHARACTER;

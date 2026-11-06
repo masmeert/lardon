@@ -14,6 +14,8 @@ import { useRef } from "react";
 import { Text, View } from "react-native";
 import { Schema } from "effect";
 
+import * as Linking from "expo-linking";
+
 import { authClient } from "@/lib/auth-client";
 import { Email, Name, Password } from "@/lib/credentials";
 
@@ -68,6 +70,7 @@ export function SignUp() {
           name: value.name.trim(),
           email: value.email.trim(),
           password: value.password,
+          callbackURL: Linking.createURL("/"),
         },
         {
           onError(error) {
@@ -80,7 +83,7 @@ export function SignUp() {
             formApi.reset();
             toast.show({
               variant: "success",
-              label: "Account created successfully",
+              label: "Check your inbox and confirm your email address to finish signing up.",
             });
           },
         },
@@ -167,13 +170,17 @@ export function SignUp() {
                         autoComplete="new-password"
                         textContentType="newPassword"
                         returnKeyType="go"
-                        onSubmitEditing={form.handleSubmit}
+                        onSubmitEditing={() => void form.handleSubmit()}
                       />
                     </TextField>
                   )}
                 </form.Field>
 
-                <Button onPress={form.handleSubmit} isDisabled={isSubmitting} className="mt-1">
+                <Button
+                  onPress={() => void form.handleSubmit()}
+                  isDisabled={isSubmitting}
+                  className="mt-1"
+                >
                   {isSubmitting ? (
                     <Spinner size="sm" color="default" />
                   ) : (

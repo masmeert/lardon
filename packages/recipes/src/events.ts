@@ -53,7 +53,23 @@ export const SectionKind = Schema.Literals(["ingredients", "steps"]);
 
 export type SectionKind = typeof SectionKind.Type;
 
-const IngredientFields = {
+export const RecipeDetailsFields = {
+  title: Title,
+  servings: Servings,
+  servingsUnit: ServingsUnit,
+  prepTimeMinutes: Minutes,
+  cookTimeMinutes: Minutes,
+  notes: Notes,
+  sourceUrl: SourceUrl,
+};
+
+export const SectionFields = { title: SectionTitle };
+
+export const StepFields = { text: StepText };
+
+export const TagList = Schema.Array(text(40)).check(Schema.isMaxLength(30));
+
+export const IngredientFields = {
   quantity: Quantity,
   unit: Unit,
   name: IngredientName,

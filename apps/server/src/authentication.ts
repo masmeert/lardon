@@ -6,6 +6,7 @@ export class Authentication extends Context.Service<
   Authentication,
   {
     userFromHeaders(headers: Headers): Effect.Effect<User | null>;
+    handle(request: Request): Effect.Effect<Response>;
   }
 >()("lardon/server/Authentication") {
   static fromBetterAuth(auth: ReturnType<typeof createAuth>) {
@@ -21,6 +22,7 @@ export class Authentication extends Context.Service<
             }
           : null;
       }),
+      handle: (request) => Effect.promise(() => auth.handler(request)),
     });
   }
 }

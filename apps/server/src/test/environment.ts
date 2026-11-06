@@ -3,18 +3,28 @@ import { user } from "@lardon/db/schema/auth";
 import { createTestDatabase } from "@lardon/db/testing";
 import { eq } from "@lardon/db/orm";
 import { Context, Effect, Layer, type Scope } from "effect";
-import { HttpClientRequest, HttpServer } from "effect/http";
+import { HttpClientRequest, HttpRouter, HttpServer } from "effect/http";
 import { HttpApiMiddleware, HttpApiTest } from "effect/http-api";
 
+import { Accounts } from "../accounts";
 import { Authentication } from "../authentication";
 import { Database } from "../database";
+import { Families } from "../families";
 import { ApiHandlers } from "../http/api";
+import { AppRoutes } from "../http/app";
 import { ImageStorage, type StoredImage } from "../image-storage";
+import { RateLimits } from "../rate-limits";
 import { RecipeStoreBackend } from "../recipe-store-backend";
 
 export class DeletedStores extends Context.Service<DeletedStores, string[]>()(
   "lardon/server/test/DeletedStores",
 ) {}
+
+export class RateLimitCounts extends Context.Service<RateLimitCounts, Map<string, number>>()(
+  "lardon/server/test/RateLimitCounts",
+) {}
+
+export const TEST_RATE_LIMITS = { auth: 3, sensitive: 3, api: 1000 } as const;
 
 export class StoredImages extends Context.Service<
   StoredImages,
@@ -23,7 +33,7 @@ export class StoredImages extends Context.Service<
 
 const DatabaseTest = Layer.effect(
   Database,
-  Effect.promise(() => createTestDatabase()).pipe(Effect.map(Database.make)),
+  Effect.promise(() => createTestDatabase()).pipe(Effect.map((client) => Database.make(client))),
 );
 
 const AuthenticationTest = Layer.effect(
@@ -42,6 +52,10 @@ const AuthenticationTest = Layer.effect(
             ? { id: row.id, name: row.name, email: row.email, image: row.image ?? null }
             : null;
         }),
+      handle: (request) =>
+        Effect.succeed(
+          Response.json({ handledBy: "better-auth", path: new URL(request.url).pathname }),
+        ),
     });
   }),
 );
@@ -63,6 +77,16 @@ const ImageStorageTest = Layer.effect(
     return ImageStorage.of({
       put: (key, bytes, contentType) =>
         Effect.sync(() => void images.set(key, { bytes, contentType })),
+      copy: (sourceKey, targetKey) =>
+        Effect.sync(() => {
+          const source = images.get(sourceKey);
+          if (source) images.set(targetKey, source);
+          return source !== undefined;
+        }),
+      deleteAll: (prefix) =>
+        Effect.sync(() => {
+          for (const key of images.keys()) if (key.startsWith(prefix)) images.delete(key);
+        }),
       get: (key) =>
         Effect.sync((): StoredImage | null => {
           const image = images.get(key);
@@ -74,12 +98,42 @@ const ImageStorageTest = Layer.effect(
   }),
 );
 
-export const TestServer = Layer.mergeAll(ApiHandlers, HttpServer.layerServices).pipe(
-  Layer.provideMerge(Layer.mergeAll(AuthenticationTest, RecipeStoreBackendTest, ImageStorageTest)),
+const RateLimitsTest = Layer.effect(
+  RateLimits,
+  Effect.gen(function* () {
+    const counts = yield* RateLimitCounts;
+    return RateLimits.of({
+      allow: (rule, key) =>
+        Effect.sync(() => {
+          const count = (counts.get(`${rule}:${key}`) ?? 0) + 1;
+          counts.set(`${rule}:${key}`, count);
+          return count <= TEST_RATE_LIMITS[rule];
+        }),
+    });
+  }),
+);
+
+export const TestServices = Accounts.layer.pipe(
+  Layer.provideMerge(Families.layer),
+  Layer.provideMerge(
+    Layer.mergeAll(AuthenticationTest, RecipeStoreBackendTest, ImageStorageTest, RateLimitsTest),
+  ),
   Layer.provideMerge(DatabaseTest),
   Layer.provideMerge(Layer.sync(DeletedStores, () => [])),
   Layer.provideMerge(Layer.sync(StoredImages, () => new Map())),
+  Layer.provideMerge(Layer.sync(RateLimitCounts, () => new Map())),
 );
+
+export const TestServer = Layer.mergeAll(ApiHandlers, HttpServer.layerServices).pipe(
+  Layer.provideMerge(TestServices),
+);
+
+export function testWebHandler() {
+  return HttpRouter.toWebHandler(
+    AppRoutes.pipe(Layer.provide(TestServices), Layer.provide(HttpServer.layerServices)),
+    { disableLogger: true },
+  );
+}
 
 export function signedInAs(userId: string | null) {
   return HttpApiMiddleware.layerClient(Authorization, ({ next, request }) =>

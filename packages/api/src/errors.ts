@@ -23,3 +23,9 @@ export class InvalidRequest extends Schema.TaggedError<InvalidRequest>()(
   { message: Schema.String },
   { httpApiStatus: 400 },
 ) {}
+
+export class TooManyRequests extends Schema.TaggedError<TooManyRequests>()(
+  "TooManyRequests",
+  { message: Schema.String },
+  { httpApiStatus: 429 },
+) {}

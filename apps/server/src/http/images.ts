@@ -54,8 +54,20 @@ export const ImageUploadHandlers = HttpApiBuilder.group(
             message: "The image must be a JPEG, PNG or WebP file.",
           });
         }
-        const imageKey = `${crypto.randomUUID()}.${imageType.extension}`;
+        const imageKey = `${params.storeId}/${crypto.randomUUID()}.${imageType.extension}`;
         yield* storage.put(imageKey, payload, imageType.contentType);
+        return { imageKey };
+      }),
+      copy: Effect.fn("images.copy")(function* ({ params, payload }) {
+        const user = yield* CurrentUser;
+        const [sourceStoreId, fileName] = payload.imageKey.split("/") as [string, string];
+        const allowed =
+          (yield* families.canAccessRecipeStore(user.id, params.storeId)) &&
+          (yield* families.canAccessRecipeStore(user.id, sourceStoreId));
+        const imageKey = `${params.storeId}/${crypto.randomUUID()}.${fileName.split(".")[1]}`;
+        if (!allowed || !(yield* storage.copy(payload.imageKey, imageKey))) {
+          return yield* new NotFound({ message: "This picture doesn't exist." });
+        }
         return { imageKey };
       }),
     });
@@ -69,7 +81,7 @@ export const ImageDownloadHandlers = HttpApiBuilder.group(
     const storage = yield* ImageStorage;
     return handlers.handleRaw("download", ({ params }) =>
       Effect.gen(function* () {
-        const image = yield* storage.get(params.imageKey);
+        const image = yield* storage.get(`${params.storeId}/${params.fileName}`);
         if (!image) return yield* new NotFound({ message: "This picture doesn't exist." });
         return HttpServerResponse.fromWeb(
           new Response(image.body, {

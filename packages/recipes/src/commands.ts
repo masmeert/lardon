@@ -348,16 +348,20 @@ export function removeStep(store: RecipeStore, recipeId: string, stepId: string)
   store.commit(recipeEvents.stepRemoved({ recipeId, stepId, deletedAt: new Date() }));
 }
 
+export type CopyOverrides = { imageKey?: string | null };
+
 export function copyRecipe(
   source: RecipeStore,
   target: RecipeStore,
   recipeId: string,
   createdById: string,
+  overrides: CopyOverrides = {},
 ) {
   const document = readRecipeDocument(source, recipeId);
   if (!document) return null;
   return createRecipe(target, {
     ...document,
+    ...overrides,
     title: source === target ? `${document.title} (copy)` : document.title,
     createdById,
   });
@@ -368,9 +372,10 @@ export function moveRecipe(
   target: RecipeStore,
   recipeId: string,
   createdById: string,
+  overrides: CopyOverrides = {},
 ) {
   if (source === target || !source.query(recipe$(recipeId))) return recipeId;
-  const movedId = copyRecipe(source, target, recipeId, createdById);
+  const movedId = copyRecipe(source, target, recipeId, createdById, overrides);
   if (movedId) deleteRecipe(source, recipeId);
   return movedId;
 }

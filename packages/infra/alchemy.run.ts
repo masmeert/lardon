@@ -57,6 +57,20 @@ export const server = Cloudflare.Worker("server", {
     DB: db,
     IMAGES: images,
     SYNC_BACKEND: Cloudflare.DurableObject("SyncBackendDO"),
+    EMAIL: Cloudflare.Email.SendEmail("Email"),
+    EMAIL_FROM: Config.String("EMAIL_FROM"),
+    AUTH_RATE_LIMIT: Cloudflare.RateLimit("AUTH_RATE_LIMIT", {
+      namespaceId: 1001,
+      simple: { limit: 20, period: 60 },
+    }),
+    SENSITIVE_RATE_LIMIT: Cloudflare.RateLimit("SENSITIVE_RATE_LIMIT", {
+      namespaceId: 1002,
+      simple: { limit: 30, period: 60 },
+    }),
+    API_RATE_LIMIT: Cloudflare.RateLimit("API_RATE_LIMIT", {
+      namespaceId: 1003,
+      simple: { limit: 600, period: 60 },
+    }),
     CORS_ORIGIN: Config.String("CORS_ORIGIN"),
     BETTER_AUTH_SECRET: Config.Redacted("BETTER_AUTH_SECRET"),
     BETTER_AUTH_URL: Cloudflare.Worker.URL,

@@ -1,6 +1,7 @@
 import { Authorization, CurrentUser, Unauthorized } from "@lardon/api";
 import { Effect, Layer } from "effect";
 import { HttpServerRequest } from "effect/http";
+import { set } from "evlog/effect";
 
 import { Authentication } from "../authentication";
 
@@ -15,6 +16,7 @@ export const AuthorizationLive = Layer.effect(
           new Headers(request.headers as Record<string, string>),
         );
         if (!user) return yield* new Unauthorized({ message: "Sign in to continue." });
+        yield* set({ user: { id: user.id } });
         return yield* Effect.provideService(httpEffect, CurrentUser, user);
       }),
     );

@@ -14,6 +14,7 @@ import { familyStoreId, parseStoreId } from "@lardon/recipes/store-id";
 import { Clock, Context, Effect, Layer } from "effect";
 
 import { Database } from "./database";
+import { ImageStorage } from "./image-storage";
 import { formatInviteCode, generateInviteCode, normalizeInviteCode } from "./invite-code";
 import { RecipeStoreBackend } from "./recipe-store-backend";
 
@@ -55,6 +56,7 @@ export class Families extends Context.Service<
     Effect.gen(function* () {
       const database = yield* Database;
       const recipeStores = yield* RecipeStoreBackend;
+      const images = yield* ImageStorage;
 
       const requireMember = Effect.fn("Families.requireMember")(function* (
         familyId: string,
@@ -125,6 +127,7 @@ export class Families extends Context.Service<
       const destroy = Effect.fn("Families.destroy")(function* (familyId: string) {
         yield* database.use((client) => client.delete(family).where(eq(family.id, familyId)));
         yield* recipeStores.deleteStore(familyStoreId(familyId));
+        yield* images.deleteAll(`${familyStoreId(familyId)}/`);
       });
 
       return Families.of({

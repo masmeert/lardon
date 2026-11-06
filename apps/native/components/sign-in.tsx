@@ -14,6 +14,8 @@ import { useRef } from "react";
 import { Text, View } from "react-native";
 import { Schema } from "effect";
 
+import * as Linking from "expo-linking";
+
 import { authClient } from "@/lib/auth-client";
 import { Email, Password } from "@/lib/credentials";
 
@@ -63,12 +65,16 @@ function SignIn() {
         {
           email: value.email.trim(),
           password: value.password,
+          callbackURL: Linking.createURL("/"),
         },
         {
           onError(error) {
             toast.show({
               variant: "danger",
-              label: error.error?.message || "Failed to sign in",
+              label:
+                error.error?.code === "EMAIL_NOT_VERIFIED"
+                  ? "Confirm your email address first. We just sent you a new link."
+                  : error.error?.message || "Failed to sign in",
             });
           },
           onSuccess() {
@@ -140,13 +146,17 @@ function SignIn() {
                         autoComplete="password"
                         textContentType="password"
                         returnKeyType="go"
-                        onSubmitEditing={form.handleSubmit}
+                        onSubmitEditing={() => void form.handleSubmit()}
                       />
                     </TextField>
                   )}
                 </form.Field>
 
-                <Button onPress={form.handleSubmit} isDisabled={isSubmitting} className="mt-1">
+                <Button
+                  onPress={() => void form.handleSubmit()}
+                  isDisabled={isSubmitting}
+                  className="mt-1"
+                >
                   {isSubmitting ? (
                     <Spinner size="sm" color="default" />
                   ) : (

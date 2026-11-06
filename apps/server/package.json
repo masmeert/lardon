@@ -17,7 +17,6 @@
     "better-auth": "catalog:",
     "effect": "catalog:",
     "evlog": "^2.33.1",
-    "hono": "^4.13.7",
     "varlock": "catalog:"
   },
   "devDependencies": {

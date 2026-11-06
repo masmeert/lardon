@@ -66,11 +66,12 @@ describe("images", () => {
           params: { storeId: personalStoreId(alice.id) },
           payload: TINY_PNG,
         });
-        expect(imageKey).toMatch(/^[0-9a-f-]{36}\.png$/);
+        expect(imageKey).toMatch(new RegExp(`^${personalStoreId(alice.id)}/[0-9a-f-]{36}\\.png$`));
         expect(images.get(imageKey)?.contentType).toBe("image/png");
 
         const anonymous = yield* clientFor(null);
-        const downloaded = yield* anonymous.imageFiles.download({ params: { imageKey } });
+        const [storeId, fileName] = imageKey.split("/") as [string, string];
+        const downloaded = yield* anonymous.imageFiles.download({ params: { storeId, fileName } });
         expect([...downloaded]).toEqual([...TINY_PNG]);
 
         const foreign = yield* bob.api.images

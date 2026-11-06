@@ -10,24 +10,45 @@ export type AuthConfig = {
   CORS_ORIGIN: string;
 };
 
-export function createAuth(
-  env: AuthConfig,
-  database: Database,
-  desktopOrigins: readonly string[] = [],
-) {
+export type AuthEmail = {
+  kind: "verify-email" | "reset-password";
+  to: string;
+  name: string;
+  url: string;
+};
+
+export type AuthHooks = {
+  sendEmail(email: AuthEmail): Promise<void>;
+  beforeDeleteUser(userId: string): Promise<void>;
+};
+
+export function createAuth(env: AuthConfig, database: Database, hooks: AuthHooks) {
   return betterAuth({
     database: drizzleAdapter(database, {
       provider: "sqlite",
       schema,
     }),
-    trustedOrigins: [
-      env.CORS_ORIGIN,
-      ...desktopOrigins,
-      "lardon://",
-      "exp://",
-      "http://localhost:8081",
-    ],
-    emailAndPassword: { enabled: true },
+    trustedOrigins: [env.CORS_ORIGIN, "lardon://", "exp://", "http://localhost:8081"],
+    emailAndPassword: {
+      enabled: true,
+      requireEmailVerification: true,
+      revokeSessionsOnPasswordReset: true,
+      sendResetPassword: ({ user, url }) =>
+        hooks.sendEmail({ kind: "reset-password", to: user.email, name: user.name, url }),
+    },
+    emailVerification: {
+      sendOnSignUp: true,
+      sendOnSignIn: true,
+      autoSignInAfterVerification: true,
+      sendVerificationEmail: ({ user, url }) =>
+        hooks.sendEmail({ kind: "verify-email", to: user.email, name: user.name, url }),
+    },
+    user: {
+      deleteUser: {
+        enabled: true,
+        beforeDelete: (user) => hooks.beforeDeleteUser(user.id),
+      },
+    },
     secret: env.BETTER_AUTH_SECRET,
     baseURL: env.BETTER_AUTH_URL,
     advanced: {

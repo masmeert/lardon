@@ -27,7 +27,6 @@ export default function Home() {
   const mutedColor = useThemeColor("muted");
   const successColor = useThemeColor("success");
   const dangerColor = useThemeColor("danger");
-  const foregroundColor = useThemeColor("foreground");
 
   return (
     <Container className="p-6">
@@ -44,7 +43,7 @@ export default function Home() {
           <Pressable
             className="bg-danger py-3 px-4 rounded-lg self-start active:opacity-70"
             onPress={() => {
-              authClient.signOut();
+              void authClient.signOut();
             }}
           >
             <Text className="text-foreground font-medium">Sign Out</Text>
