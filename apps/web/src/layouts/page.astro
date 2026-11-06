@@ -1,6 +1,7 @@
 ---
 import { Font } from "astro:assets";
 
+import Logo from "../assets/logo.svg";
 import { operator } from "../operator";
 import "../styles/global.css";
 
@@ -20,6 +21,7 @@ const { title, description } = Astro.props;
     <meta name="description" content={description} />
     <meta name="color-scheme" content="light" />
     <title>{title === "Lardon" ? title : `${title} · Lardon`}</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <Font cssVariable="--font-hanken-grotesk" preload />
   </head>
   <body
@@ -29,9 +31,9 @@ const { title, description } = Astro.props;
       <header class="mb-8">
         <a
           href="/"
-          class="-m-2 inline-flex min-h-11 items-center rounded-sm p-2 font-medium text-ink-strong hover:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-line-strong"
+          class="-m-2 inline-flex min-h-11 items-center rounded-sm p-2 text-ink-strong hover:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-line-strong"
         >
-          Lardon
+          <Logo class="h-6 w-auto" />
         </a>
       </header>
       <main
