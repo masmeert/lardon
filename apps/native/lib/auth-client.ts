@@ -1,4 +1,5 @@
 import { expoClient } from "@better-auth/expo/client";
+import { emailOTPClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 import { Schema } from "effect";
 import Constants from "expo-constants";
@@ -16,5 +17,6 @@ export const authClient = createAuthClient({
       storagePrefix: scheme,
       storage: SecureStore,
     }),
+    emailOTPClient(),
   ],
 });

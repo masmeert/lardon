@@ -7,15 +7,19 @@ import {
   useFonts,
 } from "@expo-google-fonts/hanken-grotesk";
 import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import { HeroUINativeProvider } from "heroui-native";
+import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 
-export const unstable_settings = {
-  anchor: "(drawer)",
-};
+import { authClient } from "@/lib/auth-client";
+
+void SplashScreen.preventAutoHideAsync();
 
 function StackLayout() {
+  const { data: session, isPending } = authClient.useSession();
+
   const [fontsLoaded, fontError] = useFonts({
     HankenGrotesk_400Regular,
     HankenGrotesk_500Medium,
@@ -23,14 +27,26 @@ function StackLayout() {
     HankenGrotesk_700Bold,
   });
 
-  if (!fontsLoaded && fontError === null) {
+  const areFontsReady = fontsLoaded || fontError !== null;
+
+  useEffect(() => {
+    if (!isPending && areFontsReady) {
+      SplashScreen.hide();
+    }
+  }, [isPending, areFontsReady]);
+
+  if (!areFontsReady) {
     return null;
   }
 
   return (
-    <Stack screenOptions={{}}>
-      <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
-      <Stack.Screen name="modal" options={{ title: "Modal", presentation: "modal" }} />
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Protected guard={!!session}>
+        <Stack.Screen name="(app)" />
+      </Stack.Protected>
+      <Stack.Protected guard={!session}>
+        <Stack.Screen name="sign-in" />
+      </Stack.Protected>
     </Stack>
   );
 }
@@ -39,7 +55,7 @@ export default function Layout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <KeyboardProvider>
-        <HeroUINativeProvider>
+        <HeroUINativeProvider config={{ toast: false }}>
           <StackLayout />
         </HeroUINativeProvider>
       </KeyboardProvider>

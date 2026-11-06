@@ -22,6 +22,4 @@ export class ApiClient extends AtomHttpApi.Service<ApiClient>()("lardon/native/A
   ),
 }) {}
 
-export const healthAtom = ApiClient.query("system", "health", {});
-
 export const familiesAtom = ApiClient.query("families", "list", { reactivityKeys: ["families"] });

@@ -38,7 +38,7 @@
       --warning: oklch(0.6803 0.1356 74.4);
       --warning-foreground: var(--foreground);
 
-      --danger: oklch(0.5286 0.188 20.34);
+      --danger: oklch(0.6 0.14 33);
       --danger-foreground: var(--white);
 
       --segment: var(--white);
