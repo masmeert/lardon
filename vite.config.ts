@@ -2,45 +2,13 @@ import { defineConfig } from "vite-plus";
 
 export default defineConfig({
   lint: {
-    ignorePatterns: [
-      "node_modules/**",
-      "**/node_modules/**",
-      "apps/native/.expo/**",
-      "apps/native/dist/**",
-      "apps/native/web-build/**",
-      "apps/native/ios/**",
-      "apps/native/android/**",
-      "apps/server/dist/**",
-      "packages/db/dist/**",
-      ".alchemy/**",
-      ".wrangler/**",
-      "**/.wrangler/**",
-    ],
-    options: {
-      typeAware: false,
-      typeCheck: false,
-    },
+    plugins: ["typescript", "unicorn", "oxc"],
+    categories: { correctness: "error" },
+    env: { builtin: true },
+    options: { typeAware: true, typeCheck: true },
   },
-  fmt: {
-    ignorePatterns: [
-      "node_modules/**",
-      "**/node_modules/**",
-      "apps/native/.expo/**",
-      "apps/native/dist/**",
-      "apps/native/web-build/**",
-      "apps/native/ios/**",
-      "apps/native/android/**",
-      "apps/server/dist/**",
-      "packages/db/dist/**",
-      ".alchemy/**",
-      ".wrangler/**",
-      "**/.wrangler/**",
-    ],
-    singleQuote: false,
-    semi: true,
-    sortPackageJson: true,
-  },
+  fmt: { singleQuote: false, semi: true, sortPackageJson: true },
   staged: {
-    "*.{js,ts,jsx,tsx,vue,svelte,json,jsonc,css,md}": "vp check --fix",
+    "*": "vp check --fix",
   },
 });

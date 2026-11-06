@@ -3,8 +3,7 @@
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
-    "build": "tsdown",
-    "check-types": "tsc --noEmit",
+    "build": "vp pack",
     "compile": "bun build --compile --no-compile-autoload-dotenv --minify --sourcemap --bytecode ./src/index.ts --outfile server",
     "env:generate": "varlock codegen",
     "test": "vp test run"
@@ -27,8 +26,7 @@
     "@lardon/infra": "workspace:*",
     "@libsql/client": "0.18.0",
     "@types/node": "catalog:",
-    "tsdown": "^0.23.0",
     "typescript": "^6.0.3",
-    "vite-plus": "1.4.0"
+    "vite-plus": "catalog:"
   }
 }

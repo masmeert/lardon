@@ -10,7 +10,6 @@
     "ios": "expo run:ios",
     "prebuild": "expo prebuild",
     "web": "expo start --web",
-    "check-types": "tsc --noEmit",
     "env:generate": "varlock codegen"
   },
   "dependencies": {

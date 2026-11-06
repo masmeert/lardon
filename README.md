@@ -1,22 +1,19 @@
 # lardon
 
-This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines React Native, Expo, Hono, TRPC, and more. It has since moved to Effect (HttpApi) and LiveStore.
-
 ## Features
 
 - **TypeScript** - For type safety and improved developer experience
 - **React Native** - Build mobile apps using React
 - **Expo** - Tools for React Native development
 - **TailwindCSS** - Utility-first CSS for rapid UI development
-- **Hono** - Lightweight, performant server framework
+- **Effect HTTP** - The Worker serves the API, better-auth and image routes from one Effect router
 - **Effect** - Typed services, errors and the schema-first `HttpApi` with a generated client
 - **LiveStore** - Local-first recipe data, synced through Cloudflare Durable Objects
 - **workers** - Runtime environment
 - **Drizzle** - TypeScript-first ORM
 - **Cloudflare D1** - Database engine
 - **Authentication** - Better-Auth
-- **Oxlint** - Oxlint + Oxfmt (linting & formatting)
-- **Vite+** - Unified Vite toolchain, workspace task runner, linting, and formatting
+- **Vite+** - Unified toolchain: task runner, Oxlint + Oxfmt, type-aware checks, tsdown packing and commit hooks
 
 ## Getting Started
 
@@ -103,10 +100,9 @@ lardon/
 
 - `pnpm run dev`: Start all applications in development mode
 - `pnpm run build`: Build all applications
-- `pnpm run check-types`: Check TypeScript types across all apps
 - `pnpm run dev:native`: Start the React Native/Expo development server
 - `pnpm run db:generate`: Generate database client/types
-- `pnpm run check`: Run Vite+ format/lint checks and workspace TypeScript checks
-- `pnpm run lint`: Run Vite+ lint checks
-- `pnpm run format`: Run Vite+ formatting
-- `pnpm run staged`: Run Vite+ checks against staged files
+- `vp check`: Format, lint and type-check the workspace (`--fix` to apply fixes)
+- `vp lint`: Run lint checks
+- `vp fmt`: Format the workspace
+- `vp staged`: Run checks against staged files (runs on pre-commit)
