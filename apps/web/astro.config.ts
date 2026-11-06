@@ -22,6 +22,7 @@ export default defineConfig({
       weights: [400],
       styles: ["normal"],
       subsets: ["latin"],
+      display: "block",
       fallbacks: ["cursive"],
     },
     {
@@ -31,6 +32,7 @@ export default defineConfig({
       weights: [400],
       styles: ["normal"],
       subsets: ["latin"],
+      display: "block",
       fallbacks: ["cursive"],
     },
   ],
