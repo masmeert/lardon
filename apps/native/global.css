@@ -61,3 +61,10 @@
     }
   }
 }
+
+@theme {
+  --font-normal: "HankenGrotesk_400Regular";
+  --font-medium: "HankenGrotesk_500Medium";
+  --font-semibold: "HankenGrotesk_600SemiBold";
+  --font-bold: "HankenGrotesk_700Bold";
+}
