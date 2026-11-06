@@ -1,8 +1,9 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useAtomRefresh, useAtomValue } from "@effect/atom-react";
-import { Button, Icon, Surface, Text } from "@lardon/ui";
 import { AsyncResult } from "effect/reactivity";
+import { Card, Chip, useThemeColor } from "heroui-native";
 import { useEffect } from "react";
-import { View } from "react-native";
+import { Text, View, Pressable } from "react-native";
 
 import { Container } from "@/components/container";
 import { SignIn } from "@/components/sign-in";
@@ -23,67 +24,80 @@ export default function Home() {
     refreshFamilies();
   }, [userId, refreshFamilies]);
 
+  const mutedColor = useThemeColor("muted");
+  const successColor = useThemeColor("success");
+  const dangerColor = useThemeColor("danger");
+
   return (
-    <Container>
-      <View className="gap-6 p-5">
-        <Text variant="display" className="py-4">
-          Lardon
-        </Text>
-
-        {session?.user ? (
-          <Surface className="gap-1 rounded-card p-5">
-            <Text variant="headline">Welcome, {session.user.name}</Text>
-            <Text variant="caption" tone="muted">
-              {session.user.email}
-            </Text>
-            <Button
-              label="Sign out"
-              variant="secondary"
-              size="compact"
-              className="mt-3 self-start"
-              onPress={() => {
-                void authClient.signOut();
-              }}
-            />
-          </Surface>
-        ) : null}
-
-        <Surface className="flex-row items-center gap-3 rounded-card p-5">
-          <Icon
-            name={
-              isLoading ? "hourglass" : isConnected ? "checkmark.circle.fill" : "xmark.circle.fill"
-            }
-            tone={isLoading ? "muted" : isConnected ? "success" : "danger"}
-            size={22}
-          />
-          <View className="flex-1 gap-0.5">
-            <Text variant="headline">Server</Text>
-            <Text variant="caption" tone="muted">
-              {isLoading
-                ? "Checking the connection…"
-                : isConnected
-                  ? "Connected"
-                  : "Can't reach the server. Check that it's running and that your phone is online."}
-            </Text>
-          </View>
-        </Surface>
-
-        <Surface className="gap-1 rounded-card p-5">
-          <Text variant="headline">Families</Text>
-          {AsyncResult.isSuccess(families) ? (
-            <Text variant="caption" tone="muted">
-              {families.value.length} families
-            </Text>
-          ) : null}
-        </Surface>
-
-        {session?.user ? null : (
-          <>
-            <SignIn />
-            <SignUp />
-          </>
-        )}
+    <Container className="p-6">
+      <View className="py-4 mb-6">
+        <Text className="text-4xl font-bold text-foreground mb-2">BETTER T STACK</Text>
       </View>
+
+      {session?.user ? (
+        <Card variant="secondary" className="mb-6 p-4">
+          <Text className="text-foreground text-base mb-2">
+            Welcome, <Text className="font-medium">{session.user.name}</Text>
+          </Text>
+          <Text className="text-muted text-sm mb-4">{session.user.email}</Text>
+          <Pressable
+            className="bg-danger py-3 px-4 rounded-lg self-start active:opacity-70"
+            onPress={() => {
+              void authClient.signOut();
+            }}
+          >
+            <Text className="text-foreground font-medium">Sign Out</Text>
+          </Pressable>
+        </Card>
+      ) : null}
+
+      <Card variant="secondary" className="p-6">
+        <View className="flex-row items-center justify-between mb-4">
+          <Card.Title>System Status</Card.Title>
+          <Chip variant="secondary" color={isConnected ? "success" : "danger"} size="sm">
+            <Chip.Label>{isConnected ? "LIVE" : "OFFLINE"}</Chip.Label>
+          </Chip>
+        </View>
+
+        <Card className="p-4">
+          <View className="flex-row items-center">
+            <View
+              className={`w-3 h-3 rounded-full mr-3 ${isConnected ? "bg-success" : "bg-muted"}`}
+            />
+            <View className="flex-1">
+              <Text className="text-foreground font-medium mb-1">TRPC Backend</Text>
+              <Card.Description>
+                {isLoading
+                  ? "Checking connection..."
+                  : isConnected
+                    ? "Connected to API"
+                    : "API Disconnected"}
+              </Card.Description>
+            </View>
+            {isLoading && <Ionicons name="hourglass-outline" size={20} color={mutedColor} />}
+            {!isLoading && isConnected && (
+              <Ionicons name="checkmark-circle" size={20} color={successColor} />
+            )}
+            {!isLoading && !isConnected && (
+              <Ionicons name="close-circle" size={20} color={dangerColor} />
+            )}
+          </View>
+        </Card>
+      </Card>
+
+      <Card variant="secondary" className="mt-6 p-4">
+        <Card.Title className="mb-3">Families</Card.Title>
+        {AsyncResult.isSuccess(families) && (
+          <Card.Description>{families.value.length} families</Card.Description>
+        )}
+      </Card>
+
+      {!session?.user && (
+        <>
+          <SignIn />
+          <SignUp />
+        </>
+      )}
     </Container>
   );
 }

@@ -2,7 +2,6 @@ const { withVarlockMetroConfig } = require("@varlock/expo-integration/metro-conf
 const { getDefaultConfig } = require("expo/metro-config");
 const { withUniwindConfig } = require("uniwind/metro");
 const { wrapWithReanimatedMetroConfig } = require("react-native-reanimated/metro-config");
-const { withStorybook } = require("@storybook/react-native/metro/withStorybook");
 
 /** @type {import('expo/metro-config').MetroConfig} */
 const config = getDefaultConfig(__dirname);
@@ -16,14 +15,9 @@ config.resolver.blockList = [
   /[/\\]packages[/\\]infra[/\\]\.alchemy(?:[/\\]|$)/,
 ];
 
-const uniwindConfig = withUniwindConfig(
-  wrapWithReanimatedMetroConfig(
-    withStorybook(config, { enabled: process.env.EXPO_PUBLIC_STORYBOOK_ENABLED === "true" }),
-  ),
-  {
-    cssEntryFile: "./global.css",
-    dtsFile: "./uniwind-types.d.ts",
-  },
-);
+const uniwindConfig = withUniwindConfig(wrapWithReanimatedMetroConfig(config), {
+  cssEntryFile: "./global.css",
+  dtsFile: "./uniwind-types.d.ts",
+});
 
 module.exports = withVarlockMetroConfig(uniwindConfig);

@@ -23,7 +23,6 @@
 - Keep needed info and options visible — don't make users remember across screens.
 - Show only what serves the user's goal.
 - Error messages: plain language, the exact problem, how to fix it.
-- Native app UI follows the design system in `packages/ui` (`@lardon/ui`). Read `packages/ui/README.md` and the relevant `packages/ui/docs/*.md` before building or changing UI. Use its tokens, `Text` variants, sizes and spring tiers, never one-off colors, font sizes or durations. Prefer iOS-native components (native tabs, headers, sheets, menus) over custom ones.
 
 ## Committing
 

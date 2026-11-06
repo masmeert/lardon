@@ -1,22 +1,24 @@
-import { Button, Icon, Surface, Text } from "@lardon/ui";
-import { router, Stack } from "expo-router";
-import { View } from "react-native";
+import { Link, Stack } from "expo-router";
+import { Button, Surface } from "heroui-native";
+import { Text, View } from "react-native";
 
 import { Container } from "@/components/container";
 
 export default function NotFoundScreen() {
   return (
     <>
-      <Stack.Screen options={{ title: "Not found" }} />
+      <Stack.Screen options={{ title: "Not Found" }} />
       <Container>
-        <View className="flex-1 items-center justify-center p-5">
-          <Surface className="max-w-sm items-center gap-3 rounded-card p-6">
-            <Icon name="questionmark.folder" tone="muted" size={32} />
-            <Text variant="headline">Page not found</Text>
-            <Text variant="caption" tone="muted" className="text-center">
-              This page doesn't exist. It may have been moved or deleted.
+        <View className="flex-1 justify-center items-center p-4">
+          <Surface variant="secondary" className="items-center p-6 max-w-sm rounded-lg">
+            <Text className="text-4xl mb-3">🤔</Text>
+            <Text className="text-foreground font-medium text-lg mb-1">Page Not Found</Text>
+            <Text className="text-muted text-sm text-center mb-4">
+              The page you're looking for doesn't exist.
             </Text>
-            <Button label="Go home" size="compact" onPress={() => router.replace("/")} />
+            <Link href="/" asChild>
+              <Button size="sm">Go Home</Button>
+            </Link>
           </Surface>
         </View>
       </Container>

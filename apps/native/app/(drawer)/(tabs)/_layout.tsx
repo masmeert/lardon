@@ -1,10 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import { useColor } from "@lardon/ui";
+import { useThemeColor } from "heroui-native";
 
 export default function TabLayout() {
-  const themeColorForeground = useColor("foreground");
-  const themeColorBackground = useColor("background");
+  const themeColorForeground = useThemeColor("foreground");
+  const themeColorBackground = useThemeColor("background");
 
   return (
     <Tabs
