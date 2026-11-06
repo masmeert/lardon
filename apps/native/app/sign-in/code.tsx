@@ -13,6 +13,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { InlineError } from "@/components/inline-error";
+import { RollingNumber } from "@/components/rolling-number/rolling-number";
 import { KeyboardFooter } from "@/components/sign-in/keyboard-footer";
 import { authClient } from "@/lib/auth-client";
 
@@ -108,7 +109,7 @@ export default function CodeScreen() {
             {"\n"}
             <Text className="text-foreground">{email}</Text>
           </Text>
-          <Text className="text-[15px] leading-[22px] text-muted">
+          <Text className="text-[15px] leading-5.5 text-muted">
             It can take a minute to arrive. Check your spam folder if you can't find it.
           </Text>
         </View>
@@ -146,9 +147,18 @@ export default function CodeScreen() {
           {isResending ? (
             <Spinner size="sm" color={foregroundColor} />
           ) : (
-            <Button.Label>
-              {resendInSeconds > 0 ? `Resend (${resendInSeconds})` : "Resend"}
-            </Button.Label>
+            <View className="flex-row items-center">
+              <Button.Label>{resendInSeconds > 0 ? "Resend (" : "Resend"}</Button.Label>
+              {resendInSeconds > 0 && (
+                <>
+                  <RollingNumber
+                    value={resendInSeconds}
+                    className="text-base font-medium text-foreground"
+                  />
+                  <Button.Label>)</Button.Label>
+                </>
+              )}
+            </View>
           )}
         </Button>
         <Button
