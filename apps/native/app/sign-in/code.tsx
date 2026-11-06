@@ -16,7 +16,6 @@ import { InlineError } from "@/components/inline-error";
 import { RollingNumber } from "@/components/rolling-number/rolling-number";
 import { KeyboardFooter } from "@/components/sign-in/keyboard-footer";
 import { authClient } from "@/lib/auth-client";
-import { logRequestFailure } from "@/lib/request-failure";
 
 export default function CodeScreen() {
   const { email } = useLocalSearchParams<{ email: string }>();
@@ -51,11 +50,7 @@ export default function CodeScreen() {
 
     const { error: verifyError } = await authClient.signIn
       .emailOtp({ email, otp: code })
-      .catch((error) => {
-        logRequestFailure("Code check", error);
-
-        return { error: { code: "NETWORK", message: undefined } };
-      });
+      .catch(() => ({ error: { code: "NETWORK", message: undefined } }));
 
     if (!verifyError) {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -89,11 +84,7 @@ export default function CodeScreen() {
 
     const { error: sendError } = await authClient.emailOtp
       .sendVerificationOtp({ email, type: "sign-in" })
-      .catch((error) => {
-        logRequestFailure("Code resend", error);
-
-        return { error: { message: undefined } };
-      });
+      .catch(() => ({ error: { message: undefined } }));
 
     setIsResending(false);
 

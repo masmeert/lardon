@@ -10,7 +10,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { InlineError } from "@/components/inline-error";
 import { Hero } from "@/components/sign-in/hero";
 import { authClient } from "@/lib/auth-client";
-import { logRequestFailure } from "@/lib/request-failure";
 
 export default function SignInScreen() {
   const insets = useSafeAreaInsets();
@@ -37,8 +36,6 @@ export default function SignInScreen() {
       .then(
         async (credential) => {
           if (!credential.identityToken) {
-            logRequestFailure("Apple authorization", new Error("Apple returned no identity token"));
-
             return "MISSING_TOKEN";
           }
 
@@ -58,23 +55,12 @@ export default function SignInScreen() {
 
           return signInError ? (signInError.code ?? "UNKNOWN") : undefined;
         },
-        (appleError) => {
-          if (
-            Schema.is(Schema.Struct({ code: Schema.Literal("ERR_REQUEST_CANCELED") }))(appleError)
-          ) {
-            return undefined;
-          }
-
-          logRequestFailure("Apple authorization", appleError);
-
-          return "UNKNOWN";
-        },
+        (appleError) =>
+          Schema.is(Schema.Struct({ code: Schema.Literal("ERR_REQUEST_CANCELED") }))(appleError)
+            ? undefined
+            : "UNKNOWN",
       )
-      .catch((error) => {
-        logRequestFailure("Apple sign-in", error);
-
-        return "NETWORK";
-      });
+      .catch(() => "NETWORK");
 
     setPendingProvider(undefined);
 
@@ -89,11 +75,7 @@ export default function SignInScreen() {
 
     const errorCode = await authClient.signIn.social({ provider: "google", callbackURL: "/" }).then(
       ({ error: signInError }) => (signInError ? (signInError.code ?? "UNKNOWN") : undefined),
-      (error) => {
-        logRequestFailure("Google sign-in", error);
-
-        return "NETWORK";
-      },
+      () => "NETWORK",
     );
 
     setPendingProvider(undefined);
