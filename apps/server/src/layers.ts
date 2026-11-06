@@ -2,7 +2,6 @@ import { createAuth } from "@lardon/auth";
 import { createDb } from "@lardon/db";
 import { Effect, Layer, ManagedRuntime } from "effect";
 import { HttpRouter, HttpServer } from "effect/http";
-import { createAxiomDrain } from "evlog/axiom";
 import { routerLayer } from "evlog/effect";
 
 import { Accounts } from "./accounts";
@@ -15,8 +14,6 @@ import { ImageStorage } from "./image-storage";
 import { Mailer, authEmail } from "./mailer";
 import { RateLimits } from "./rate-limits";
 import { RecipeStoreBackend } from "./recipe-store-backend";
-
-export const axiomDrain = createAxiomDrain();
 
 const InfrastructureLive = Layer.mergeAll(
   Layer.sync(Database, () => Database.make(createDb(ENV))),
@@ -67,7 +64,7 @@ export const webHandler = HttpRouter.toWebHandler(
       allowedHeaders: ["content-type", "authorization", "cookie"],
       credentials: true,
     }),
-    routerLayer({ drain: axiomDrain }),
+    routerLayer(),
   ).pipe(Layer.provide(ServicesLive), Layer.provide(HttpServer.layerServices)),
   { disableLogger: true, memoMap: serverRuntime.memoMap },
 ).handler;

@@ -13,7 +13,7 @@ import { set, withLogger } from "evlog/effect";
 
 import { Authentication } from "./authentication";
 import { Families } from "./families";
-import { axiomDrain, serverRuntime } from "./layers";
+import { serverRuntime } from "./layers";
 import { RateLimits, tooManyRequests } from "./rate-limits";
 
 function authorizeRecipeStore(
@@ -42,7 +42,7 @@ function authorizeRecipeStore(
     return user.id;
   });
 
-  const logged = withLogger(`sync.${phase}`, { drain: axiomDrain, fields: { storeId } });
+  const logged = withLogger(`sync.${phase}`, { fields: { storeId } });
 
   return serverRuntime.runPromise(
     phase === "connect"
@@ -79,7 +79,6 @@ export class SyncBackendDO extends makeDurableObject({
         Effect.ignore(
           Effect.fail(rejection).pipe(
             withLogger("sync.push", {
-              drain: axiomDrain,
               fields: { storeId, user: { id: userId } },
             }),
           ),
