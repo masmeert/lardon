@@ -1,0 +1,31 @@
+---
+import { Font } from "astro:assets";
+
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="description" content={description} />
+    <meta name="color-scheme" content="light" />
+    <title>{title === "Lardon" ? title : `${title} · Lardon`}</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <Font cssVariable="--font-hanken-grotesk" preload />
+    <Font cssVariable="--font-reenie-beanie" />
+  </head>
+  <body
+    class="bg-paper font-sans text-sm leading-relaxed text-muted antialiased selection:bg-accent-soft selection:text-ink"
+  >
+    <slot />
+  </body>
+</html>

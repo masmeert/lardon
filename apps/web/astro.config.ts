@@ -15,6 +15,15 @@ export default defineConfig({
       subsets: ["latin"],
       fallbacks: ["ui-sans-serif", "system-ui", "sans-serif"],
     },
+    {
+      provider: fontProviders.fontsource(),
+      name: "Reenie Beanie",
+      cssVariable: "--font-reenie-beanie",
+      weights: [400],
+      styles: ["normal"],
+      subsets: ["latin"],
+      fallbacks: ["cursive"],
+    },
   ],
   vite: {
     plugins: [tailwindcss()],

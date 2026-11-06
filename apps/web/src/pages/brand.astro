@@ -1,0 +1,247 @@
+---
+import Logo from "../assets/logo.svg";
+import LogoStacked from "../assets/logo-stacked.svg";
+import Mark from "../assets/mark.svg";
+import Wordmark from "../assets/wordmark.svg";
+import SiteFooter from "../components/site-footer.astro";
+import SiteHeader from "../components/site-header.astro";
+import Base from "../layouts/base.astro";
+---
+
+<Base title="Brand" description="The Lardon logo, colors and fonts.">
+  <SiteHeader class="max-w-5xl" />
+  <main class="mx-auto max-w-5xl px-6 pt-12 pb-24 sm:pt-20">
+    <h1 class="text-5xl leading-[1.05] font-medium tracking-tight text-ink-strong">Brand</h1>
+    <p class="mt-4 text-base leading-relaxed">Our logo, colors and fonts.</p>
+    <a
+      href="/brand/lardon-brand-assets.zip"
+      download
+      class="mt-6 inline-flex min-h-11 items-center gap-2 rounded-full bg-accent px-5 text-sm font-medium text-white hover:bg-[#4A5818] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+    >
+      Download all files
+      <span class="font-normal text-white/70">ZIP, 0.6 MB</span>
+    </a>
+
+    <section class="mt-20" aria-labelledby="logo">
+      <h2 id="logo" class="text-2xl font-medium tracking-tight text-ink-strong">Logo</h2>
+      <div class="mt-6 grid gap-4 sm:grid-cols-3">
+        {
+          [
+            "border border-line bg-white text-ink-strong",
+            "bg-accent text-[#FBF6EC]",
+            "bg-ink-strong text-paper",
+          ].map((tile) => (
+            <div class:list={["flex h-40 items-center justify-center rounded-2xl px-8", tile]}>
+              <Logo class="h-9 w-auto max-w-full" />
+            </div>
+          ))
+        }
+        <div
+          class="flex h-40 items-center justify-center rounded-2xl border border-line bg-white text-ink-strong"
+        >
+          <LogoStacked class="h-24 w-auto" />
+        </div>
+        <div
+          class="flex h-40 items-center justify-center rounded-2xl border border-line bg-white text-accent"
+        >
+          <Mark class="h-20 w-auto" />
+        </div>
+        <div
+          class="flex h-40 items-center justify-center rounded-2xl border border-line bg-accent-soft"
+        >
+          <img
+            src="/brand/lardon-app-icon-rounded.svg"
+            alt=""
+            width="96"
+            height="96"
+            class="size-24 drop-shadow-[0_1px_2px_rgb(34_28_24/0.12)]"
+          />
+        </div>
+      </div>
+      <p class="mt-4 max-w-xl text-sm leading-relaxed">
+        Use the full logo when it fits, and the bacon strip alone when it doesn't. Leave some room
+        around it, and keep it at least 20 px tall.
+      </p>
+    </section>
+
+    <section class="mt-20" aria-labelledby="color">
+      <h2 id="color" class="text-2xl font-medium tracking-tight text-ink-strong">Colors</h2>
+      <div class="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        {
+          [
+            ["Olive", "#5A6A1F", "bg-accent text-white"],
+            ["Paper", "#FAF8F5", "bg-paper text-ink-strong ring-1 ring-line ring-inset"],
+            ["Ink", "#221C18", "bg-ink-strong text-paper"],
+            ["Bacon", "#FBF6EC", "bg-[#FBF6EC] text-ink-strong ring-1 ring-line ring-inset"],
+          ].map(([name, hex, swatch]) => (
+            <div class:list={["flex h-28 flex-col justify-end rounded-2xl p-4", swatch]}>
+              <span class="text-sm font-medium">{name}</span>
+              <span class="font-mono text-xs opacity-75">{hex}</span>
+            </div>
+          ))
+        }
+      </div>
+      <ul class="mt-4 flex flex-wrap gap-x-6 gap-y-3">
+        {
+          [
+            ["Muted", "#5F554D"],
+            ["Line", "#E8E2DB"],
+            ["Success", "#2E7A47"],
+            ["Warning", "#C98A1E"],
+            ["Danger", "#C55C46"],
+          ].map(([name, hex]) => (
+            <li class="flex items-center gap-2">
+              <span
+                class="size-5 rounded-md ring-1 ring-line ring-inset"
+                style={`background-color: ${hex}`}
+              />
+              <span class="text-ink">{name}</span>
+              <span class="font-mono text-xs">{hex}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="mt-4 max-w-xl text-sm leading-relaxed">
+        Mostly paper and ink. Olive is for the logo and the main button. The app icon uses an olive
+        gradient, <span class="font-mono text-xs text-ink">#7A8C30 → #4A5818</span>.
+      </p>
+    </section>
+
+    <section class="mt-20" aria-labelledby="type">
+      <h2 id="type" class="text-2xl font-medium tracking-tight text-ink-strong">Fonts</h2>
+      <div class="mt-6 grid gap-4 sm:grid-cols-3">
+        <div class="rounded-2xl border border-line bg-white p-6">
+          <div class="flex h-16 items-center text-ink-strong">
+            <Wordmark class="h-10 w-auto" />
+          </div>
+          <p class="mt-4 text-ink">Eczar SemiBold</p>
+          <p class="mt-1 text-sm">Only for the wordmark.</p>
+        </div>
+        <div class="rounded-2xl border border-line bg-white p-6">
+          <p class="flex h-16 items-center text-3xl font-medium tracking-tight text-ink-strong">
+            Pot-au-feu
+          </p>
+          <p class="mt-4 text-ink">Hanken Grotesk</p>
+          <p class="mt-1 text-sm">Everything else.</p>
+        </div>
+        <div class="rounded-2xl border border-line bg-white p-6">
+          <p class="flex h-16 items-center font-handwritten text-5xl leading-none text-ink-strong">
+            À table !
+          </p>
+          <p class="mt-4 text-ink">Reenie Beanie</p>
+          <p class="mt-1 text-sm">Handwriting on recipe cards.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-20" aria-labelledby="voice">
+      <h2 id="voice" class="text-2xl font-medium tracking-tight text-ink-strong">Writing</h2>
+      <p class="mt-4 max-w-xl text-sm leading-relaxed">
+        Plain and friendly. When something goes wrong, say what happened and how to fix it.
+      </p>
+      <div class="mt-6 grid gap-4 sm:grid-cols-2">
+        <div class="rounded-2xl border border-line bg-white p-6">
+          <p class="text-xs font-medium text-[#2E7A47]">Yes</p>
+          <p class="mt-2 text-ink-strong">Couldn't reach Lardon. Check your connection.</p>
+        </div>
+        <div class="rounded-2xl border border-line bg-white p-6">
+          <p class="text-xs font-medium text-[#C55C46]">No</p>
+          <p class="mt-2 text-ink-strong">Error 503: network request failed.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-20" aria-labelledby="misuse">
+      <h2 id="misuse" class="text-2xl font-medium tracking-tight text-ink-strong">Please don't</h2>
+      <div class="mt-6 grid gap-4 sm:grid-cols-3">
+        {
+          [
+            ["Stretch it", "text-ink-strong", "scale-x-150"],
+            ["Recolor it", "text-[#C55C46]", ""],
+            ["Add effects", "text-accent", "drop-shadow-[0_0_10px_rgb(122_140_48/0.9)]"],
+          ].map(([caption, color, effect]) => (
+            <figure>
+              <div
+                class:list={[
+                  "flex h-32 items-center justify-center overflow-hidden rounded-2xl border border-line bg-white",
+                  color,
+                ]}
+              >
+                <Logo class:list={["h-7 w-auto", effect]} />
+              </div>
+              <figcaption class="mt-2 flex items-center gap-2 text-ink">
+                <span aria-hidden="true" class="text-[#C55C46]">
+                  ✕
+                </span>
+                {caption}
+              </figcaption>
+            </figure>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="mt-20" aria-labelledby="files">
+      <h2 id="files" class="text-2xl font-medium tracking-tight text-ink-strong">Files</h2>
+      <ul class="mt-6 divide-y divide-line border-y border-line">
+        {
+          [
+            [
+              "Logo",
+              [
+                ["Ink", "/brand/lardon-logo-ink.svg"],
+                ["White", "/brand/lardon-logo-white.svg"],
+                ["Olive", "/brand/lardon-logo-olive.svg"],
+              ],
+            ],
+            [
+              "Stacked logo",
+              [
+                ["Ink", "/brand/lardon-logo-stacked-ink.svg"],
+                ["White", "/brand/lardon-logo-stacked-white.svg"],
+              ],
+            ],
+            [
+              "Bacon strip",
+              [
+                ["Ink", "/brand/lardon-mark-ink.svg"],
+                ["White", "/brand/lardon-mark-white.svg"],
+                ["Olive", "/brand/lardon-mark-olive.svg"],
+              ],
+            ],
+            [
+              "Wordmark",
+              [
+                ["Ink", "/brand/lardon-wordmark-ink.svg"],
+                ["White", "/brand/lardon-wordmark-white.svg"],
+              ],
+            ],
+            [
+              "App icon",
+              [
+                ["Square PNG", "/brand/lardon-app-icon.png"],
+                ["Rounded SVG", "/brand/lardon-app-icon-rounded.svg"],
+              ],
+            ],
+          ].map(([name, files]) => (
+            <li class="flex flex-wrap items-center gap-x-6 gap-y-1 py-2">
+              <span class="w-32 text-ink">{name}</span>
+              <span class="flex flex-wrap gap-x-4">
+                {(files as string[][]).map(([label, href]) => (
+                  <a
+                    href={href}
+                    download
+                    class="-m-2 inline-flex min-h-11 items-center rounded-sm p-2 text-muted-soft underline underline-offset-2 hover:text-ink-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-line-strong"
+                  >
+                    {label}
+                  </a>
+                ))}
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </main>
+  <SiteFooter class="max-w-5xl" />
+</Base>

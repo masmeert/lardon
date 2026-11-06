@@ -1,0 +1,18 @@
+---
+import Logo from "../assets/logo.svg";
+
+interface Props {
+  class: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<header class:list={["mx-auto w-full px-6 pt-16", className]}>
+  <a
+    href="/"
+    class="-m-2 inline-flex min-h-11 items-center rounded-sm p-2 text-ink-strong hover:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-line-strong"
+  >
+    <Logo class="h-6 w-auto" />
+  </a>
+</header>
