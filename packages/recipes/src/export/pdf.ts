@@ -24,25 +24,25 @@ const COLORS = {
   rule: rgb(0.88, 0.85, 0.82),
 };
 
-const WIN_ANSI_FALLBACKS: Record<string, string> = {
-  "⅛": "1/8",
-  "⅓": "1/3",
-  "⅜": "3/8",
-  "⅝": "5/8",
-  "⅔": "2/3",
-  "⅞": "7/8",
-  "⅕": "1/5",
-  "⅙": "1/6",
-  "→": "->",
-  "≈": "~",
-  "−": "-",
-  "×": "x",
-  "℃": "°C",
-  "℉": "°F",
-  "\u00a0": " ",
-  "\u2009": " ",
-  "\u202f": " ",
-};
+const WIN_ANSI_FALLBACKS = new Map([
+  ["⅛", "1/8"],
+  ["⅓", "1/3"],
+  ["⅜", "3/8"],
+  ["⅝", "5/8"],
+  ["⅔", "2/3"],
+  ["⅞", "7/8"],
+  ["⅕", "1/5"],
+  ["⅙", "1/6"],
+  ["→", "->"],
+  ["≈", "~"],
+  ["−", "-"],
+  ["×", "x"],
+  ["℃", "°C"],
+  ["℉", "°F"],
+  ["\u00a0", " "],
+  ["\u2009", " "],
+  ["\u202f", " "],
+]);
 
 export type PdfPicture = { bytes: Uint8Array; contentType: string };
 
@@ -76,13 +76,15 @@ class PdfLayout {
 
   sanitize(text: string) {
     let output = "";
+
     for (const character of text) {
       if (character === "\n" || this.supportedCodePoints.has(character.codePointAt(0)!)) {
         output += character;
-      } else if (WIN_ANSI_FALLBACKS[character] !== undefined) {
-        output += WIN_ANSI_FALLBACKS[character];
+      } else if (WIN_ANSI_FALLBACKS.has(character)) {
+        output += WIN_ANSI_FALLBACKS.get(character);
       } else {
         const base = character.normalize("NFKD").replace(/[\u0300-\u036f]/g, "");
+
         if (Array.from(base).every((part) => this.supportedCodePoints.has(part.codePointAt(0)!))) {
           output += base;
         } else if (/\p{Extended_Pictographic}|\p{M}|\u200d|\ufe0f/u.test(character)) {
@@ -92,6 +94,7 @@ class PdfLayout {
         }
       }
     }
+
     return output
       .replace(new RegExp(` *${DROPPED_CHARACTER}+(?=[.,!?;:)]|$)`, "gm"), "")
       .replace(new RegExp(`${DROPPED_CHARACTER}+ ?`, "g"), "");
@@ -99,26 +102,34 @@ class PdfLayout {
 
   wrap(text: string, font: PDFFont, fontSize: number, widthPoints: number) {
     const lines: string[] = [];
+
     for (const paragraph of this.sanitize(text).split("\n")) {
       let line = "";
+
       for (const word of paragraph.split(/\s+/).filter(Boolean)) {
         const candidate = line ? `${line} ${word}` : word;
+
         if (font.widthOfTextAtSize(candidate, fontSize) <= widthPoints) {
           line = candidate;
           continue;
         }
+
         if (line) lines.push(line);
         line = "";
+
         for (const character of word) {
           if (font.widthOfTextAtSize(line + character, fontSize) > widthPoints && line) {
             lines.push(line);
             line = "";
           }
+
           line += character;
         }
       }
+
       lines.push(line);
     }
+
     return lines;
   }
 
@@ -133,6 +144,7 @@ class PdfLayout {
     lines.forEach((line, index) => {
       this.ensure(index === 0 ? lineHeightPoints * Math.min(lines.length, 2) : lineHeightPoints);
       this.cursorPoints -= lineHeightPoints;
+
       if (index === 0 && options.prefix) {
         this.page.drawText(this.sanitize(options.prefix.text), {
           x: MARGIN_POINTS,
@@ -142,6 +154,7 @@ class PdfLayout {
           color: options.prefix.style.color ?? COLORS.text,
         });
       }
+
       this.page.drawText(line, {
         x: MARGIN_POINTS + indentPoints,
         y: this.cursorPoints,
@@ -196,6 +209,7 @@ class PdfLayout {
 
   table(rows: { label: string; value: string }[], widthPoints: number) {
     const fontSize = 10.5;
+
     for (const row of rows) {
       this.ensure(fontSize * 1.6);
       this.cursorPoints -= fontSize * 1.6;
@@ -227,6 +241,7 @@ class PdfLayout {
         pages.length > 1
           ? `${this.sanitize(title)}  ·  ${index + 1}/${pages.length}`
           : this.sanitize(title);
+
       page.drawText(text, {
         x: PAGE_WIDTH_POINTS - MARGIN_POINTS - this.fonts.regular.widthOfTextAtSize(text, 8.5),
         y: MARGIN_POINTS / 2,
@@ -249,17 +264,21 @@ export async function recipeToPdf(recipe: RecipeDocument, picture?: PdfPicture |
     document.embedFont(StandardFonts.HelveticaBold),
     document.embedFont(StandardFonts.HelveticaOblique),
   ]);
+
   const layout = new PdfLayout(document, { regular, bold });
   const body: TextStyle = { font: regular, fontSize: 10.5, lineHeight: 1.45 };
   const marker: TextStyle = { font: bold, fontSize: 10.5, color: COLORS.accent };
 
   let image: PDFImage | null = null;
+
   try {
     if (picture?.contentType === "image/jpeg") image = await document.embedJpg(picture.bytes);
+
     if (picture?.contentType === "image/png") image = await document.embedPng(picture.bytes);
   } catch {
     image = null;
   }
+
   if (image) {
     layout.image(image, 250);
     layout.space(18);
@@ -267,10 +286,12 @@ export async function recipeToPdf(recipe: RecipeDocument, picture?: PdfPicture |
 
   layout.text(recipe.title, { font: bold, fontSize: 24, lineHeight: 1.2 });
   const meta = formatMeta(recipe);
+
   if (meta) {
     layout.space(4);
     layout.text(meta, { font: regular, fontSize: 10.5, color: COLORS.muted });
   }
+
   if (recipe.tags.length > 0) {
     layout.space(2);
     layout.text(recipe.tags.map((tag) => `#${tag}`).join("  "), {
@@ -282,9 +303,12 @@ export async function recipeToPdf(recipe: RecipeDocument, picture?: PdfPicture |
 
   if (hasIngredients(recipe)) {
     layout.heading("Ingredients");
+
     for (const section of recipe.ingredients) {
       if (section.ingredients.length === 0) continue;
+
       if (section.title) layout.subheading(section.title);
+
       for (const ingredient of section.ingredients) {
         layout.text(formatIngredient(ingredient), body, {
           indentPoints: 14,
@@ -296,8 +320,10 @@ export async function recipeToPdf(recipe: RecipeDocument, picture?: PdfPicture |
 
   if (hasSteps(recipe)) {
     layout.heading("Steps");
+
     for (const section of recipe.steps) {
       if (section.steps.length === 0) continue;
+
       if (section.title) layout.subheading(section.title);
       section.steps.forEach((step, index) => {
         layout.text(step.text, body, {
@@ -310,6 +336,7 @@ export async function recipeToPdf(recipe: RecipeDocument, picture?: PdfPicture |
   }
 
   const nutrition = nutritionRows(recipe.nutrition);
+
   if (nutrition.length > 0) {
     layout.heading("Nutrition per serving");
     layout.table(nutrition, 220);
@@ -326,5 +353,6 @@ export async function recipeToPdf(recipe: RecipeDocument, picture?: PdfPicture |
   }
 
   layout.footer(recipe.title);
+
   return document.save();
 }

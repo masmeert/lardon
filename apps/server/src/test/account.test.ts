@@ -1,3 +1,4 @@
+import { InvalidRequest, Unauthorized } from "@lardon/api";
 import { familyStoreId, personalStoreId } from "@lardon/recipes/store-id";
 import { Effect } from "effect";
 import { describe, expect, it } from "vite-plus/test";
@@ -22,7 +23,7 @@ describe("account", () => {
         const anonymous = yield* clientFor(null);
         yield* anonymous.health();
         const error = yield* anonymous.families.list().pipe(Effect.flip);
-        expect(error).toMatchObject({ _tag: "Unauthorized", message: "Sign in to continue." });
+        expect(error).toEqual(new Unauthorized({ message: "Sign in to continue." }));
       }),
     ));
 });
@@ -35,6 +36,7 @@ describe("recipe store access", () => {
         const alice = yield* createUser("Alice");
         const bob = yield* createUser("Bob");
         const family = yield* alice.api.families.create({ payload: { name: "Meerts" } });
+
         const canAccess = (userId: string, storeId: string) =>
           families.canAccessRecipeStore(userId, storeId);
 
@@ -66,10 +68,12 @@ describe("images", () => {
           params: { storeId: personalStoreId(alice.id) },
           payload: TINY_PNG,
         });
+
         expect(imageKey).toMatch(new RegExp(`^${personalStoreId(alice.id)}/[0-9a-f-]{36}\\.png$`));
         expect(images.get(imageKey)?.contentType).toBe("image/png");
 
         const anonymous = yield* clientFor(null);
+        // SAFETY: the API returns an ImageKey, which only matches "<storeId>/<fileName>".
         const [storeId, fileName] = imageKey.split("/") as [string, string];
         const downloaded = yield* anonymous.imageFiles.download({ params: { storeId, fileName } });
         expect([...downloaded]).toEqual([...TINY_PNG]);
@@ -77,6 +81,7 @@ describe("images", () => {
         const foreign = yield* bob.api.images
           .upload({ params: { storeId: personalStoreId(alice.id) }, payload: TINY_PNG })
           .pipe(Effect.flip);
+
         expect(foreign._tag).toBe("NotFound");
 
         const notAnImage = yield* alice.api.images
@@ -85,10 +90,10 @@ describe("images", () => {
             payload: new TextEncoder().encode("nope"),
           })
           .pipe(Effect.flip);
-        expect(notAnImage).toMatchObject({
-          _tag: "InvalidRequest",
-          message: "The image must be a JPEG, PNG or WebP file.",
-        });
+
+        expect(notAnImage).toEqual(
+          new InvalidRequest({ message: "The image must be a JPEG, PNG or WebP file." }),
+        );
         expect(images.size).toBe(1);
       }),
     ));

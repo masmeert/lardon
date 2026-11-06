@@ -32,42 +32,55 @@ export const ImageUploadHandlers = HttpApiBuilder.group(
   Effect.fn(function* (handlers) {
     const families = yield* Families;
     const storage = yield* ImageStorage;
+
     return handlers.handleAll({
       upload: Effect.fn("images.upload")(function* ({ params, payload }) {
         const user = yield* CurrentUser;
+
         if (!(yield* families.canAccessRecipeStore(user.id, params.storeId))) {
           return yield* new NotFound({ message: "This recipe collection doesn't exist." });
         }
+
         if (payload.byteLength === 0) {
           return yield* new InvalidRequest({
             message: "The image is empty. Choose another picture.",
           });
         }
+
         if (payload.byteLength > MAX_IMAGE_BYTES) {
           return yield* new InvalidRequest({
             message: "The image is larger than 5 MB. Choose a smaller picture or resize it.",
           });
         }
+
         const imageType = sniffImageType(payload);
+
         if (!imageType) {
           return yield* new InvalidRequest({
             message: "The image must be a JPEG, PNG or WebP file.",
           });
         }
+
         const imageKey = `${params.storeId}/${crypto.randomUUID()}.${imageType.extension}`;
         yield* storage.put(imageKey, payload, imageType.contentType);
+
         return { imageKey };
       }),
       copy: Effect.fn("images.copy")(function* ({ params, payload }) {
         const user = yield* CurrentUser;
+        // SAFETY: ImageKey only matches "<storeId>/<fileName>", so splitting yields exactly two parts.
         const [sourceStoreId, fileName] = payload.imageKey.split("/") as [string, string];
+
         const allowed =
           (yield* families.canAccessRecipeStore(user.id, params.storeId)) &&
           (yield* families.canAccessRecipeStore(user.id, sourceStoreId));
+
         const imageKey = `${params.storeId}/${crypto.randomUUID()}.${fileName.split(".")[1]}`;
+
         if (!allowed || !(yield* storage.copy(payload.imageKey, imageKey))) {
           return yield* new NotFound({ message: "This picture doesn't exist." });
         }
+
         return { imageKey };
       }),
     });
@@ -79,10 +92,13 @@ export const ImageDownloadHandlers = HttpApiBuilder.group(
   "imageFiles",
   Effect.fn(function* (handlers) {
     const storage = yield* ImageStorage;
+
     return handlers.handleRaw("download", ({ params }) =>
       Effect.gen(function* () {
         const image = yield* storage.get(`${params.storeId}/${params.fileName}`);
+
         if (!image) return yield* new NotFound({ message: "This picture doesn't exist." });
+
         return HttpServerResponse.fromWeb(
           new Response(image.body, {
             headers: {

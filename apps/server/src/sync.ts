@@ -19,24 +19,31 @@ import { RateLimits, tooManyRequests } from "./rate-limits";
 function authorizeRecipeStore(
   phase: "connect" | "push" | "pull",
   headers: ForwardedHeaders | undefined,
-  payload: unknown,
+  payload: Schema.Json | undefined,
   storeId: string,
 ) {
   const authorization = Effect.gen(function* () {
     const sessionHeaders = new Headers([...(headers ?? new Map<string, string>())]);
     const decoded = Schema.decodeUnknownOption(RecipeSyncPayload)(payload);
+
     if (!sessionHeaders.has("cookie") && Option.isSome(decoded)) {
       sessionHeaders.set("cookie", decoded.value.sessionCookie);
     }
+
     const user = yield* (yield* Authentication).userFromHeaders(sessionHeaders);
+
     if (!user) return yield* new Unauthorized({ message: "Sign in to sync your recipes." });
     yield* set({ user: { id: user.id } });
+
     if (!(yield* (yield* Families).canAccessRecipeStore(user.id, storeId))) {
       return yield* new NotFound({ message: "You don't have access to this recipe collection." });
     }
+
     return user.id;
   });
+
   const logged = withLogger(`sync.${phase}`, { drain: axiomDrain, fields: { storeId } });
+
   return serverRuntime.runPromise(
     phase === "connect"
       ? authorization.pipe(logged)
@@ -47,20 +54,27 @@ function authorizeRecipeStore(
 }
 
 export class SyncBackendDO extends makeDurableObject({
+  // oxlint-disable-next-line anti-slop-effect/no-manual-tagged-construction -- livestore's storage option is a plain tagged literal with no constructor
   storage: { _tag: "do-sqlite" },
   enabledTransports: new Set(["ws"]),
   forwardHeaders: ["cookie"],
   onPush: async (message, { storeId, headers, payload }) => {
     const userId = await authorizeRecipeStore("push", headers, payload, storeId);
+
     const forged = message.batch.find(
       (event) =>
         event.name === recipeEvents.recipeCreated.name &&
-        (event.args as { createdById?: unknown }).createdById !== userId,
+        !Option.exists(
+          Schema.decodeUnknownOption(Schema.Struct({ createdById: Schema.String }))(event.args),
+          (args) => args.createdById === userId,
+        ),
     );
+
     if (forged) {
       const rejection = new Forbidden({
         message: "Recipes can only be created on behalf of the signed-in user.",
       });
+
       await serverRuntime.runPromise(
         Effect.ignore(
           Effect.fail(rejection).pipe(
@@ -78,21 +92,19 @@ export class SyncBackendDO extends makeDurableObject({
     await authorizeRecipeStore("pull", headers, payload, storeId);
   },
 }) {
+  declare readonly ctx: DurableObjectState;
+
   async deleteStore() {
-    const { ctx } = this as unknown as { ctx: DurableObjectState };
-    for (const socket of ctx.getWebSockets()) {
+    for (const socket of this.ctx.getWebSockets()) {
       socket.close(4404, "This recipe collection was deleted.");
     }
-    await ctx.storage.deleteAll();
+
+    await this.ctx.storage.deleteAll();
   }
 }
 
-type SyncRequest = Parameters<typeof matchSyncRequest>[0];
-
 export function matchRecipeSyncRequest(request: Request) {
-  return new URL(request.url).pathname === "/sync"
-    ? matchSyncRequest(request as unknown as SyncRequest)
-    : undefined;
+  return new URL(request.url).pathname === "/sync" ? matchSyncRequest(request) : undefined;
 }
 
 export async function handleRecipeSyncRequest(
@@ -108,21 +120,22 @@ export async function handleRecipeSyncRequest(
       );
     }),
   );
+
   if (!allowed) {
     return Response.json(
       { _tag: tooManyRequests._tag, message: tooManyRequests.message },
       { status: 429, headers: { "retry-after": "60" } },
     );
   }
-  const response = await handleSyncRequest({
-    request: request as unknown as SyncRequest,
+
+  return handleSyncRequest({
+    request,
     searchParams,
-    ctx: executionContext as unknown as Parameters<typeof handleSyncRequest>[0]["ctx"],
+    ctx: executionContext,
     syncBackendBinding: "SYNC_BACKEND",
     syncPayloadSchema: RecipeSyncPayload,
     validatePayload: async (payload, { storeId, headers }) => {
       await authorizeRecipeStore("connect", headers, payload, storeId);
     },
   });
-  return response as unknown as Response;
 }

@@ -21,9 +21,7 @@ export const axiomDrain = createAxiomDrain();
 const InfrastructureLive = Layer.mergeAll(
   Layer.sync(Database, () => Database.make(createDb(ENV))),
   Layer.sync(ImageStorage, () => ImageStorage.fromR2(ENV.IMAGES)),
-  Layer.sync(RecipeStoreBackend, () =>
-    RecipeStoreBackend.fromDurableObjects(ENV.SYNC_BACKEND as unknown as DurableObjectNamespace),
-  ),
+  Layer.sync(RecipeStoreBackend, () => RecipeStoreBackend.fromDurableObjects(ENV.SYNC_BACKEND)),
   Layer.sync(Mailer, () =>
     ENV.EMAIL ? Mailer.fromCloudflare(ENV.EMAIL, ENV.EMAIL_FROM) : Mailer.logOnly(),
   ),
@@ -42,6 +40,7 @@ const AuthenticationLive = Layer.effect(
     const database = yield* Database;
     const mailer = yield* Mailer;
     const accounts = yield* Accounts;
+
     return Authentication.fromBetterAuth(
       createAuth(ENV, database.client, {
         sendEmail: (email) => Effect.runPromise(mailer.send(authEmail(email))),

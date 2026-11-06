@@ -167,9 +167,6 @@ catalogs:
     '@better-auth/expo':
       specifier: 1.7.12
       version: 1.7.12
-    '@cloudflare/workers-types':
-      specifier: ^5.20260906.1
-      version: 5.20261104.1
     '@livestore/adapter-node':
       specifier: 0.5.0
       version: 0.5.0
@@ -197,6 +194,7 @@ catalogs:
 
 overrides:
   vite@*: npm:@voidzero-dev/vite-plus-core@1.4.0
+  '@cloudflare/workers-types': ^5.20260906.1
   effect: 4.1.2
   '@effect/platform-node-shared': 4.1.2
   '@effect/platform-node': 4.1.2
@@ -210,7 +208,7 @@ importers:
   .:
     devDependencies:
       '@cloudflare/workers-types':
-        specifier: 'catalog:'
+        specifier: ^5.20260906.1
         version: 5.20261104.1
       '@lardon/config':
         specifier: workspace:*
@@ -404,7 +402,7 @@ importers:
         version: 1.23.0
     devDependencies:
       '@cloudflare/workers-types':
-        specifier: 'catalog:'
+        specifier: ^5.20260906.1
         version: 5.20261104.1
       '@lardon/config':
         specifier: workspace:*
@@ -1189,9 +1187,6 @@ packages:
     engines: {node: '>=16'}
     cpu: [x64]
     os: [win32]
-
-  '@cloudflare/workers-types@4.20251118.0':
-    resolution: {integrity: sha512-O1BlPjaQlM5rsxf8rc8NwNrXduzXMCWZDsSelI1SEyt0zYuBYMzn0kNrrD2bXAtXeYCk6LrX98037AlVdGXBUw==}
 
   '@cloudflare/workers-types@5.20261104.1':
     resolution: {integrity: sha512-XSPcK88JXnW/oC82wuXvaP7vgyk2myydugbgOd/RcLKwqkwW0cP09Ozp9ItACa4IAZ7uKtMIfxZpUTXajYVd1Q==}
@@ -3726,7 +3721,7 @@ packages:
       '@aws-sdk/client-rds-data': '>=3'
       '@aws/aurora-dsql-node-postgres-connector': '>=0.1.9'
       '@aws/aurora-dsql-postgresjs-connector': '>=0.3.0'
-      '@cloudflare/workers-types': '>=4'
+      '@cloudflare/workers-types': ^5.20260906.1
       '@drizzle-team/minipg': '>=0.4.2'
       '@effect/sql-d1': '>=4.0.0'
       '@effect/sql-libsql': '>=4.0.0'
@@ -6655,8 +6650,6 @@ snapshots:
   '@cloudflare/workerd-windows-64@1.20261026.1':
     optional: true
 
-  '@cloudflare/workers-types@4.20251118.0': {}
-
   '@cloudflare/workers-types@5.20261104.1': {}
 
   '@distilled.cloud/acme@1.0.0-rc.18(effect@4.1.2)':
@@ -7389,7 +7382,7 @@ snapshots:
 
   '@livestore/common-cf@0.5.0(@effect/opentelemetry@4.1.2(@opentelemetry/api@1.10.0)(@opentelemetry/resources@2.12.0(@opentelemetry/api@1.10.0))(@opentelemetry/semantic-conventions@1.44.0)(effect@4.1.2))(@effect/platform-browser@4.1.2(effect@4.1.2))(@effect/platform-bun@4.1.2(effect@4.1.2))(@effect/platform-node-shared@4.1.2(effect@4.1.2))(@effect/platform-node@4.1.2(effect@4.1.2)(redis@6.3.1(@opentelemetry/api@1.10.0)))(@effect/vitest@4.1.2(effect@4.1.2)(vitest@5.0.5))(@opentelemetry/api@1.10.0)(@opentelemetry/resources@2.12.0(@opentelemetry/api@1.10.0))(@standard-schema/spec@1.1.0)(effect@4.1.2)':
     dependencies:
-      '@cloudflare/workers-types': 4.20251118.0
+      '@cloudflare/workers-types': 5.20261104.1
       '@effect/opentelemetry': 4.1.2(@opentelemetry/api@1.10.0)(@opentelemetry/resources@2.12.0(@opentelemetry/api@1.10.0))(@opentelemetry/semantic-conventions@1.44.0)(effect@4.1.2)
       '@effect/platform-browser': 4.1.2(effect@4.1.2)
       '@effect/platform-bun': 4.1.2(effect@4.1.2)
@@ -7435,7 +7428,7 @@ snapshots:
 
   '@livestore/sqlite-wasm@0.5.0(@effect/opentelemetry@4.1.2(@opentelemetry/api@1.10.0)(@opentelemetry/resources@2.12.0(@opentelemetry/api@1.10.0))(@opentelemetry/semantic-conventions@1.44.0)(effect@4.1.2))(@effect/platform-browser@4.1.2(effect@4.1.2))(@effect/platform-bun@4.1.2(effect@4.1.2))(@effect/platform-node-shared@4.1.2(effect@4.1.2))(@effect/platform-node@4.1.2(effect@4.1.2)(redis@6.3.1(@opentelemetry/api@1.10.0)))(@effect/vitest@4.1.2(effect@4.1.2)(vitest@5.0.5))(@opentelemetry/api@1.10.0)(@opentelemetry/resources@2.12.0(@opentelemetry/api@1.10.0))(@standard-schema/spec@1.1.0)(effect@4.1.2)':
     dependencies:
-      '@cloudflare/workers-types': 4.20251118.0
+      '@cloudflare/workers-types': 5.20261104.1
       '@effect/opentelemetry': 4.1.2(@opentelemetry/api@1.10.0)(@opentelemetry/resources@2.12.0(@opentelemetry/api@1.10.0))(@opentelemetry/semantic-conventions@1.44.0)(effect@4.1.2)
       '@effect/platform-browser': 4.1.2(effect@4.1.2)
       '@effect/platform-bun': 4.1.2(effect@4.1.2)
@@ -7453,7 +7446,7 @@ snapshots:
 
   '@livestore/sync-cf@0.5.0(@effect/opentelemetry@4.1.2(@opentelemetry/api@1.10.0)(@opentelemetry/resources@2.12.0(@opentelemetry/api@1.10.0))(@opentelemetry/semantic-conventions@1.44.0)(effect@4.1.2))(@effect/platform-browser@4.1.2(effect@4.1.2))(@effect/platform-bun@4.1.2(effect@4.1.2))(@effect/platform-node-shared@4.1.2(effect@4.1.2))(@effect/platform-node@4.1.2(effect@4.1.2)(redis@6.3.1(@opentelemetry/api@1.10.0)))(@effect/vitest@4.1.2(effect@4.1.2)(vitest@5.0.5))(@opentelemetry/api@1.10.0)(@opentelemetry/resources@2.12.0(@opentelemetry/api@1.10.0))(@standard-schema/spec@1.1.0)(effect@4.1.2)':
     dependencies:
-      '@cloudflare/workers-types': 4.20251118.0
+      '@cloudflare/workers-types': 5.20261104.1
       '@effect/opentelemetry': 4.1.2(@opentelemetry/api@1.10.0)(@opentelemetry/resources@2.12.0(@opentelemetry/api@1.10.0))(@opentelemetry/semantic-conventions@1.44.0)(effect@4.1.2)
       '@effect/platform-browser': 4.1.2(effect@4.1.2)
       '@effect/platform-bun': 4.1.2(effect@4.1.2)
