@@ -1,0 +1,26 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans: var(--font-hanken-grotesk);
+  --color-paper: #faf8f5;
+  --color-ink-strong: #221c18;
+  --color-ink: #3a312b;
+  --color-muted: #5f554d;
+  --color-muted-soft: #776b62;
+  --color-line: #e8e2db;
+  --color-line-strong: #d8d0c6;
+  --color-accent-soft: #f0ebe4;
+}
+
+@utility prose-lardon {
+  --tw-prose-body: var(--color-muted);
+  --tw-prose-headings: var(--color-ink-strong);
+  --tw-prose-links: var(--color-ink-strong);
+  --tw-prose-bold: var(--color-ink);
+  --tw-prose-counters: var(--color-muted-soft);
+  --tw-prose-bullets: var(--color-line-strong);
+  --tw-prose-hr: var(--color-line);
+  --tw-prose-th-borders: var(--color-line-strong);
+  --tw-prose-td-borders: var(--color-line);
+}

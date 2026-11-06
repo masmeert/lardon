@@ -1,7 +1,11 @@
 export const operator = {
   name: "Massimo Meert",
-  contactEmail: "pro@masmeert.com",
+  address: "Rue de la Station 13, 6181 Courcelles",
   country: "Belgium",
+  enterpriseNumber: "BE 0785.590.429",
+  contactEmail: "pro@masmeert.com",
 };
 
 export const lastUpdated = "6 November 2026";
+
+export const sourceCodeUrl = "https://github.com/masmeert/lardon";

@@ -1,90 +1,308 @@
 ---
+import Contents from "../components/contents.astro";
+import Summary from "../components/summary.astro";
 import Page from "../layouts/page.astro";
-import { lastUpdated, operator } from "../operator";
+import { lastUpdated, operator, sourceCodeUrl } from "../operator";
 ---
 
 <Page title="Privacy Policy" description="What Lardon collects, why, and the choices you have.">
   <h1>Privacy Policy</h1>
-  <p class="updated">Last updated {lastUpdated}</p>
+  <p class="mt-0 text-muted-soft">Last updated {lastUpdated}</p>
 
   <p>
-    Lardon is a family cookbook app run by {operator.name}. This policy explains what we collect when
-    you use Lardon, why, and what you can do about it. We don't sell your data, show ads or track
-    you across other apps and websites.
+    Lardon is a family cookbook app. This policy explains what we collect when you use the Lardon
+    app and this website, why we collect it, who can see it and what you can do about it.
   </p>
 
-  <h2>What we collect</h2>
+  <Summary>
+    <ul>
+      <li>We collect only what Lardon needs to work: your account, your recipes and photos.</li>
+      <li>We don't sell your data, show ads, use analytics or track you across apps and websites.</li>
+      <li>Only you and the families you join can see your recipes.</li>
+      <li>You can delete your account and data from the app at any time.</li>
+    </ul>
+  </Summary>
+
+  <Contents
+    sections={[
+      { id: "who-we-are", title: "Who we are" },
+      { id: "what-we-collect", title: "What we collect" },
+      { id: "what-we-dont-collect", title: "What we don't collect" },
+      { id: "how-we-use-it", title: "How we use it" },
+      { id: "who-can-see-it", title: "Who can see it" },
+      { id: "where-its-stored", title: "Where it's stored" },
+      { id: "how-long-we-keep-it", title: "How long we keep it" },
+      { id: "security", title: "Security" },
+      { id: "your-rights", title: "Your rights and choices" },
+      { id: "children", title: "Children" },
+      { id: "changes", title: "Changes to this policy" },
+      { id: "contact", title: "Contact" },
+    ]}
+  />
+
+  <h2 id="who-we-are">1. Who we are</h2>
+  <p>
+    Lardon is made and run by {operator.name}, registered as a business in {operator.country} ("we",
+    "us"). We decide how your personal data is used, which
+    makes us its controller under the EU General Data Protection Regulation (GDPR). You can reach
+    us at{" "}
+    <a href={`mailto:${operator.contactEmail}`}>{operator.contactEmail}</a>.
+  </p>
+
+  <h2 id="what-we-collect">2. What we collect</h2>
+  <h3>What you give us</h3>
   <ul>
+    <li><strong>Account details:</strong> your email address, your name and, if you add one, a profile photo.</li>
     <li>
-      <strong>Account details:</strong> your email address and name. If you sign in with Apple or
-      Google, we also receive an identifier for that account and, if you allow it, your name and
-      profile picture. If you use Apple's "Hide My Email", we only receive the relay address Apple
-      gives us.
+      <strong>Your recipes:</strong> the recipes, photos and meal plans you add, and the families you
+      create or join, including who is in them and their role.
     </li>
     <li>
-      <strong>Sign-in data:</strong> one-time sign-in codes (stored hashed and valid for 5 minutes)
-      and active sessions, including the IP address and device type they were created from.
-    </li>
-    <li>
-      <strong>What you add to Lardon:</strong> recipes, photos, family groups and the people you
-      share them with.
-    </li>
-    <li>
-      <strong>Technical logs:</strong> short-lived server logs of requests (such as the address
-      requested and whether it succeeded), used to keep the service running and secure.
+      <strong>Messages to us:</strong> if you email us, we keep your message and our reply so we can
+      help you.
     </li>
   </ul>
 
-  <h2>Why we use it</h2>
-  <ul>
-    <li>To create your account and sign you in.</li>
-    <li>To store your recipes and share them with the family members you choose.</li>
-    <li>To send you sign-in codes by email.</li>
-    <li>To keep Lardon secure, prevent abuse and fix problems.</li>
-  </ul>
   <p>
-    We process this data to provide the service you asked for and, for security logs, because we
-    have a legitimate interest in keeping Lardon safe.
+    We need your email address to create your account, since that's how you sign in: without it,
+    you can't use Lardon. Your name, photo and everything else you add are up to you.
   </p>
 
-  <h2>Who we share it with</h2>
-  <p>We only share data with the services needed to run Lardon:</p>
+  <h3>What we receive when you sign in</h3>
   <ul>
-    <li><strong>Cloudflare</strong> hosts our servers, database, photo storage and email sending.</li>
     <li>
-      <strong>Apple</strong> and <strong>Google</strong>, only if you choose to sign in with them.
+      <strong>Email codes:</strong> when you sign in with your email, we send you a one-time code. We
+      store it hashed, so we can't read it, and it expires after 5 minutes.
+    </li>
+    <li>
+      <strong>Apple or Google:</strong> if you choose to sign in with Apple or Google, they send us an
+      identifier for your account, your email address and, if you allow it, your name and profile
+      picture. If you use Apple's "Hide My Email", we only receive the relay address Apple gives us.
+    </li>
+    <li>
+      <strong>Sessions:</strong> to keep you signed in, we store a session along with the IP address
+      and device type it was created from.
     </li>
   </ul>
-  <p>The people in your family groups can see the recipes and photos you share with them.</p>
 
-  <h2>How long we keep it</h2>
+  <h3>What we collect automatically</h3>
+  <ul>
+    <li>
+      <strong>Server logs:</strong> when the app talks to our servers, we log technical details of
+      the request, such as the address requested, the time, whether it succeeded and your IP address.
+      We use them to keep Lardon running, fix problems and stop abuse.
+    </li>
+  </ul>
+
+  <h3>Permissions on your phone</h3>
   <p>
-    We keep your account and content for as long as you have an account. Sign-in codes expire after
-    5 minutes, sessions expire on their own, and server logs are deleted after a few days. When you
-    delete your account, we delete your account details and the content only you have access to.
+    Lardon asks for access to your photos only when you choose one to add, and only uploads the
+    photo you pick. You can turn this permission off at any time in your phone's settings.
   </p>
 
-  <h2>Your rights</h2>
+  <h2 id="what-we-dont-collect">3. What we don't collect</h2>
+  <ul>
+    <li>No analytics, advertising or tracking tools, in the app or on this website.</li>
+    <li>No cookies on this website.</li>
+    <li>No location, contacts or other data from your phone beyond the photos you pick.</li>
+    <li>No passwords: you sign in with an email code, Apple or Google.</li>
+    <li>No payment details: Lardon is free and has no purchases.</li>
+  </ul>
+
+  <h2 id="how-we-use-it">4. How we use it</h2>
   <p>
-    You can ask us for a copy of your data, to correct it, or to delete your account and data. You
-    can also object to how we use it or ask us to limit it. Email{" "}
-    <a href={`mailto:${operator.contactEmail}`}>{operator.contactEmail}</a> and we'll reply within
-    30 days. If you're unhappy with our answer, you can complain to your local data protection
-    authority.
+    We only use your data for the purposes below. The GDPR requires a legal reason for each one,
+    which we list in brackets.
+  </p>
+  <ul>
+    <li>
+      To create your account, sign you in and send you sign-in codes{" "}
+      <span class="text-muted-soft">(to provide the service you asked for)</span>.
+    </li>
+    <li>
+      To store your recipes, keep them in sync across your devices and share them with the families
+      you choose <span class="text-muted-soft">(to provide the service you asked for)</span>.
+    </li>
+    <li>
+      To keep Lardon secure, limit abuse and fix problems{" "}
+      <span class="text-muted-soft">(our legitimate interest in running a safe and reliable service)</span>.
+    </li>
+    <li>
+      To answer your messages <span class="text-muted-soft">(our legitimate interest in helping you)</span>.
+    </li>
+    <li>
+      To meet our legal obligations, such as answering a valid request from authorities{" "}
+      <span class="text-muted-soft">(legal obligation)</span>.
+    </li>
+  </ul>
+  <p>
+    We don't use your data for marketing, profiling or automated decisions, and we don't use your
+    recipes or photos to train AI models. Lardon only emails you about your account, such as
+    sign-in codes. Since we don't rely on your consent for any of this, there's no consent to
+    withdraw, but you can object to how we use your data (see{" "}
+    <a href="#your-rights">your rights</a>).
   </p>
 
-  <h2>Children</h2>
-  <p>Lardon isn't intended for children under 13, and we don't knowingly collect their data.</p>
-
-  <h2>Changes</h2>
+  <h2 id="who-can-see-it">5. Who can see it</h2>
+  <p>We don't sell, rent or trade your personal data. It's only seen by:</p>
+  <ul>
+    <li>
+      <strong>Your families:</strong> members of a family can see the family's name, its members'
+      names, profile photos and roles, and the recipes and photos shared with it. Recipes you keep in
+      your own collection are visible only to you.
+    </li>
+    <li>
+      <strong>Cloudflare:</strong> hosts our servers, database and photos, and sends our emails. It
+      processes your data only on our instructions and under a data processing agreement.
+    </li>
+    <li>
+      <strong>Apple and Google:</strong> only if you choose to sign in with them. They handle that
+      sign-in under their own privacy policies.
+    </li>
+    <li>
+      <strong>Authorities:</strong> only if the law requires it, for example a valid court order.
+    </li>
+  </ul>
   <p>
-    If we change this policy, we'll update the date at the top. For important changes, we'll let you
-    know in the app before they apply.
+    If Lardon is ever taken over by someone else, we'll tell you before your data moves and before
+    a different privacy policy applies, so you can delete your account first.
   </p>
 
-  <h2>Contact</h2>
+  <h2 id="where-its-stored">6. Where it's stored</h2>
   <p>
-    {operator.name}, {operator.country}. Questions about privacy:{" "}
+    Your account, recipes and photos are stored with Cloudflare in data centres in the European
+    Union.
+  </p>
+  <p>
+    To keep Lardon fast, Cloudflare handles each request in the data centre closest to you, which
+    can be outside the European Economic Area, for example when you travel. Cloudflare's systems
+    for sending emails and keeping server logs can also run outside it, including in the United
+    States. Transfers to the United States are covered by the European Commission's adequacy
+    decision for the EU-US Data Privacy Framework, under which Cloudflare is certified. Transfers
+    to other countries are covered by the Commission's Standard Contractual Clauses. Both are part
+    of{" "}
+    <a href="https://www.cloudflare.com/cloudflare-customer-dpa/">Cloudflare's data processing
+    agreement</a>, and Cloudflare lists the{" "}
+    <a href="https://www.cloudflare.com/gdpr/subprocessors/cloudflare-services/">companies it
+    works with</a>.
+  </p>
+
+  <h2 id="how-long-we-keep-it">7. How long we keep it</h2>
+  <table>
+    <thead>
+      <tr>
+        <th scope="col">Data</th>
+        <th scope="col">How long</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Account details</td>
+        <td>Until you delete your account</td>
+      </tr>
+      <tr>
+        <td>Recipes and photos</td>
+        <td>Until you delete them, or the cookbook they're in is deleted (see below)</td>
+      </tr>
+      <tr>
+        <td>Sessions</td>
+        <td>Until you sign out, or 7 days after you last use Lardon</td>
+      </tr>
+      <tr>
+        <td>Server logs</td>
+        <td>7 days at most</td>
+      </tr>
+      <tr>
+        <td>Emails with us</td>
+        <td>12 months after our last message</td>
+      </tr>
+      <tr>
+        <td>Backups</td>
+        <td>30 days</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>
+    When you delete a recipe, we erase its content and photos from our servers within seconds of
+    the deletion reaching us, which is right away when you're online. Deleted recipes can't be
+    restored, and Lardon on your other phones removes them the next time they sync. For a recipe
+    you keep, its history holds earlier versions of the text, including ingredients and steps you
+    removed, so your devices stay in sync; they're erased with the recipe. Photos you replace or
+    remove are deleted as soon as the change reaches us. Recipes are also erased when their
+    cookbook is deleted: your own cookbook when you delete your account, a family's when the
+    family is deleted.
+  </p>
+  <p>
+    When you delete your account, we immediately delete your account details, sessions, your own
+    cookbook and your photos, and you leave your families. Recipes you shared with a family stay
+    with that family so its other members don't lose them. If you were the last member of a
+    family, the family and its recipes are deleted too. Deleted data disappears from our backups
+    within 30 days.
+  </p>
+
+  <h2 id="security">8. Security</h2>
+  <p>
+    All data travels between the app and our servers over encrypted connections. Sign-in codes are
+    stored hashed, your session is kept in your phone's secure storage, and sign-in attempts are
+    rate-limited to block guessing. Each request is checked so that you can only reach your own
+    data and your families' recipes. Lardon's <a href={sourceCodeUrl}>source code is public</a>,
+    so anyone can check how it handles your data.
+  </p>
+  <p>
+    No service can be perfectly secure. If a breach puts your data at risk, we'll tell you and the
+    data protection authority without undue delay, as the law requires.
+  </p>
+
+  <h2 id="your-rights">9. Your rights and choices</h2>
+  <p>Wherever you live, you can:</p>
+  <ul>
+    <li><strong>Access</strong> your data and get a copy of it.</li>
+    <li><strong>Correct</strong> it if it's wrong.</li>
+    <li><strong>Delete</strong> it, along with your account.</li>
+    <li><strong>Move</strong> it to another service: we'll send it to you as a JSON file.</li>
+    <li><strong>Limit</strong> how we use it, for example while we check a correction.</li>
+  </ul>
+  <p>
+    You can also <strong>object</strong> at any time to the uses we base on our legitimate
+    interests, such as server logs and security checks. We'll stop unless we have compelling
+    reasons that override yours, such as stopping abuse.
+  </p>
+  <p>
+    You can change your name and photo in the app's settings, and delete your account under
+    Settings, then Delete account. For anything else, email{" "}
+    <a href={`mailto:${operator.contactEmail}`}>{operator.contactEmail}</a> from the address of
+    your account. We may ask you to confirm it's you, and we'll reply within one month. We haven't
+    appointed a data protection officer, since the law doesn't require one for Lardon: you deal
+    with us directly.
+  </p>
+  <p>
+    If you're unhappy with how we handled your request, you can complain to the{" "}
+    <a href="https://www.dataprotectionauthority.be">Belgian Data Protection Authority</a> (Rue de
+    la Presse 35, 1000 Brussels) or the data protection authority where you live.
+  </p>
+  <p>
+    If you live in California or another US state with a privacy law: we don't sell or share your
+    personal information for advertising, and you have the rights above. We won't treat you
+    differently for using them.
+  </p>
+
+  <h2 id="children">10. Children</h2>
+  <p>
+    You must be at least 13 to have a Lardon account, and we don't knowingly collect data from
+    younger children. If you think a child under 13 has given us their data, email us and we'll
+    delete it.
+  </p>
+
+  <h2 id="changes">11. Changes to this policy</h2>
+  <p>
+    If we change this policy, we'll update the date at the top. For important changes, we'll let
+    you know by email and in the app before they apply.
+  </p>
+
+  <h2 id="contact">12. Contact</h2>
+  <p>
+    {operator.name}, {operator.address}, {operator.country}. Enterprise and VAT number{" "}
+    {operator.enterpriseNumber}. Questions about privacy:{" "}
     <a href={`mailto:${operator.contactEmail}`}>{operator.contactEmail}</a>.
   </p>
 </Page>
