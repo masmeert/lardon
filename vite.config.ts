@@ -7,7 +7,7 @@ export default defineConfig({
     env: { builtin: true },
     options: { typeAware: true, typeCheck: true },
   },
-  fmt: { singleQuote: false, semi: true, sortPackageJson: true },
+  fmt: { singleQuote: false, semi: true, sortPackageJson: true, ignorePatterns: ["LICENSE.md"] },
   staged: {
     "*": "vp check --fix",
   },

@@ -106,3 +106,7 @@ lardon/
 - `vp lint`: Run lint checks
 - `vp fmt`: Format the workspace
 - `vp staged`: Run checks against staged files (runs on pre-commit)
+
+## License
+
+Lardon is source-available under the [PolyForm Strict License 1.0.0](LICENSE.md). You may read the code and use it for personal, noncommercial purposes, but you may not modify it, redistribute it, or use it commercially.
