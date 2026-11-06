@@ -11,7 +11,6 @@
   "devDependencies": {
     "@alchemy.run/axiom": "2.0.0-beta.85",
     "@alchemy.run/cloudflare": "2.0.0-beta.85",
-    "@effect/platform-bun": "catalog:",
     "@effect/platform-node": "catalog:",
     "@lardon/config": "workspace:*",
     "alchemy": "2.0.0-beta.85",

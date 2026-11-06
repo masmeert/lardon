@@ -28,7 +28,6 @@ catalog:
   "@livestore/sync-cf": 0.5.0
   "@livestore/adapter-node": 0.5.0
   "@livestore/peer-deps": 0.5.0
-  "@effect/platform-bun": 4.1.2
   "@effect/platform-node": 4.1.2
   vite: npm:@voidzero-dev/vite-plus-core@1.4.0
   vite-plus: 1.4.0

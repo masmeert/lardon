@@ -5,7 +5,6 @@
   "main": "src/index.ts",
   "scripts": {
     "build": "vp pack",
-    "compile": "bun build --compile --no-compile-autoload-dotenv --minify --sourcemap --bytecode ./src/index.ts --outfile server",
     "env:generate": "varlock codegen",
     "test": "vp test run"
   },
