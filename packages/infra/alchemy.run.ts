@@ -44,6 +44,7 @@ export const server = Cloudflare.Worker("server", {
     APPLE_BUNDLE_ID: Config.String("APPLE_BUNDLE_ID").pipe(Config.withDefault("")),
     BETTER_AUTH_URL: Cloudflare.Worker.URL,
   },
+  domain: process.env.APP_ENV === "production" ? "api.lardon.masmeert.org" : undefined,
   dev: {
     port: 3000,
   },
