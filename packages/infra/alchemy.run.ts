@@ -52,6 +52,13 @@ export const server = Cloudflare.Worker("server", {
 
 export type ServerEnv = Cloudflare.InferEnv<typeof server>;
 
+export const website = Cloudflare.Website.Astro("website", {
+  rootDir: "../../apps/web",
+  astro: { output: "static" },
+  assets: { notFoundHandling: "404-page" },
+  domain: process.env.APP_ENV === "production" ? "lardon.masmeert.com" : undefined,
+});
+
 export default Alchemy.Stack(
   "lardon",
   {
@@ -60,7 +67,8 @@ export default Alchemy.Stack(
   },
   Effect.gen(function* () {
     const serverWorker = yield* server;
+    const websiteWorker = yield* website;
 
-    return { server: serverWorker.url };
+    return { server: serverWorker.url, website: websiteWorker.url };
   }),
 );

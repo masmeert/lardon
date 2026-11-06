@@ -1,0 +1,75 @@
+---
+import Page from "../layouts/page.astro";
+import { lastUpdated, operator } from "../operator";
+---
+
+<Page title="Terms of Use" description="The rules for using Lardon.">
+  <h1>Terms of Use</h1>
+  <p class="updated">Last updated {lastUpdated}</p>
+
+  <p>
+    These terms apply when you use Lardon, the family cookbook app run by {operator.name}. By
+    creating an account or using Lardon, you agree to them. If you don't agree, please don't use
+    Lardon.
+  </p>
+
+  <h2>Your account</h2>
+  <p>
+    You need an account to use Lardon. Keep access to your email and your Apple or Google account
+    secure, since they're how you sign in. You're responsible for what happens in your account. You
+    must be at least 13 years old to use Lardon.
+  </p>
+
+  <h2>Your recipes</h2>
+  <p>
+    You keep ownership of the recipes, photos and other content you add. You give us permission to
+    store, process and show that content so Lardon can work, including sharing it with the family
+    members you choose. Only add content you have the right to share.
+  </p>
+
+  <h2>Acceptable use</h2>
+  <p>Don't use Lardon to:</p>
+  <ul>
+    <li>break the law or infringe other people's rights;</li>
+    <li>share content that is abusive, hateful or harmful;</li>
+    <li>try to access other people's accounts or data;</li>
+    <li>disrupt or overload the service, or get around its limits and security.</li>
+  </ul>
+  <p>We may suspend or close accounts that break these rules.</p>
+
+  <h2>The service</h2>
+  <p>
+    We work to keep Lardon available and your data safe, but we provide it as is and can't promise
+    it will always be available or free of errors. Keep your own copies of recipes that matter to
+    you. We may change, add or remove features over time.
+  </p>
+
+  <h2>Liability</h2>
+  <p>
+    To the extent the law allows, we aren't liable for indirect losses or for losing content
+    because of events outside our reasonable control. Nothing in these terms limits rights you have
+    under consumer protection law.
+  </p>
+
+  <h2>Closing your account</h2>
+  <p>
+    You can stop using Lardon at any time and ask us to delete your account by emailing{" "}
+    <a href={`mailto:${operator.contactEmail}`}>{operator.contactEmail}</a>. See the{" "}
+    <a href="/privacy">Privacy Policy</a> for what happens to your data.
+  </p>
+
+  <h2>Changes to these terms</h2>
+  <p>
+    If we change these terms, we'll update the date at the top. For important changes, we'll let
+    you know in the app before they apply.
+  </p>
+
+  <h2>Governing law</h2>
+  <p>These terms are governed by the laws of {operator.country}.</p>
+
+  <h2>Contact</h2>
+  <p>
+    Questions about these terms:{" "}
+    <a href={`mailto:${operator.contactEmail}`}>{operator.contactEmail}</a>.
+  </p>
+</Page>

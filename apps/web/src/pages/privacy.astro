@@ -1,0 +1,90 @@
+---
+import Page from "../layouts/page.astro";
+import { lastUpdated, operator } from "../operator";
+---
+
+<Page title="Privacy Policy" description="What Lardon collects, why, and the choices you have.">
+  <h1>Privacy Policy</h1>
+  <p class="updated">Last updated {lastUpdated}</p>
+
+  <p>
+    Lardon is a family cookbook app run by {operator.name}. This policy explains what we collect when
+    you use Lardon, why, and what you can do about it. We don't sell your data, show ads or track
+    you across other apps and websites.
+  </p>
+
+  <h2>What we collect</h2>
+  <ul>
+    <li>
+      <strong>Account details:</strong> your email address and name. If you sign in with Apple or
+      Google, we also receive an identifier for that account and, if you allow it, your name and
+      profile picture. If you use Apple's "Hide My Email", we only receive the relay address Apple
+      gives us.
+    </li>
+    <li>
+      <strong>Sign-in data:</strong> one-time sign-in codes (stored hashed and valid for 5 minutes)
+      and active sessions, including the IP address and device type they were created from.
+    </li>
+    <li>
+      <strong>What you add to Lardon:</strong> recipes, photos, family groups and the people you
+      share them with.
+    </li>
+    <li>
+      <strong>Technical logs:</strong> short-lived server logs of requests (such as the address
+      requested and whether it succeeded), used to keep the service running and secure.
+    </li>
+  </ul>
+
+  <h2>Why we use it</h2>
+  <ul>
+    <li>To create your account and sign you in.</li>
+    <li>To store your recipes and share them with the family members you choose.</li>
+    <li>To send you sign-in codes by email.</li>
+    <li>To keep Lardon secure, prevent abuse and fix problems.</li>
+  </ul>
+  <p>
+    We process this data to provide the service you asked for and, for security logs, because we
+    have a legitimate interest in keeping Lardon safe.
+  </p>
+
+  <h2>Who we share it with</h2>
+  <p>We only share data with the services needed to run Lardon:</p>
+  <ul>
+    <li><strong>Cloudflare</strong> hosts our servers, database, photo storage and email sending.</li>
+    <li>
+      <strong>Apple</strong> and <strong>Google</strong>, only if you choose to sign in with them.
+    </li>
+  </ul>
+  <p>The people in your family groups can see the recipes and photos you share with them.</p>
+
+  <h2>How long we keep it</h2>
+  <p>
+    We keep your account and content for as long as you have an account. Sign-in codes expire after
+    5 minutes, sessions expire on their own, and server logs are deleted after a few days. When you
+    delete your account, we delete your account details and the content only you have access to.
+  </p>
+
+  <h2>Your rights</h2>
+  <p>
+    You can ask us for a copy of your data, to correct it, or to delete your account and data. You
+    can also object to how we use it or ask us to limit it. Email{" "}
+    <a href={`mailto:${operator.contactEmail}`}>{operator.contactEmail}</a> and we'll reply within
+    30 days. If you're unhappy with our answer, you can complain to your local data protection
+    authority.
+  </p>
+
+  <h2>Children</h2>
+  <p>Lardon isn't intended for children under 13, and we don't knowingly collect their data.</p>
+
+  <h2>Changes</h2>
+  <p>
+    If we change this policy, we'll update the date at the top. For important changes, we'll let you
+    know in the app before they apply.
+  </p>
+
+  <h2>Contact</h2>
+  <p>
+    {operator.name}, {operator.country}. Questions about privacy:{" "}
+    <a href={`mailto:${operator.contactEmail}`}>{operator.contactEmail}</a>.
+  </p>
+</Page>

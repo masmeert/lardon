@@ -8,6 +8,9 @@
     "deploy": "alchemy deploy",
     "destroy": "alchemy destroy"
   },
+  "dependencies": {
+    "@alchemy.run/frontend-frameworks": "2.0.0-beta.85"
+  },
   "devDependencies": {
     "@alchemy.run/cloudflare": "2.0.0-beta.85",
     "@effect/platform-node": "catalog:",
