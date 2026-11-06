@@ -97,4 +97,32 @@ describe("images", () => {
         expect(images.size).toBe(1);
       }),
     ));
+
+  it("deletes pictures only from accessible stores", () =>
+    runTest(
+      Effect.gen(function* () {
+        const images = yield* StoredImages;
+        const alice = yield* createUser("Alice");
+        const bob = yield* createUser("Bob");
+
+        const { imageKey } = yield* alice.api.images.upload({
+          params: { storeId: personalStoreId(alice.id) },
+          payload: TINY_PNG,
+        });
+
+        // SAFETY: the API returns an ImageKey, which only matches "<storeId>/<fileName>".
+        const [storeId, fileName] = imageKey.split("/") as [string, string];
+
+        const foreign = yield* bob.api.images
+          .delete({ params: { storeId, fileName } })
+          .pipe(Effect.flip);
+
+        expect(foreign._tag).toBe("NotFound");
+        expect(images.has(imageKey)).toBe(true);
+
+        yield* alice.api.images.delete({ params: { storeId, fileName } });
+
+        expect(images.has(imageKey)).toBe(false);
+      }),
+    ));
 });

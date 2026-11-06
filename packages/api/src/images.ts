@@ -32,6 +32,10 @@ export class ImageUploadApi extends HttpApiGroup.make("images")
       success: Schema.Struct({ imageKey: ImageKey }),
       error: NotFound,
     }),
+    HttpApiEndpoint.delete("delete", "/api/stores/:storeId/images/:fileName", {
+      params: { storeId: StoreId, fileName: ImageFileName },
+      error: NotFound,
+    }),
   )
   .middleware(Authorization) {}
 

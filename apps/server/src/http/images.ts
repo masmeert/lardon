@@ -83,6 +83,15 @@ export const ImageUploadHandlers = HttpApiBuilder.group(
 
         return { imageKey };
       }),
+      delete: Effect.fn("images.delete")(function* ({ params }) {
+        const user = yield* CurrentUser;
+
+        if (!(yield* families.canAccessRecipeStore(user.id, params.storeId))) {
+          return yield* new NotFound({ message: "This picture doesn't exist." });
+        }
+
+        yield* storage.delete(`${params.storeId}/${params.fileName}`);
+      }),
     });
   }),
 );
