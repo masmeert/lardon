@@ -29,6 +29,7 @@ export class Accounts extends Context.Service<
               .from(familyMember)
               .where(eq(familyMember.userId, userId)),
           );
+
           yield* Effect.forEach(memberships, ({ familyId }) =>
             families.leave(userId, familyId).pipe(Effect.catchTag("NotFound", () => Effect.void)),
           );

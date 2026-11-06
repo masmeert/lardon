@@ -4,6 +4,7 @@ import { type PdfPicture, recipeToPdf } from "./pdf";
 import { recipeToText } from "./text";
 
 export const exportFormats = ["text", "markdown", "pdf"] as const;
+
 export type ExportFormat = (typeof exportFormats)[number];
 
 export const exportSections = [
@@ -16,6 +17,7 @@ export const exportSections = [
   "notes",
   "source",
 ] as const;
+
 export type ExportSection = (typeof exportSections)[number];
 
 export type ExportedFile = {
@@ -29,6 +31,7 @@ export function selectSections(
   include: readonly ExportSection[],
 ): RecipeDocument {
   const included = new Set(include);
+
   return {
     ...recipe,
     imageKey: included.has("picture") ? recipe.imageKey : null,
@@ -50,6 +53,7 @@ export async function exportRecipe(
   options: { include?: readonly ExportSection[]; picture?: PdfPicture | null } = {},
 ): Promise<ExportedFile> {
   const recipe = selectSections(document, options.include ?? exportSections);
+
   const name =
     recipe.title
       .normalize("NFKD")

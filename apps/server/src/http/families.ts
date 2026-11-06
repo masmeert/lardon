@@ -9,6 +9,7 @@ export const FamiliesHandlers = HttpApiBuilder.group(
   "families",
   Effect.fn(function* (handlers) {
     const families = yield* Families;
+
     return handlers.handleAll({
       list: () => Effect.flatMap(CurrentUser, (user) => families.list(user.id)),
       create: ({ payload }) =>

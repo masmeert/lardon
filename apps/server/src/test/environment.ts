@@ -40,14 +40,18 @@ const AuthenticationTest = Layer.effect(
   Authentication,
   Effect.gen(function* () {
     const database = yield* Database;
+
     return Authentication.of({
       userFromHeaders: (headers) =>
         Effect.gen(function* () {
           const userId = /test-user=([^;]+)/.exec(headers.get("cookie") ?? "")?.[1];
+
           if (!userId) return null;
+
           const [row] = yield* database.use((client) =>
             client.select().from(user).where(eq(user.id, userId)),
           );
+
           return row
             ? { id: row.id, name: row.name, email: row.email, image: row.image ?? null }
             : null;
@@ -64,6 +68,7 @@ const RecipeStoreBackendTest = Layer.effect(
   RecipeStoreBackend,
   Effect.gen(function* () {
     const deletedStores = yield* DeletedStores;
+
     return RecipeStoreBackend.of({
       deleteStore: (storeId) => Effect.sync(() => void deletedStores.push(storeId)),
     });
@@ -74,13 +79,16 @@ const ImageStorageTest = Layer.effect(
   ImageStorage,
   Effect.gen(function* () {
     const images = yield* StoredImages;
+
     return ImageStorage.of({
       put: (key, bytes, contentType) =>
         Effect.sync(() => void images.set(key, { bytes, contentType })),
       copy: (sourceKey, targetKey) =>
         Effect.sync(() => {
           const source = images.get(sourceKey);
+
           if (source) images.set(targetKey, source);
+
           return source !== undefined;
         }),
       deleteAll: (prefix) =>
@@ -90,6 +98,7 @@ const ImageStorageTest = Layer.effect(
       get: (key) =>
         Effect.sync((): StoredImage | null => {
           const image = images.get(key);
+
           return image
             ? { body: new Blob([image.bytes.slice()]).stream(), contentType: image.contentType }
             : null;
@@ -102,11 +111,13 @@ const RateLimitsTest = Layer.effect(
   RateLimits,
   Effect.gen(function* () {
     const counts = yield* RateLimitCounts;
+
     return RateLimits.of({
       allow: (rule, key) =>
         Effect.sync(() => {
           const count = (counts.get(`${rule}:${key}`) ?? 0) + 1;
           counts.set(`${rule}:${key}`, count);
+
           return count <= TEST_RATE_LIMITS[rule];
         }),
     });
@@ -153,13 +164,16 @@ export const clientFor = Effect.fn("clientFor")(function* (userId: string | null
 
 export const createUser = Effect.fn("createUser")(function* (name: string) {
   const database = yield* Database;
+
   const created: User = {
     id: crypto.randomUUID(),
     name,
     email: `${name.toLowerCase()}-${crypto.randomUUID().slice(0, 8)}@example.com`,
     image: null,
   };
+
   yield* database.use((client) => client.insert(user).values(created));
+
   return { ...created, api: yield* clientFor(created.id) };
 });
 

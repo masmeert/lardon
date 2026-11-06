@@ -17,6 +17,7 @@ export function ThemeToggle() {
         if (Platform.OS === "ios") {
           void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         }
+
         toggleTheme();
       }}
       className="px-2.5"

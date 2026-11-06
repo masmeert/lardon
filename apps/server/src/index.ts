@@ -12,6 +12,7 @@ initLogger({ env: { service: "lardon-server" } });
 export default {
   fetch(request: Request, _env: Env, executionContext: ExecutionContext) {
     const syncRequest = matchRecipeSyncRequest(request);
+
     return syncRequest
       ? handleRecipeSyncRequest(request, syncRequest, executionContext)
       : webHandler(

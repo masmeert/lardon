@@ -5,6 +5,7 @@ import { Authorization } from "./authorization";
 import { Forbidden, InvalidRequest, NotFound } from "./errors";
 
 export const FamilyRole = Schema.Literals(["owner", "member"]);
+
 export type FamilyRole = typeof FamilyRole.Type;
 
 export const FamilyName = Schema.String.check(
@@ -20,6 +21,7 @@ export const FamilySummary = Schema.Struct({
   memberCount: Schema.Number,
   createdAt: Schema.DateFromString,
 });
+
 export type FamilySummary = typeof FamilySummary.Type;
 
 export const FamilyMember = Schema.Struct({
@@ -36,6 +38,7 @@ export const FamilyInvite = Schema.Struct({
   createdById: Schema.NullOr(Schema.String),
   expiresAt: Schema.DateFromString,
 });
+
 export type FamilyInvite = typeof FamilyInvite.Type;
 
 export const FamilyDetails = Schema.Struct({
@@ -46,6 +49,7 @@ export const FamilyDetails = Schema.Struct({
   members: Schema.Array(FamilyMember),
   invites: Schema.Array(FamilyInvite),
 });
+
 export type FamilyDetails = typeof FamilyDetails.Type;
 
 const familyParams = { familyId: Schema.String };

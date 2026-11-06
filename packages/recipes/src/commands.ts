@@ -32,6 +32,7 @@ function cleanText(value: string | null | undefined) {
 
 function positionAt(siblingPositions: readonly string[], index: number) {
   const clampedIndex = Math.max(0, Math.min(index, siblingPositions.length));
+
   return generateKeyBetween(
     siblingPositions[clampedIndex - 1] ?? null,
     siblingPositions[clampedIndex] ?? null,
@@ -49,9 +50,11 @@ function cleanIngredient(ingredient: IngredientInput) {
 
 export function createRecipe(store: RecipeStore, recipe: NewRecipe) {
   const recipeId = nanoid();
+
   const ingredientSections = recipe.ingredients?.length
     ? recipe.ingredients
     : [{ title: null, ingredients: [] }];
+
   const stepSections = recipe.steps?.length ? recipe.steps : [{ title: null, steps: [] }];
   const ingredientSectionPositions = generateNKeysBetween(null, null, ingredientSections.length);
   const stepSectionPositions = generateNKeysBetween(null, null, stepSections.length);
@@ -76,6 +79,7 @@ export function createRecipe(store: RecipeStore, recipe: NewRecipe) {
         ),
       ingredientSections: ingredientSections.map((section, sectionIndex) => {
         const positions = generateNKeysBetween(null, null, section.ingredients.length);
+
         return {
           sectionId: nanoid(),
           position: ingredientSectionPositions[sectionIndex]!,
@@ -89,6 +93,7 @@ export function createRecipe(store: RecipeStore, recipe: NewRecipe) {
       }),
       stepSections: stepSections.map((section, sectionIndex) => {
         const positions = generateNKeysBetween(null, null, section.steps.length);
+
         return {
           sectionId: nanoid(),
           position: stepSectionPositions[sectionIndex]!,
@@ -104,6 +109,7 @@ export function createRecipe(store: RecipeStore, recipe: NewRecipe) {
       createdAt: new Date(),
     }),
   );
+
   return recipeId;
 }
 
@@ -159,10 +165,12 @@ export function addRecipeSection(
   title: string | null = null,
 ) {
   const sectionId = nanoid();
+
   const positions = store
     .query(recipeSections$(recipeId))
     .filter((section) => section.kind === kind)
     .map((section) => section.position);
+
   store.commit(
     recipeEvents.recipeSectionAdded({
       recipeId,
@@ -173,6 +181,7 @@ export function addRecipeSection(
       updatedAt: new Date(),
     }),
   );
+
   return sectionId;
 }
 
@@ -239,6 +248,7 @@ function siblingPositions(
             .where({ sectionId, deletedAt: null })
             .orderBy("position", "asc"),
         );
+
   return rows.filter((row) => row.id !== excludedId).map((row) => row.position);
 }
 
@@ -260,6 +270,7 @@ export function addIngredient(
       updatedAt: new Date(),
     }),
   );
+
   return ingredientId;
 }
 
@@ -317,6 +328,7 @@ export function addStep(store: RecipeStore, recipeId: string, sectionId: string,
       updatedAt: new Date(),
     }),
   );
+
   return stepId;
 }
 
@@ -358,7 +370,9 @@ export function copyRecipe(
   overrides: CopyOverrides = {},
 ) {
   const document = readRecipeDocument(source, recipeId);
+
   if (!document) return null;
+
   return createRecipe(target, {
     ...document,
     ...overrides,
@@ -376,6 +390,8 @@ export function moveRecipe(
 ) {
   if (source === target || !source.query(recipe$(recipeId))) return recipeId;
   const movedId = copyRecipe(source, target, recipeId, createdById, overrides);
+
   if (movedId) deleteRecipe(source, recipeId);
+
   return movedId;
 }

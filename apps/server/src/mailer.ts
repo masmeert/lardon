@@ -43,6 +43,7 @@ export function authEmail(email: AuthEmail): Email {
   const content = authEmailContent[email.kind];
   const escapedUrl = email.url.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
   const escapedName = email.name.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
   return {
     to: email.to,
     subject: content.subject,
