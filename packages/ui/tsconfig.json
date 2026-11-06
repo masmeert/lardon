@@ -1,0 +1,10 @@
+{
+  "extends": "@lardon/config/tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "types": [],
+    "customConditions": ["react-native"]
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "uniwind-env.d.ts"]
+}

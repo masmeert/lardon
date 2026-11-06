@@ -1,0 +1,174 @@
+@source "./";
+
+@layer theme {
+  :root {
+    @variant light {
+      --background: #f8f5f0;
+      --raised: #ffffff;
+      --floating: #ffffff;
+      --foreground: #221c18;
+      --muted: #736961;
+      --well: rgb(34 28 24 / 5%);
+      --hairline: rgb(34 28 24 / 10%);
+      --pressed: rgb(34 28 24 / 5%);
+      --selected: rgb(34 28 24 / 8%);
+      --tint: rgb(34 28 24 / 7%);
+      --scrim: rgb(34 28 24 / 30%);
+      --accent: #5a6a1f;
+      --accent-top: #6f8230;
+      --accent-bottom: #3e4a12;
+      --accent-rim: #2f3a0b;
+      --accent-glow: rgb(62 74 18 / 55%);
+      --on-accent: #ffffff;
+      --danger: #c0263a;
+      --danger-top: #d23a4d;
+      --danger-bottom: #9c1a2c;
+      --danger-rim: #7a1020;
+      --danger-glow: rgb(156 26 44 / 50%);
+      --on-danger: #ffffff;
+      --success: #2e7a47;
+      --image-outline: rgb(0 0 0 / 8%);
+      --edge-light: rgb(255 255 255 / 28%);
+      --edge-dark: rgb(0 0 0 / 20%);
+      --pressed-fill: rgb(0 0 0 / 14%);
+      --drop: rgb(34 28 24 / 25%);
+      --control-top: #ffffff;
+      --control-bottom: #f2eee8;
+      --control-rim: rgb(34 28 24 / 12%);
+      --control-shade: rgb(34 28 24 / 6%);
+      --disabled-top: #c4c0b2;
+      --disabled-bottom: #aeaa9b;
+      --disabled-rim: rgb(34 28 24 / 14%);
+      --on-disabled: #ffffff;
+      --shadow-raised-color: rgb(34 28 24 / 6%);
+      --shadow-floating-color: rgb(34 28 24 / 12%);
+    }
+
+    @variant dark {
+      --background: #151210;
+      --raised: #211c19;
+      --floating: #2b2521;
+      --foreground: #f4efe9;
+      --muted: #a39990;
+      --well: rgb(244 239 233 / 6%);
+      --hairline: rgb(244 239 233 / 10%);
+      --pressed: rgb(244 239 233 / 8%);
+      --selected: rgb(244 239 233 / 12%);
+      --tint: rgb(244 239 233 / 12%);
+      --scrim: rgb(0 0 0 / 50%);
+      --accent: #a5b45a;
+      --accent-top: #b9c86e;
+      --accent-bottom: #87963d;
+      --accent-rim: rgb(0 0 0 / 45%);
+      --accent-glow: rgb(135 150 61 / 35%);
+      --on-accent: #151210;
+      --danger: #f0707e;
+      --danger-top: #f58894;
+      --danger-bottom: #d9566a;
+      --danger-rim: rgb(0 0 0 / 45%);
+      --danger-glow: rgb(217 86 106 / 35%);
+      --on-danger: #151210;
+      --success: #6cc48a;
+      --image-outline: rgb(255 255 255 / 8%);
+      --edge-light: rgb(255 255 255 / 35%);
+      --edge-dark: rgb(0 0 0 / 25%);
+      --pressed-fill: rgb(0 0 0 / 18%);
+      --drop: rgb(0 0 0 / 50%);
+      --control-top: #312b27;
+      --control-bottom: #231e1b;
+      --control-rim: rgb(244 239 233 / 10%);
+      --control-shade: rgb(0 0 0 / 25%);
+      --disabled-top: #3d3834;
+      --disabled-bottom: #322d2a;
+      --disabled-rim: rgb(0 0 0 / 40%);
+      --on-disabled: #8c837b;
+      --shadow-raised-color: rgb(0 0 0 / 0%);
+      --shadow-floating-color: rgb(0 0 0 / 40%);
+    }
+  }
+}
+
+@theme inline static {
+  --color-background: var(--background);
+  --color-raised: var(--raised);
+  --color-floating: var(--floating);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-well: var(--well);
+  --color-hairline: var(--hairline);
+  --color-pressed: var(--pressed);
+  --color-selected: var(--selected);
+  --color-tint: var(--tint);
+  --color-scrim: var(--scrim);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+  --color-danger: var(--danger);
+  --color-on-danger: var(--on-danger);
+  --color-success: var(--success);
+  --color-image-outline: var(--image-outline);
+  --color-pressed-fill: var(--pressed-fill);
+  --color-on-disabled: var(--on-disabled);
+
+  --shadow-raised: 0 1px 2px var(--shadow-raised-color), 0 6px 16px var(--shadow-raised-color);
+  --shadow-floating:
+    0 2px 6px var(--shadow-floating-color), 0 16px 40px var(--shadow-floating-color);
+  --shadow-accent:
+    inset 0 1px 0 var(--edge-light), inset 0 -2px 3px var(--edge-dark), 0 0 0 1px var(--accent-rim),
+    0 1px 2px var(--drop), 0 8px 18px -6px var(--accent-glow);
+  --shadow-danger:
+    inset 0 1px 0 var(--edge-light), inset 0 -2px 3px var(--edge-dark), 0 0 0 1px var(--danger-rim),
+    0 1px 2px var(--drop), 0 8px 18px -6px var(--danger-glow);
+  --shadow-control:
+    inset 0 1px 0 var(--edge-light), inset 0 -1px 0 var(--control-shade),
+    0 0 0 1px var(--control-rim), 0 1px 2px var(--shadow-raised-color),
+    0 6px 14px -6px var(--shadow-floating-color);
+  --shadow-disabled:
+    inset 0 1px 0 var(--edge-light), 0 0 0 1px var(--disabled-rim),
+    0 1px 2px var(--shadow-raised-color), 0 4px 10px -6px var(--shadow-floating-color);
+}
+
+@utility bg-accent-gradient {
+  background-image: linear-gradient(to bottom, var(--accent-top), var(--accent-bottom));
+}
+
+@utility bg-control-gradient {
+  background-image: linear-gradient(to bottom, var(--control-top), var(--control-bottom));
+}
+
+@utility bg-disabled-gradient {
+  background-image: linear-gradient(to bottom, var(--disabled-top), var(--disabled-bottom));
+}
+
+@utility bg-danger-gradient {
+  background-image: linear-gradient(to bottom, var(--danger-top), var(--danger-bottom));
+}
+
+@theme static {
+  --text-display: 34px;
+  --text-display--line-height: 41px;
+  --text-display-compact: 28px;
+  --text-display-compact--line-height: 34px;
+  --text-title: 22px;
+  --text-title--line-height: 28px;
+  --text-title-compact: 20px;
+  --text-title-compact--line-height: 25px;
+  --text-headline: 17px;
+  --text-headline--line-height: 22px;
+  --text-headline-compact: 15px;
+  --text-headline-compact--line-height: 20px;
+  --text-body: 17px;
+  --text-body--line-height: 22px;
+  --text-body-compact: 15px;
+  --text-body-compact--line-height: 20px;
+  --text-caption: 13px;
+  --text-caption--line-height: 18px;
+  --text-caption-compact: 12px;
+  --text-caption-compact--line-height: 16px;
+  --text-micro: 11px;
+  --text-micro--line-height: 13px;
+
+  --radius-sheet: 32px;
+  --radius-card: 24px;
+  --radius-tile: 16px;
+  --radius-control: 9999px;
+}

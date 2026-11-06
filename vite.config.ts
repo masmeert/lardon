@@ -13,6 +13,7 @@ const ignorePatterns = [
   ".roo/**",
   ".windsurf/**",
   "tools/oxlint/anti-slop/**",
+  "**/.rnstorybook/storybook.requires.ts",
   "LICENSE.md",
 ];
 
