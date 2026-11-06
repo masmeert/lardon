@@ -1,9 +1,10 @@
 import { Feather } from "@expo/vector-icons";
+import Constants from "expo-constants";
 import { router } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import { ListGroup, Spinner, useThemeColor } from "heroui-native";
 import { useState } from "react";
-import { ScrollView, View } from "react-native";
+import { Linking, Platform, ScrollView, View } from "react-native";
 
 import { InlineError } from "@/components/inline-error";
 import { UserAvatar } from "@/components/user-avatar";
@@ -16,6 +17,7 @@ export default function SettingsScreen() {
   const dangerColor = useThemeColor("danger");
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [error, setError] = useState<string>();
+  const [supportError, setSupportError] = useState<string>();
 
   async function signOut() {
     setIsSigningOut(true);
@@ -27,6 +29,18 @@ export default function SettingsScreen() {
       setIsSigningOut(false);
       setError("Couldn't sign out. Check your connection and try again.");
     }
+  }
+
+  async function contactSupport() {
+    setSupportError(undefined);
+
+    await Linking.openURL(
+      `mailto:${ENV.EXPO_PUBLIC_SUPPORT_EMAIL}?subject=${encodeURIComponent("Lardon support")}&body=${encodeURIComponent(`\n\n—\nLardon ${Constants.expoConfig?.version ?? ""} on ${Platform.OS} ${Platform.Version}`)}`,
+    ).catch(() =>
+      setSupportError(
+        `Couldn't open your email app. Write to ${ENV.EXPO_PUBLIC_SUPPORT_EMAIL} instead.`,
+      ),
+    );
   }
 
   return (
@@ -52,6 +66,21 @@ export default function SettingsScreen() {
       </ListGroup.Item>
 
       <View className="border-t border-default py-2">
+        <ListGroup.Item
+          accessibilityRole="link"
+          onPress={() => void contactSupport()}
+          className="px-5 py-2 active:bg-default"
+        >
+          <ListGroup.ItemContent>
+            <ListGroup.ItemTitle className="leading-5.5">Contact support</ListGroup.ItemTitle>
+          </ListGroup.ItemContent>
+          <Feather name="mail" size={16} color={foregroundColor} />
+        </ListGroup.Item>
+        {supportError && (
+          <View className="px-5 pb-2">
+            <InlineError>{supportError}</InlineError>
+          </View>
+        )}
         {[
           { title: "Privacy policy", url: `${ENV.EXPO_PUBLIC_WEBSITE_URL}/privacy` },
           { title: "Terms of use", url: `${ENV.EXPO_PUBLIC_WEBSITE_URL}/terms` },
