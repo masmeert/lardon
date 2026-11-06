@@ -1,20 +1,28 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useQuery } from "@tanstack/react-query";
+import { useAtomRefresh, useAtomValue } from "@effect/atom-react";
+import { AsyncResult } from "effect/reactivity";
 import { Card, Chip, useThemeColor } from "heroui-native";
+import { useEffect } from "react";
 import { Text, View, Pressable } from "react-native";
 
 import { Container } from "@/components/container";
 import { SignIn } from "@/components/sign-in";
 import { SignUp } from "@/components/sign-up";
 import { authClient } from "@/lib/auth-client";
-import { queryClient, trpc } from "@/utils/trpc";
+import { familiesAtom, healthAtom } from "@/utils/api";
 
 export default function Home() {
-  const healthCheck = useQuery(trpc.healthCheck.queryOptions());
-  const recipes = useQuery(trpc.recipes.manifest.queryOptions());
-  const isConnected = healthCheck?.data === "OK";
-  const isLoading = healthCheck?.isLoading;
+  const health = useAtomValue(healthAtom);
+  const families = useAtomValue(familiesAtom);
+  const refreshFamilies = useAtomRefresh(familiesAtom);
+  const isConnected = AsyncResult.isSuccess(health);
+  const isLoading = AsyncResult.isInitial(health) || health.waiting;
   const { data: session } = authClient.useSession();
+  const userId = session?.user.id;
+
+  useEffect(() => {
+    refreshFamilies();
+  }, [userId, refreshFamilies]);
 
   const mutedColor = useThemeColor("muted");
   const successColor = useThemeColor("success");
@@ -37,7 +45,6 @@ export default function Home() {
             className="bg-danger py-3 px-4 rounded-lg self-start active:opacity-70"
             onPress={() => {
               authClient.signOut();
-              queryClient.invalidateQueries();
             }}
           >
             <Text className="text-foreground font-medium">Sign Out</Text>
@@ -80,8 +87,10 @@ export default function Home() {
       </Card>
 
       <Card variant="secondary" className="mt-6 p-4">
-        <Card.Title className="mb-3">Recipes</Card.Title>
-        {recipes.data && <Card.Description>{recipes.data.length} recipes</Card.Description>}
+        <Card.Title className="mb-3">Families</Card.Title>
+        {AsyncResult.isSuccess(families) && (
+          <Card.Description>{families.value.length} families</Card.Description>
+        )}
       </Card>
 
       {!session?.user && (

@@ -1,0 +1,24 @@
+{
+  "name": "@lardon/recipes",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "test": "vp test run"
+  },
+  "dependencies": {
+    "@livestore/livestore": "catalog:",
+    "effect": "catalog:",
+    "fractional-indexing": "^4.0.0",
+    "pdf-lib": "^1.17.1"
+  },
+  "devDependencies": {
+    "@lardon/config": "workspace:*",
+    "@livestore/adapter-node": "catalog:",
+    "typescript": "^6.0.3",
+    "vite-plus": "1.4.0"
+  }
+}

@@ -12,15 +12,12 @@ import {
 } from "heroui-native";
 import { useRef } from "react";
 import { Text, View } from "react-native";
-import z from "zod";
+import { Schema } from "effect";
 
 import { authClient } from "@/lib/auth-client";
-import { queryClient } from "@/utils/trpc";
+import { Email, Password } from "@/lib/credentials";
 
-const signInSchema = z.object({
-  email: z.string().trim().min(1, "Email is required").email("Enter a valid email address"),
-  password: z.string().min(1, "Password is required").min(8, "Use at least 8 characters"),
-});
+const signInSchema = Schema.toStandardSchemaV1(Schema.Struct({ email: Email, password: Password }));
 
 function getErrorMessage(error: unknown): string | null {
   if (!error) return null;
@@ -80,7 +77,6 @@ function SignIn() {
               variant: "success",
               label: "Signed in successfully",
             });
-            queryClient.refetchQueries();
           },
         },
       );

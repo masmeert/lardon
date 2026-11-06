@@ -1,6 +1,6 @@
 # lardon
 
-This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines React Native, Expo, Hono, TRPC, and more.
+This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines React Native, Expo, Hono, TRPC, and more. It has since moved to Effect (HttpApi) and LiveStore.
 
 ## Features
 
@@ -9,7 +9,8 @@ This project was created with [Better-T-Stack](https://github.com/AmanVarshney01
 - **Expo** - Tools for React Native development
 - **TailwindCSS** - Utility-first CSS for rapid UI development
 - **Hono** - Lightweight, performant server framework
-- **tRPC** - End-to-end type-safe APIs
+- **Effect** - Typed services, errors and the schema-first `HttpApi` with a generated client
+- **LiveStore** - Local-first recipe data, synced through Cloudflare Durable Objects
 - **workers** - Runtime environment
 - **Drizzle** - TypeScript-first ORM
 - **Cloudflare D1** - Database engine
@@ -90,11 +91,12 @@ Alchemy creates a stage-specific Axiom dataset and a least-privilege ingest toke
 lardon/
 ├── apps/
 │   ├── native/      # Mobile application (React Native, Expo)
-│   └── server/      # Backend API (Hono, TRPC)
+│   └── server/      # Cloudflare Worker: Effect HttpApi handlers, LiveStore sync backend
 ├── packages/
-│   ├── api/         # API layer / business logic
+│   ├── api/         # Shared HttpApi definition (endpoints, schemas, errors)
 │   ├── auth/        # Authentication configuration & logic
-│   └── db/          # Database schema & queries
+│   ├── db/          # Database schema & queries (auth, families)
+│   └── recipes/     # LiveStore recipe schema, commands, queries and export
 ```
 
 ## Available Scripts

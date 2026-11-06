@@ -1,5 +1,3 @@
-import { trpcServer } from "@hono/trpc-server";
-import { appRouter } from "@lardon/api/routers/index";
 import { initLogger } from "evlog";
 import { createAxiomDrain } from "evlog/axiom";
 import { createAuthMiddleware, type BetterAuthInstance } from "evlog/better-auth";
@@ -7,10 +5,12 @@ import { evlog, type EvlogVariables } from "evlog/hono";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 
-import { createContext } from "./context";
 import { ENV } from "./env.server";
-import { routes } from "./routes";
+import { apiHandler } from "./layers";
 import { createAuth } from "./services";
+import { handleRecipeSyncRequest, matchRecipeSyncRequest } from "./sync";
+
+export { SyncBackendDO } from "./sync";
 
 initLogger({
   env: { service: "lardon-server" },
@@ -41,21 +41,18 @@ app.use(
 
 app.on(["POST", "GET"], "/api/auth/*", async (c) => (await createAuth()).handler(c.req.raw));
 
-app.route("/", routes);
-
-app.use(
-  "/trpc/*",
-  trpcServer({
-    endpoint: "/trpc",
-    router: appRouter,
-    createContext: (_opts, context) => {
-      return createContext({ context });
-    },
-  }),
-);
+app.all("/api/*", (context) => apiHandler(context.req.raw));
+app.get("/images/*", (context) => apiHandler(context.req.raw));
 
 app.get("/", (c) => {
   return c.text("OK");
 });
 
-export default app;
+export default {
+  fetch(request: Request, env: Env, executionContext: ExecutionContext) {
+    const syncRequest = matchRecipeSyncRequest(request);
+    return syncRequest
+      ? handleRecipeSyncRequest(request, syncRequest, executionContext)
+      : app.fetch(request, env, executionContext);
+  },
+};

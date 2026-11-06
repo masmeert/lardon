@@ -14,8 +14,7 @@
     "@better-auth/expo": "catalog:",
     "@lardon/db": "workspace:*",
     "better-auth": "catalog:",
-    "drizzle-orm": "catalog:",
-    "zod": "catalog:"
+    "drizzle-orm": "catalog:"
   },
   "devDependencies": {
     "@lardon/config": "workspace:*",

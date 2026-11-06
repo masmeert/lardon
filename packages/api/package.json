@@ -6,20 +6,13 @@
     "./*": "./src/*.ts"
   },
   "scripts": {
-    "check-types": "tsc --noEmit",
-    "test": "vp test run"
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@lardon/auth": "workspace:*",
-    "@lardon/db": "workspace:*",
-    "@trpc/client": "catalog:",
-    "@trpc/server": "catalog:",
-    "pdf-lib": "^1.17.1",
-    "zod": "catalog:"
+    "effect": "catalog:"
   },
   "devDependencies": {
     "@lardon/config": "workspace:*",
-    "typescript": "^6.0.3",
-    "vite-plus": "1.4.0"
+    "typescript": "^6.0.3"
   }
 }

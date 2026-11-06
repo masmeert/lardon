@@ -1,17 +1,25 @@
-import { TRPCError } from "@trpc/server";
+import { Schema } from "effect";
 
-export function notFound(subject = "Recipe") {
-  return new TRPCError({ code: "NOT_FOUND", message: `${subject} not found` });
-}
+export class Unauthorized extends Schema.TaggedError<Unauthorized>()(
+  "Unauthorized",
+  { message: Schema.String },
+  { httpApiStatus: 401 },
+) {}
 
-export function forbidden(message: string) {
-  return new TRPCError({ code: "FORBIDDEN", message });
-}
+export class Forbidden extends Schema.TaggedError<Forbidden>()(
+  "Forbidden",
+  { message: Schema.String },
+  { httpApiStatus: 403 },
+) {}
 
-export function conflict(message: string) {
-  return new TRPCError({ code: "CONFLICT", message });
-}
+export class NotFound extends Schema.TaggedError<NotFound>()(
+  "NotFound",
+  { message: Schema.String },
+  { httpApiStatus: 404 },
+) {}
 
-export function badRequest(message: string) {
-  return new TRPCError({ code: "BAD_REQUEST", message });
-}
+export class InvalidRequest extends Schema.TaggedError<InvalidRequest>()(
+  "InvalidRequest",
+  { message: Schema.String },
+  { httpApiStatus: 400 },
+) {}

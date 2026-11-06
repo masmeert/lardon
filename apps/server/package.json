@@ -6,26 +6,29 @@
     "build": "tsdown",
     "check-types": "tsc --noEmit",
     "compile": "bun build --compile --no-compile-autoload-dotenv --minify --sourcemap --bytecode ./src/index.ts --outfile server",
-    "env:generate": "varlock codegen"
+    "env:generate": "varlock codegen",
+    "test": "vp test run"
   },
   "dependencies": {
-    "@hono/trpc-server": "^0.4.2",
     "@lardon/api": "workspace:*",
     "@lardon/auth": "workspace:*",
     "@lardon/db": "workspace:*",
-    "@trpc/server": "catalog:",
+    "@lardon/recipes": "workspace:*",
+    "@livestore/sync-cf": "catalog:",
     "better-auth": "catalog:",
+    "effect": "catalog:",
     "evlog": "^2.33.1",
     "hono": "^4.13.7",
-    "varlock": "catalog:",
-    "zod": "catalog:"
+    "varlock": "catalog:"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "catalog:",
     "@lardon/config": "workspace:*",
     "@lardon/infra": "workspace:*",
+    "@libsql/client": "0.18.0",
     "@types/node": "catalog:",
     "tsdown": "^0.23.0",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vite-plus": "1.4.0"
   }
 }

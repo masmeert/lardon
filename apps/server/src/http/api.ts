@@ -1,0 +1,21 @@
+import { Api } from "@lardon/api";
+import { Layer } from "effect";
+import { HttpApiBuilder } from "effect/http-api";
+
+import { Families } from "../families";
+import { AuthorizationLive } from "./authorization";
+import { FamiliesHandlers } from "./families";
+import { ImageDownloadHandlers, ImageUploadHandlers } from "./images";
+import { AccountHandlers, SystemHandlers } from "./system";
+
+export const ApiHandlers = Layer.mergeAll(
+  SystemHandlers,
+  AccountHandlers,
+  FamiliesHandlers,
+  ImageUploadHandlers,
+  ImageDownloadHandlers,
+).pipe(Layer.provide(Families.layer), Layer.provideMerge(AuthorizationLive));
+
+export const ApiRoutes = HttpApiBuilder.layer(Api, { openapiPath: "/api/openapi.json" }).pipe(
+  Layer.provide(ApiHandlers),
+);
