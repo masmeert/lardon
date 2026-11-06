@@ -10,6 +10,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { InlineError } from "@/components/inline-error";
 import { Hero } from "@/components/sign-in/hero";
 import { authClient } from "@/lib/auth-client";
+import { logRequestFailure } from "@/lib/request-failure";
 
 export default function SignInScreen() {
   const insets = useSafeAreaInsets();
@@ -60,7 +61,11 @@ export default function SignInScreen() {
             ? undefined
             : "UNKNOWN",
       )
-      .catch(() => "NETWORK");
+      .catch((error) => {
+        logRequestFailure("Apple sign-in", error);
+
+        return "NETWORK";
+      });
 
     setPendingProvider(undefined);
 
@@ -75,7 +80,11 @@ export default function SignInScreen() {
 
     const errorCode = await authClient.signIn.social({ provider: "google", callbackURL: "/" }).then(
       ({ error: signInError }) => (signInError ? (signInError.code ?? "UNKNOWN") : undefined),
-      () => "NETWORK",
+      (error) => {
+        logRequestFailure("Google sign-in", error);
+
+        return "NETWORK";
+      },
     );
 
     setPendingProvider(undefined);

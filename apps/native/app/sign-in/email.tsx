@@ -7,6 +7,7 @@ import { Keyboard, Text, View } from "react-native";
 import { InlineError } from "@/components/inline-error";
 import { KeyboardFooter } from "@/components/sign-in/keyboard-footer";
 import { authClient } from "@/lib/auth-client";
+import { logRequestFailure } from "@/lib/request-failure";
 import { Email } from "@/lib/credentials";
 
 export default function EmailScreen() {
@@ -39,7 +40,11 @@ export default function EmailScreen() {
 
     const { error: sendError } = await authClient.emailOtp
       .sendVerificationOtp({ email: email.trim(), type: "sign-in" })
-      .catch(() => ({ error: { message: undefined } }));
+      .catch((error) => {
+        logRequestFailure("Code request", error);
+
+        return { error: { message: undefined } };
+      });
 
     setIsSending(false);
 
