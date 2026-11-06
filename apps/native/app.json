@@ -10,7 +10,8 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.masmeert.lardon",
-      "usesAppleSignIn": true
+      "usesAppleSignIn": true,
+      "appleTeamId": "3942GST99F"
     },
     "android": {
       "adaptiveIcon": {
