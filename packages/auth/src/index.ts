@@ -9,6 +9,9 @@ export type AuthConfig = {
   BETTER_AUTH_URL: string;
   BETTER_AUTH_SECRET: string;
   CORS_ORIGIN: string;
+  GOOGLE_CLIENT_ID: string;
+  GOOGLE_CLIENT_SECRET: string;
+  APPLE_BUNDLE_ID: string;
 };
 
 export type AuthEmail =
@@ -40,6 +43,20 @@ export function createAuth(env: AuthConfig, database: Database, hooks: AuthHooks
       autoSignInAfterVerification: true,
       sendVerificationEmail: ({ user, url }) =>
         hooks.sendEmail({ kind: "verify-email", to: user.email, name: user.name, url }),
+    },
+    socialProviders: {
+      google: {
+        enabled: env.GOOGLE_CLIENT_ID !== "" && env.GOOGLE_CLIENT_SECRET !== "",
+        clientId: env.GOOGLE_CLIENT_ID,
+        clientSecret: env.GOOGLE_CLIENT_SECRET,
+        prompt: "select_account",
+      },
+      apple: {
+        enabled: env.APPLE_BUNDLE_ID !== "",
+        clientId: env.APPLE_BUNDLE_ID,
+        clientSecret: "",
+        appBundleIdentifier: env.APPLE_BUNDLE_ID,
+      },
     },
     user: {
       deleteUser: {

@@ -1,7 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
+import { Schema } from "effect";
+import * as AppleAuthentication from "expo-apple-authentication";
 import { router } from "expo-router";
 import { Button, Spinner, Typography, useThemeColor } from "heroui-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -15,20 +17,71 @@ export default function SignInScreen() {
   const foregroundColor = useThemeColor("foreground");
   const [pendingProvider, setPendingProvider] = useState<"apple" | "google">();
   const [error, setError] = useState<string>();
+  const [isAppleAvailable, setIsAppleAvailable] = useState(false);
 
-  async function signInWith(provider: "apple" | "google", providerName: string) {
-    setPendingProvider(provider);
+  useEffect(() => {
+    void AppleAuthentication.isAvailableAsync().then(setIsAppleAvailable);
+  }, []);
+
+  async function signInWithApple() {
+    setPendingProvider("apple");
     setError(undefined);
 
-    const failed = await authClient.signIn.social({ provider, callbackURL: "/" }).then(
-      ({ error }) => error !== null,
-      () => true,
+    const errorCode = await AppleAuthentication.signInAsync({
+      requestedScopes: [
+        AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+        AppleAuthentication.AppleAuthenticationScope.EMAIL,
+      ],
+    })
+      .then(
+        async (credential) => {
+          if (!credential.identityToken) {
+            return "MISSING_TOKEN";
+          }
+
+          const { error: signInError } = await authClient.signIn.social({
+            provider: "apple",
+            idToken: {
+              token: credential.identityToken,
+              user: {
+                name: {
+                  firstName: credential.fullName?.givenName ?? undefined,
+                  lastName: credential.fullName?.familyName ?? undefined,
+                },
+                email: credential.email ?? undefined,
+              },
+            },
+          });
+
+          return signInError ? (signInError.code ?? "UNKNOWN") : undefined;
+        },
+        (appleError) =>
+          Schema.is(Schema.Struct({ code: Schema.Literal("ERR_REQUEST_CANCELED") }))(appleError)
+            ? undefined
+            : "UNKNOWN",
+      )
+      .catch(() => "NETWORK");
+
+    setPendingProvider(undefined);
+
+    if (errorCode) {
+      setError(signInErrorMessage("Apple", errorCode));
+    }
+  }
+
+  async function signInWithGoogle() {
+    setPendingProvider("google");
+    setError(undefined);
+
+    const errorCode = await authClient.signIn.social({ provider: "google", callbackURL: "/" }).then(
+      ({ error: signInError }) => (signInError ? (signInError.code ?? "UNKNOWN") : undefined),
+      () => "NETWORK",
     );
 
     setPendingProvider(undefined);
 
-    if (failed) {
-      setError(`Couldn't sign in with ${providerName}. Try email instead`);
+    if (errorCode) {
+      setError(signInErrorMessage("Google", errorCode));
     }
   }
 
@@ -52,7 +105,7 @@ export default function SignInScreen() {
 
       <View className="gap-3 px-6 pb-4 pt-6">
         {error && (
-          <View className="items-center">
+          <View className="absolute inset-x-6 -top-4.5">
             <InlineError>{error}</InlineError>
           </View>
         )}
@@ -67,29 +120,45 @@ export default function SignInScreen() {
         </Button>
 
         <View className="flex-row gap-3">
-          {(
-            [
-              { provider: "apple", name: "Apple", icon: "logo-apple" },
-              { provider: "google", name: "Google", icon: "logo-google" },
-            ] as const
-          ).map(({ provider, name, icon }) => (
+          {isAppleAvailable && (
             <Button
-              key={provider}
               variant="secondary"
-              accessibilityLabel={`Continue with ${name}`}
+              accessibilityLabel="Continue with Apple"
               isDisabled={pendingProvider !== undefined}
-              onPress={() => void signInWith(provider, name)}
+              onPress={() => void signInWithApple()}
               className="flex-1 rounded-full"
             >
-              {pendingProvider === provider ? (
+              {pendingProvider === "apple" ? (
                 <Spinner size="sm" color={foregroundColor} />
               ) : (
-                <Ionicons name={icon} size={22} color={foregroundColor} />
+                <Ionicons name="logo-apple" size={22} color={foregroundColor} />
               )}
             </Button>
-          ))}
+          )}
+          <Button
+            variant="secondary"
+            accessibilityLabel="Continue with Google"
+            isDisabled={pendingProvider !== undefined}
+            onPress={() => void signInWithGoogle()}
+            className="flex-1 rounded-full"
+          >
+            {pendingProvider === "google" ? (
+              <Spinner size="sm" color={foregroundColor} />
+            ) : (
+              <Ionicons name="logo-google" size={22} color={foregroundColor} />
+            )}
+          </Button>
         </View>
       </View>
     </View>
+  );
+}
+
+function signInErrorMessage(providerName: string, errorCode: string) {
+  return (
+    {
+      PROVIDER_NOT_FOUND: `${providerName} sign-in isn't set up yet. Use email for now`,
+      NETWORK: "Couldn't reach Lardon. Check your connection",
+    }[errorCode] ?? `${providerName} sign-in didn't work. Try again or use email`
   );
 }

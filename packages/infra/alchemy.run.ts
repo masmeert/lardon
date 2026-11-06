@@ -4,6 +4,7 @@ import * as Alchemy from "alchemy";
 import * as Config from "effect/Config";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
+import * as Redacted from "effect/Redacted";
 import "varlock/auto-load";
 
 export const db = Cloudflare.D1.Database("database", {
@@ -74,6 +75,11 @@ export const server = Cloudflare.Worker("server", {
     }),
     CORS_ORIGIN: Config.String("CORS_ORIGIN"),
     BETTER_AUTH_SECRET: Config.Redacted("BETTER_AUTH_SECRET"),
+    GOOGLE_CLIENT_ID: Config.String("GOOGLE_CLIENT_ID").pipe(Config.withDefault("")),
+    GOOGLE_CLIENT_SECRET: Config.Redacted("GOOGLE_CLIENT_SECRET").pipe(
+      Config.withDefault(Redacted.make("")),
+    ),
+    APPLE_BUNDLE_ID: Config.String("APPLE_BUNDLE_ID").pipe(Config.withDefault("")),
     BETTER_AUTH_URL: Cloudflare.Worker.URL,
     ...observabilityBindings,
   },
