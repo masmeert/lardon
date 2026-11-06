@@ -19,15 +19,19 @@ export function recipeToMarkdown(recipe: RecipeDocument) {
   const blocks: string[] = [`# ${escapeMarkdown(recipe.title)}`];
 
   const meta = formatMeta(recipe);
+
   if (meta) blocks.push(`*${meta}*`);
+
   if (recipe.tags.length > 0) {
     blocks.push(`**Tags:** ${recipe.tags.map(escapeMarkdown).join(", ")}`);
   }
 
   if (hasIngredients(recipe)) {
     blocks.push("## Ingredients");
+
     for (const section of recipe.ingredients) {
       if (section.ingredients.length === 0) continue;
+
       if (section.title) blocks.push(`### ${escapeMarkdown(section.title)}`);
       blocks.push(
         section.ingredients
@@ -39,13 +43,16 @@ export function recipeToMarkdown(recipe: RecipeDocument) {
 
   if (hasSteps(recipe)) {
     blocks.push("## Steps");
+
     for (const section of recipe.steps) {
       if (section.steps.length === 0) continue;
+
       if (section.title) blocks.push(`### ${escapeMarkdown(section.title)}`);
       blocks.push(
         section.steps
           .map((step, index) => {
             const prefix = `${index + 1}. `;
+
             return `${prefix}${listItem(step.text, prefix.length)}`;
           })
           .join("\n"),
@@ -54,6 +61,7 @@ export function recipeToMarkdown(recipe: RecipeDocument) {
   }
 
   const nutrition = nutritionRows(recipe.nutrition);
+
   if (nutrition.length > 0) {
     blocks.push(
       [

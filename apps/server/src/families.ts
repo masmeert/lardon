@@ -68,7 +68,9 @@ export class Families extends Context.Service<
             .from(familyMember)
             .where(and(eq(familyMember.familyId, familyId), eq(familyMember.userId, userId))),
         );
+
         if (!membership) return yield* new NotFound({ message: "This family doesn't exist." });
+
         return membership.role;
       });
 
@@ -86,6 +88,7 @@ export class Families extends Context.Service<
       const get = Effect.fn("Families.get")(function* (userId: string, familyId: string) {
         const role = yield* requireMember(familyId, userId);
         const now = new Date(yield* Clock.currentTimeMillis);
+
         const [[row], members, invites] = yield* database.use((client) =>
           Promise.all([
             client.select().from(family).where(eq(family.id, familyId)),
@@ -109,7 +112,9 @@ export class Families extends Context.Service<
               .orderBy(asc(familyInvite.expiresAt)),
           ]),
         );
+
         if (!row) return yield* new NotFound({ message: "This family doesn't exist." });
+
         return {
           id: row.id,
           name: row.name,
@@ -158,6 +163,7 @@ export class Families extends Context.Service<
               client.insert(familyMember).values({ familyId, userId, role: "owner" }),
             ]),
           );
+
           return yield* get(userId, familyId).pipe(Effect.orDie);
         }),
 
@@ -170,6 +176,7 @@ export class Families extends Context.Service<
           yield* database.use((client) =>
             client.update(family).set({ name }).where(eq(family.id, familyId)),
           );
+
           return yield* get(userId, familyId);
         }),
 
@@ -188,6 +195,7 @@ export class Families extends Context.Service<
           yield* database.use((client) =>
             client.insert(familyInvite).values({ code, familyId, createdById: userId, expiresAt }),
           );
+
           return { code: formatInviteCode(code), createdById: userId, expiresAt };
         }),
 
@@ -196,16 +204,20 @@ export class Families extends Context.Service<
           rawCode: string,
         ) {
           const code = normalizeInviteCode(rawCode);
+
           const [invite] = yield* database.use((client) =>
             client.select().from(familyInvite).where(eq(familyInvite.code, code)),
           );
+
           if (!invite) return yield* new NotFound({ message: "This invite doesn't exist." });
           const role = yield* requireMember(invite.familyId, userId);
+
           if (role !== "owner" && invite.createdById !== userId) {
             return yield* new Forbidden({
               message: "Only the person who created this invite or a family owner can revoke it.",
             });
           }
+
           yield* database.use((client) =>
             client.delete(familyInvite).where(eq(familyInvite.code, code)),
           );
@@ -213,6 +225,7 @@ export class Families extends Context.Service<
 
         join: Effect.fn("Families.join")(function* (userId: string, rawCode: string) {
           const now = new Date(yield* Clock.currentTimeMillis);
+
           const [invite] = yield* database.use((client) =>
             client
               .select()
@@ -224,22 +237,26 @@ export class Families extends Context.Service<
                 ),
               ),
           );
+
           if (!invite) {
             return yield* new NotFound({
               message: "This invite code is invalid or has expired. Ask for a new one.",
             });
           }
+
           yield* database.use((client) =>
             client
               .insert(familyMember)
               .values({ familyId: invite.familyId, userId, role: "member" })
               .onConflictDoNothing(),
           );
+
           return yield* get(userId, invite.familyId);
         }),
 
         leave: Effect.fn("Families.leave")(function* (userId: string, familyId: string) {
           const role = yield* requireMember(familyId, userId);
+
           const otherMembers = yield* database.use((client) =>
             client
               .select({ userId: familyMember.userId, role: familyMember.role })
@@ -247,7 +264,9 @@ export class Families extends Context.Service<
               .where(and(eq(familyMember.familyId, familyId), ne(familyMember.userId, userId)))
               .orderBy(...joinOrder),
           );
+
           const [successor] = otherMembers;
+
           if (!successor) return yield* destroy(familyId);
 
           if (role === "owner" && !otherMembers.some((member) => member.role === "owner")) {
@@ -286,16 +305,20 @@ export class Families extends Context.Service<
               message: "You can't remove yourself. Leave the family instead.",
             });
           }
+
           yield* requireOwner(familyId, userId);
+
           const [removed] = yield* database.use((client) =>
             client
               .delete(familyMember)
               .where(and(eq(familyMember.familyId, familyId), eq(familyMember.userId, memberId)))
               .returning(),
           );
+
           if (!removed) {
             return yield* new NotFound({ message: "This person isn't a member of the family." });
           }
+
           return yield* get(userId, familyId);
         }),
 
@@ -306,6 +329,7 @@ export class Families extends Context.Service<
           role: FamilyRole,
         ) {
           yield* requireOwner(familyId, userId);
+
           if (role === "member") {
             const owners = yield* database.use((client) =>
               client
@@ -313,12 +337,14 @@ export class Families extends Context.Service<
                 .from(familyMember)
                 .where(and(eq(familyMember.familyId, familyId), eq(familyMember.role, "owner"))),
             );
+
             if (owners.length === 1 && owners[0]?.userId === memberId) {
               return yield* new InvalidRequest({
                 message: "A family needs at least one owner. Make someone else an owner first.",
               });
             }
           }
+
           const [updated] = yield* database.use((client) =>
             client
               .update(familyMember)
@@ -326,9 +352,11 @@ export class Families extends Context.Service<
               .where(and(eq(familyMember.familyId, familyId), eq(familyMember.userId, memberId)))
               .returning(),
           );
+
           if (!updated) {
             return yield* new NotFound({ message: "This person isn't a member of the family." });
           }
+
           return yield* get(userId, familyId);
         }),
 
@@ -337,8 +365,11 @@ export class Families extends Context.Service<
           storeId: string,
         ) {
           const owner = parseStoreId(storeId);
+
           if (!owner) return false;
+
           if (owner.kind === "user") return owner.userId === userId;
+
           const [membership] = yield* database.use((client) =>
             client
               .select({ familyId: familyMember.familyId })
@@ -347,6 +378,7 @@ export class Families extends Context.Service<
                 and(eq(familyMember.familyId, owner.familyId), eq(familyMember.userId, userId)),
               ),
           );
+
           return membership !== undefined;
         }),
       });

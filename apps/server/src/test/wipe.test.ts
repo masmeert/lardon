@@ -23,6 +23,7 @@ describe("pictures across stores", () => {
         const alice = yield* createUser("Alice");
         const mallory = yield* createUser("Mallory");
         const family = yield* alice.api.families.create({ payload: { name: "Meerts" } });
+
         const { imageKey } = yield* alice.api.images.upload({
           params: { storeId: personalStoreId(alice.id) },
           payload: TINY_PNG,
@@ -32,12 +33,14 @@ describe("pictures across stores", () => {
           params: { storeId: familyStoreId(family.id) },
           payload: { imageKey },
         });
+
         expect(copied.imageKey.startsWith(`${familyStoreId(family.id)}/`)).toBe(true);
         expect(images.get(copied.imageKey)?.bytes).toEqual(images.get(imageKey)?.bytes);
 
         const stolen = yield* mallory.api.images
           .copy({ params: { storeId: personalStoreId(mallory.id) }, payload: { imageKey } })
           .pipe(Effect.flip);
+
         expect(stolen._tag).toBe("NotFound");
       }),
     ));
@@ -60,15 +63,18 @@ describe("account wipe", () => {
 
         const upload = (storeId: string) =>
           alice.api.images.upload({ params: { storeId }, payload: TINY_PNG });
+
         const personalPicture = yield* upload(personalStoreId(alice.id));
         const soloPicture = yield* upload(familyStoreId(solo.id));
         const sharedPicture = yield* upload(familyStoreId(shared.id));
 
         const database = yield* Database;
+
         const pendingTokens = [
           { id: "alice-reset", identifier: "reset-password:alice", value: alice.id },
           { id: "bob-reset", identifier: "reset-password:bob", value: bob.id },
         ];
+
         yield* database.use((client) =>
           client.insert(verification).values(
             pendingTokens.map((token) => ({
@@ -83,6 +89,7 @@ describe("account wipe", () => {
         const remainingTokens = yield* database.use((client) =>
           client.select({ id: verification.id }).from(verification),
         );
+
         expect(remainingTokens).toEqual([{ id: "bob-reset" }]);
 
         expect(deletedStores.sort()).toEqual(

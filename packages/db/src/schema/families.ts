@@ -20,6 +20,7 @@ export const family = sqliteTable("family", {
 });
 
 export const familyRoles = ["owner", "member"] as const;
+
 export type FamilyRole = (typeof familyRoles)[number];
 
 export const familyMember = sqliteTable(

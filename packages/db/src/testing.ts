@@ -21,5 +21,8 @@ export async function createTestDatabase(): Promise<Database> {
 
   const client = createClient({ url });
   await client.execute("PRAGMA foreign_keys = ON");
+
+  // SAFETY: tests run the same schema on local libsql in place of D1; only the driver result types differ.
+  // oxlint-disable-next-line anti-slop/no-chained-type-assertions -- libsql and D1 drizzle types share no overlap
   return drizzle({ client, relations }) as unknown as Database;
 }

@@ -27,10 +27,14 @@ const NUTRIENTS: [keyof Nutrition, string, string][] = [
 export function formatQuantity(quantity: number) {
   const whole = Math.floor(quantity);
   const remainder = quantity - whole;
+
   if (remainder < 0.01) return String(whole);
+
   if (remainder > 0.99) return String(whole + 1);
   const fraction = FRACTIONS.find(([value]) => Math.abs(value - remainder) < 0.01);
+
   if (fraction) return whole === 0 ? fraction[1] : `${whole}${fraction[1]}`;
+
   return String(Math.round(quantity * 100) / 100);
 }
 
@@ -43,18 +47,23 @@ export function formatIngredient(
   ]
     .filter(Boolean)
     .join(" ");
+
   const line = amount ? `${amount} ${ingredient.name}` : ingredient.name;
+
   return ingredient.note ? `${line}, ${ingredient.note}` : line;
 }
 
 export function formatDuration(minutes: number) {
   const hours = Math.floor(minutes / 60);
+
   if (hours === 0) return `${minutes} min`;
+
   return minutes % 60 === 0 ? `${hours} h` : `${hours} h ${minutes % 60} min`;
 }
 
 export function formatMeta(recipe: RecipeDocument) {
   const parts: string[] = [];
+
   if (recipe.servings !== null) {
     parts.push(
       recipe.servingsUnit
@@ -62,20 +71,28 @@ export function formatMeta(recipe: RecipeDocument) {
         : `Serves ${formatQuantity(recipe.servings)}`,
     );
   }
+
   const { prepTimeMinutes, cookTimeMinutes } = recipe;
+
   if (prepTimeMinutes !== null) parts.push(`Prep ${formatDuration(prepTimeMinutes)}`);
+
   if (cookTimeMinutes !== null) parts.push(`Cook ${formatDuration(cookTimeMinutes)}`);
+
   if (prepTimeMinutes && cookTimeMinutes) {
     parts.push(`Total ${formatDuration(prepTimeMinutes + cookTimeMinutes)}`);
   }
+
   return parts.length > 0 ? parts.join(" · ") : null;
 }
 
 export function nutritionRows(nutrition: Nutrition | null) {
   if (!nutrition) return [];
+
   return NUTRIENTS.flatMap(([key, label, unit]) => {
     const value = nutrition[key];
+
     if (value === null || value === undefined) return [];
+
     return [{ label, value: `${Math.round(value * 10) / 10} ${unit}` }];
   });
 }

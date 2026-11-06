@@ -12,26 +12,34 @@ const Id = Schema.String.check(Schema.isPattern(/^[A-Za-z0-9_-]{1,64}$/));
 const Position = Schema.String.check(Schema.isMinLength(1), Schema.isMaxLength(200));
 const Title = text(200);
 const SectionTitle = Schema.NullOr(text(120));
+
 const Quantity = Schema.NullOr(
   Schema.Finite.check(Schema.isGreaterThan(0), Schema.isLessThanOrEqualTo(1_000_000)),
 );
+
 const Unit = Schema.NullOr(text(40));
 const IngredientName = text(200);
 const IngredientNote = Schema.NullOr(text(300));
 const StepText = text(5000);
+
 const Minutes = Schema.NullOr(
   Schema.Int.check(Schema.isGreaterThanOrEqualTo(0), Schema.isLessThanOrEqualTo(100_000)),
 );
+
 const Servings = Schema.NullOr(
   Schema.Finite.check(Schema.isGreaterThan(0), Schema.isLessThanOrEqualTo(10_000)),
 );
+
 const ServingsUnit = Schema.NullOr(text(40));
 const Notes = Schema.NullOr(text(20_000));
+
 const SourceUrl = Schema.NullOr(
   Schema.String.check(Schema.isPattern(/^https?:\/\/\S+$/), Schema.isMaxLength(2000)),
 );
+
 const ImageKey = Schema.NullOr(Schema.String.check(Schema.isMaxLength(200)));
 const Tag = text(40);
+
 const Nutrient = Schema.NullOr(
   Schema.Finite.check(Schema.isGreaterThanOrEqualTo(0), Schema.isLessThanOrEqualTo(100_000)),
 );

@@ -1,3 +1,4 @@
+import { NotFound } from "@lardon/api";
 import { familyStoreId } from "@lardon/recipes/store-id";
 import { Effect } from "effect";
 import { describe, expect, it } from "vite-plus/test";
@@ -12,6 +13,7 @@ const createFamilyWith = Effect.fn("createFamilyWith")(function* (names: string[
   yield* Effect.forEach(others, (member) =>
     member.api.families.join({ payload: { code: invite.code } }),
   );
+
   return { users, family, invite };
 });
 
@@ -51,12 +53,15 @@ describe("families", () => {
         const unknown = yield* carol.api.families
           .join({ payload: { code: "AAAA-BBBB-CCCC" } })
           .pipe(Effect.flip);
+
         expect(unknown._tag).toBe("NotFound");
 
         yield* users[0]!.api.families.revokeInvite({ params: { code: invite.code } });
+
         const revoked = yield* carol.api.families
           .join({ payload: { code: invite.code } })
           .pipe(Effect.flip);
+
         expect(revoked._tag).toBe("NotFound");
       }),
     ));
@@ -70,11 +75,13 @@ describe("families", () => {
         const hidden = yield* mallory.api.families
           .get({ params: { familyId: family.id } })
           .pipe(Effect.flip);
-        expect(hidden).toMatchObject({ _tag: "NotFound", message: "This family doesn't exist." });
+
+        expect(hidden).toEqual(new NotFound({ message: "This family doesn't exist." }));
 
         const invalid = yield* mallory.api.families
           .create({ payload: { name: "   " } })
           .pipe(Effect.flip);
+
         expect(invalid._tag).toBe("SchemaError");
       }),
     ));
@@ -102,6 +109,7 @@ describe("families", () => {
         const forbidden = yield* bob!.api.families
           .delete({ params: { familyId: family.id } })
           .pipe(Effect.flip);
+
         expect(forbidden._tag).toBe("Forbidden");
 
         yield* alice!.api.families.delete({ params: { familyId: family.id } });
@@ -131,11 +139,13 @@ describe("families", () => {
         const forbidden = yield* bob!.api.families
           .removeMember({ params: { familyId, userId: alice!.id } })
           .pipe(Effect.flip);
+
         expect(forbidden._tag).toBe("Forbidden");
 
         const lastOwner = yield* alice!.api.families
           .setMemberRole({ params: { familyId, userId: alice!.id }, payload: { role: "member" } })
           .pipe(Effect.flip);
+
         expect(lastOwner._tag).toBe("InvalidRequest");
 
         yield* alice!.api.families.setMemberRole({
@@ -143,9 +153,11 @@ describe("families", () => {
           payload: { role: "owner" },
         });
         yield* bob!.api.families.rename({ params: { familyId }, payload: { name: "Team Lardon" } });
+
         const details = yield* bob!.api.families.removeMember({
           params: { familyId, userId: alice!.id },
         });
+
         expect(details.name).toBe("Team Lardon");
         expect(details.members.map((member) => member.name)).toEqual(["Bob"]);
       }),

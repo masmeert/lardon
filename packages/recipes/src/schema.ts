@@ -119,9 +119,11 @@ const materializers = State.SQLite.materializers(recipeEvents, {
 
   "v1.RecipeTagAdded": ({ recipeId, tag, updatedAt }, context) => {
     const [current] = context.query(recipeTables.recipes.select("tags").where({ id: recipeId }));
+
     if (!current || current.some((existing) => existing.toLowerCase() === tag.toLowerCase())) {
       return [];
     }
+
     return [
       recipeTables.recipes.update({ tags: [...current, tag] }).where({ id: recipeId }),
       touchRecipe(recipeId, updatedAt),
@@ -130,7 +132,9 @@ const materializers = State.SQLite.materializers(recipeEvents, {
 
   "v1.RecipeTagRemoved": ({ recipeId, tag, updatedAt }, context) => {
     const [current] = context.query(recipeTables.recipes.select("tags").where({ id: recipeId }));
+
     if (!current) return [];
+
     return [
       recipeTables.recipes
         .update({

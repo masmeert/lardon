@@ -13,6 +13,7 @@ export class Authentication extends Context.Service<
     return Authentication.of({
       userFromHeaders: Effect.fn("Authentication.userFromHeaders")(function* (headers: Headers) {
         const session = yield* Effect.promise(() => auth.api.getSession({ headers }));
+
         return session
           ? {
               id: session.user.id,

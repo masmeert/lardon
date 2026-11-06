@@ -8,6 +8,7 @@ allowBuilds:
   workerd: true
 overrides:
   vite@*: "catalog:"
+  "@cloudflare/workers-types": "catalog:"
   effect: 4.1.2
   "@effect/platform-node-shared": 4.1.2
   "@effect/platform-node": 4.1.2

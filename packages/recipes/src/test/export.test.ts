@@ -188,6 +188,7 @@ Source: https://example.com/creme-brulee
         },
       ],
     };
+
     const pdf = await recipeToPdf(longRecipe, { bytes: TINY_PNG, contentType: "image/png" });
     const parsed = await PDFDocument.load(pdf);
     expect(parsed.getPageCount()).toBeGreaterThan(1);
@@ -198,6 +199,7 @@ Source: https://example.com/creme-brulee
     const markdown = await exportRecipe({ ...cremeBrulee, title: "Crème Toast!" }, "markdown", {
       include: ["tags"],
     });
+
     expect(markdown).toEqual({
       filename: "creme-toast.md",
       contentType: "text/markdown; charset=utf-8",
@@ -207,9 +209,11 @@ Source: https://example.com/creme-brulee
     const withoutPicture = await exportRecipe(cremeBrulee, "pdf", {
       picture: { bytes: TINY_PNG, contentType: "image/png" },
     });
+
     const withPicture = await exportRecipe({ ...cremeBrulee, imageKey: "key" }, "pdf", {
       picture: { bytes: TINY_PNG, contentType: "image/png" },
     });
+
     expect(withPicture.body.length).toBeGreaterThan(withoutPicture.body.length);
   });
 });

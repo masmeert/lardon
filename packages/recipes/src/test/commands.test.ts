@@ -35,6 +35,7 @@ import { createTestStore } from "./store";
 
 function sectionIds(store: Awaited<ReturnType<typeof createTestStore>>, recipeId: string) {
   const sections = store.query(recipeSections$(recipeId));
+
   return {
     ingredients: sections
       .filter((section) => section.kind === "ingredients")
@@ -72,6 +73,7 @@ describe("recipe commands", () => {
 
   it("creates a recipe from a full document and keeps its order", async () => {
     const store = await createTestStore();
+
     const recipeId = createRecipe(store, {
       title: "Lasagne",
       createdById: "alice",
@@ -105,12 +107,14 @@ describe("recipe commands", () => {
 
   it("updates only the given details and never moves updatedAt backwards", async () => {
     const store = await createTestStore();
+
     const recipeId = createRecipe(store, {
       title: "Soup",
       createdById: "alice",
       servings: 2,
       notes: "Old",
     });
+
     const createdAt = store.query(recipe$(recipeId))!.updatedAt;
 
     updateRecipeDetails(store, recipeId, { title: "Leek soup", notes: "   " });
@@ -167,11 +171,13 @@ describe("recipe commands", () => {
     const spices = addRecipeSection(store, recipeId, "ingredients", " Spices ");
 
     const onion = addIngredient(store, recipeId, main!, { name: "onion", quantity: 1 });
+
     const garlic = addIngredient(store, recipeId, main!, {
       name: "garlic",
       unit: " cloves ",
       quantity: 2,
     });
+
     const rice = addIngredient(store, recipeId, main!, { name: "rice" });
     addIngredient(store, recipeId, spices, { name: "cumin" });
 
@@ -234,6 +240,7 @@ describe("recipe commands", () => {
   it("copies and moves recipes between stores", async () => {
     const personal = await createTestStore();
     const family = await createTestStore();
+
     const recipeId = createRecipe(personal, {
       title: "Stew",
       createdById: "alice",

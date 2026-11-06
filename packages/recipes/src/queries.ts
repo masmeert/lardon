@@ -69,6 +69,7 @@ export function readRecipeDocument(
   recipeId: string,
 ): RecipeDocument | null {
   const recipe = store.query(recipe$(recipeId));
+
   if (!recipe || recipe.deletedAt) return null;
   const sections = store.query(recipeSections$(recipeId));
   const ingredients = store.query(recipeIngredients$(recipeId));

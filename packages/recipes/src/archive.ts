@@ -16,6 +16,7 @@ export const ArchivedPicture = Schema.Struct({
   contentType: Schema.Literals(["image/jpeg", "image/png", "image/webp"]),
   data: Schema.Uint8ArrayFromBase64,
 });
+
 export type ArchivedPicture = typeof ArchivedPicture.Type;
 
 export const ArchivedRecipe = Schema.Struct({
@@ -43,6 +44,7 @@ export const RecipeArchive = Schema.Struct({
   exportedAt: Schema.DateFromString,
   recipes: Schema.Array(ArchivedRecipe),
 });
+
 export type RecipeArchive = typeof RecipeArchive.Type;
 
 const RecipeArchiveJson = Schema.fromJsonString(RecipeArchive);
@@ -57,8 +59,10 @@ export function createRecipeArchive(
     exportedAt: new Date(),
     recipes: store.query(recipes$).flatMap((recipe) => {
       const document = readRecipeDocument(store, recipe.id);
+
       if (!document) return [];
       const { imageKey, ...content } = document;
+
       return [{ ...content, picture: imageKey ? (pictures.get(imageKey) ?? null) : null }];
     }),
   };

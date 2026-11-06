@@ -30,9 +30,13 @@ const AUTH_PATHS = [
 
 export function rateLimitRuleFor(method: string, path: string): RateLimitRule | null {
   if (AUTH_PATHS.some((prefix) => path.startsWith(prefix))) return "auth";
+
   if (path === "/api/families/join") return "sensitive";
+
   if (method !== "GET" && /^\/api\/stores\/[^/]+\/images/.test(path)) return "sensitive";
+
   if (path.startsWith("/api/") || path === "/sync") return "api";
+
   return null;
 }
 

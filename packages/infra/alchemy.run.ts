@@ -21,6 +21,7 @@ export const observability = Effect.gen(function* () {
     kind: "axiom:events:v1",
     description: "lardon application logs",
   });
+
   const ingest = yield* Axiom.ApiToken("logs-ingest", {
     name: `lardon-${stage}-logs-ingest`,
     datasetCapabilities: {

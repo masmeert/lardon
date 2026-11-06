@@ -23,6 +23,7 @@ export class ImageStorage extends Context.Service<
             : null,
         ),
       );
+
     return ImageStorage.of({
       put: (key, bytes, contentType) =>
         Effect.promise(() => bucket.put(key, bytes, { httpMetadata: { contentType } })).pipe(
@@ -31,19 +32,24 @@ export class ImageStorage extends Context.Service<
       get,
       copy: Effect.fn("ImageStorage.copy")(function* (sourceKey: string, targetKey: string) {
         const source = yield* get(sourceKey);
+
         if (!source) return false;
         yield* Effect.promise(() =>
           bucket.put(targetKey, source.body, { httpMetadata: { contentType: source.contentType } }),
         );
+
         return true;
       }),
       deleteAll: Effect.fn("ImageStorage.deleteAll")(function* (prefix: string) {
         let cursor: string | undefined;
+
         do {
           const page = yield* Effect.promise(() => bucket.list({ prefix, cursor }));
+
           if (page.objects.length > 0) {
             yield* Effect.promise(() => bucket.delete(page.objects.map((object) => object.key)));
           }
+
           cursor = page.truncated ? page.cursor : undefined;
         } while (cursor);
       }),
