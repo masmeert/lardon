@@ -1,4 +1,9 @@
-<section class="my-8 rounded-lg border border-line bg-white px-5 py-1" aria-labelledby="summary">
-  <h2 id="summary" class="mt-4!">The short version</h2>
-  <slot />
+<section
+  class="not-prose my-10 rounded-2xl border border-line bg-white px-6 pt-5 pb-5"
+  aria-labelledby="summary"
+>
+  <h2 id="summary" class="text-base font-medium text-ink-strong">The short version</h2>
+  <div class="mt-2 text-base leading-relaxed text-muted [&_li]:relative [&_li]:py-1 [&_li]:pl-5 [&_li]:before:absolute [&_li]:before:top-[0.85em] [&_li]:before:left-0 [&_li]:before:size-1.5 [&_li]:before:rounded-full [&_li]:before:bg-line-strong">
+    <slot />
+  </div>
 </section>

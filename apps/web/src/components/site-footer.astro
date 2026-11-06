@@ -1,4 +1,5 @@
 ---
+import Logo from "../assets/logo.svg";
 import { operator } from "../operator";
 
 interface Props {
@@ -8,32 +9,33 @@ interface Props {
 const { class: className } = Astro.props;
 ---
 
-<footer class:list={["mx-auto w-full px-6 pb-24", className]}>
-  <div class="border-t border-line pt-6">
-    <nav aria-label="Legal" class="flex flex-wrap gap-x-4 gap-y-1">
-      <a
-        href="/terms"
-        class="-m-2 inline-flex min-h-11 items-center rounded-sm p-2 text-muted-soft underline underline-offset-2 hover:text-ink-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-line-strong"
-      >
-        Terms of Use
-      </a>
-      <a
-        href="/privacy"
-        class="-m-2 inline-flex min-h-11 items-center rounded-sm p-2 text-muted-soft underline underline-offset-2 hover:text-ink-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-line-strong"
-      >
-        Privacy Policy
-      </a>
-    </nav>
-    <address class="mt-4 flex flex-wrap gap-x-3 text-xs leading-5 text-muted-soft not-italic">
-      <span>{operator.name}</span>
-      <span>{operator.address}, {operator.country}</span>
-      <span>Enterprise and VAT number {operator.enterpriseNumber}</span>
-      <a
-        href={`mailto:${operator.contactEmail}`}
-        class="underline underline-offset-2 hover:text-ink-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-line-strong"
-      >
-        {operator.contactEmail}
-      </a>
-    </address>
+<footer class="overflow-hidden bg-accent-dark text-card/80">
+  <div class:list={["mx-auto w-full px-6 pt-10 pb-12", className]}>
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <p class="text-sm">© {new Date().getFullYear()} {operator.name}</p>
+      <nav aria-label="Legal" class="flex flex-wrap gap-x-5 gap-y-1 text-sm">
+        <a
+          href={`mailto:${operator.contactEmail}`}
+          class="-m-2 inline-flex min-h-11 items-center rounded-sm p-2 underline underline-offset-2 hover:text-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-card/60"
+        >
+          Contact
+        </a>
+        <a
+          href="/privacy"
+          class="-m-2 inline-flex min-h-11 items-center rounded-sm p-2 underline underline-offset-2 hover:text-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-card/60"
+        >
+          Privacy Policy
+        </a>
+        <a
+          href="/terms"
+          class="-m-2 inline-flex min-h-11 items-center rounded-sm p-2 underline underline-offset-2 hover:text-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-card/60"
+        >
+          Terms of Use
+        </a>
+      </nav>
+    </div>
+    <div class="mt-8 border-t border-card/15 pt-10">
+      <Logo aria-hidden="true" class="h-auto w-full text-card/15" />
+    </div>
   </div>
 </footer>

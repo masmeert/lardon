@@ -13,11 +13,13 @@
   --color-accent-soft: #f0ebe4;
   --color-accent: #5a6a1f;
   --color-accent-light: #6f812c;
+  --color-accent-dark: #4a5818;
   --color-butter: #f3db8c;
   --color-card: #fffdf6;
   --color-card-margin: #e9b3a1;
   --color-card-rule: #e4e7d4;
   --font-handwritten: var(--font-reenie-beanie);
+  --font-cursive: var(--font-la-belle-aurore);
   --animate-float: float 6s ease-in-out infinite;
 
   @keyframes float {

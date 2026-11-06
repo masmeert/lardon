@@ -5,10 +5,7 @@ import Page from "../layouts/page.astro";
 import { lastUpdated, operator, sourceCodeUrl } from "../operator";
 ---
 
-<Page title="Terms of Use" description="The rules for using Lardon, and what you can expect from us.">
-  <h1>Terms of Use</h1>
-  <p class="mt-0 text-muted-soft">Last updated {lastUpdated}</p>
-
+<Page title="Terms of Use" lastUpdated={lastUpdated} description="The rules for using Lardon, and what you can expect from us.">
   <p>
     These terms are the agreement between you and {operator.name} ("we", "us") for using Lardon, the
     family cookbook app, and this website. By creating an account or using Lardon, you agree to
@@ -27,6 +24,7 @@ import { lastUpdated, operator, sourceCodeUrl } from "../operator";
   </Summary>
 
   <Contents
+    slot="aside"
     sections={[
       { id: "your-account", title: "Your account" },
       { id: "families", title: "Families" },
@@ -243,8 +241,7 @@ import { lastUpdated, operator, sourceCodeUrl } from "../operator";
     the protection of your own country's consumer laws and can bring a claim in your local courts.
   </p>
   <p>
-    If part of these terms turns out to be invalid, the rest still applies. If Lardon is taken over
-    by someone else, we'll tell you in advance.
+    If part of these terms turns out to be invalid, the rest still applies.
   </p>
 
   <h2 id="contact">14. Contact</h2>

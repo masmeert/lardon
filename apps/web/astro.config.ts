@@ -24,6 +24,15 @@ export default defineConfig({
       subsets: ["latin"],
       fallbacks: ["cursive"],
     },
+    {
+      provider: fontProviders.fontsource(),
+      name: "La Belle Aurore",
+      cssVariable: "--font-la-belle-aurore",
+      weights: [400],
+      styles: ["normal"],
+      subsets: ["latin"],
+      fallbacks: ["cursive"],
+    },
   ],
   vite: {
     plugins: [tailwindcss()],

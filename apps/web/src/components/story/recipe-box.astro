@@ -1,0 +1,54 @@
+---
+import GrandmaCard from "./grandma-card.astro";
+---
+
+<button
+  type="button"
+  data-recipe-box
+  aria-label="Show another of grandma's recipes"
+  class="group grid w-56 cursor-pointer rounded-sm text-left focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-line-strong"
+>
+  <GrandmaCard
+    title="Tarte tatin"
+    ingredients={["6 apples", "150 g sugar", "lots of butter", "1 pastry"]}
+    position={0}
+  />
+  <GrandmaCard
+    title="Boulets liégeois"
+    ingredients={["500 g minced meat", "2 onions", "sirop de Liège", "1 egg"]}
+    position={1}
+  />
+  <GrandmaCard
+    title="Crêpes"
+    ingredients={["250 g flour", "4 eggs", "500 ml milk", "a pinch of salt"]}
+    position={2}
+  />
+</button>
+
+<script>
+  for (const recipeBox of document.querySelectorAll<HTMLButtonElement>("[data-recipe-box]")) {
+    recipeBox.addEventListener("click", () => {
+      const cards = [...recipeBox.querySelectorAll<HTMLElement>("[data-position]")];
+      const topCard = cards.find((card) => card.dataset.position === "0");
+
+      if (!topCard || topCard.dataset.leaving !== undefined) {
+        return;
+      }
+
+      topCard.dataset.leaving = "";
+
+      setTimeout(
+        () => {
+          for (const card of cards) {
+            card.dataset.position = String(
+              (Number(card.dataset.position) + cards.length - 1) % cards.length,
+            );
+          }
+
+          delete topCard.dataset.leaving;
+        },
+        matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 250,
+      );
+    });
+  }
+</script>

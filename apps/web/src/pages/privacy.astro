@@ -5,10 +5,7 @@ import Page from "../layouts/page.astro";
 import { lastUpdated, operator, sourceCodeUrl } from "../operator";
 ---
 
-<Page title="Privacy Policy" description="What Lardon collects, why, and the choices you have.">
-  <h1>Privacy Policy</h1>
-  <p class="mt-0 text-muted-soft">Last updated {lastUpdated}</p>
-
+<Page title="Privacy Policy" lastUpdated={lastUpdated} description="What Lardon collects, why, and the choices you have.">
   <p>
     Lardon is a family cookbook app. This policy explains what we collect when you use the Lardon
     app and this website, why we collect it, who can see it and what you can do about it.
@@ -24,6 +21,7 @@ import { lastUpdated, operator, sourceCodeUrl } from "../operator";
   </Summary>
 
   <Contents
+    slot="aside"
     sections={[
       { id: "who-we-are", title: "Who we are" },
       { id: "what-we-collect", title: "What we collect" },
@@ -163,10 +161,6 @@ import { lastUpdated, operator, sourceCodeUrl } from "../operator";
       <strong>Authorities:</strong> only if the law requires it, for example a valid court order.
     </li>
   </ul>
-  <p>
-    If Lardon is ever taken over by someone else, we'll tell you before your data moves and before
-    a different privacy policy applies, so you can delete your account first.
-  </p>
 
   <h2 id="where-its-stored">6. Where it's stored</h2>
   <p>

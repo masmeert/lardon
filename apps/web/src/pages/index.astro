@@ -1,8 +1,81 @@
 ---
-import Page from "../layouts/page.astro";
+import { appDownloadUrl } from "../app-download";
+import RecipeCard from "../components/recipe-card.astro";
+import SiteFooter from "../components/site-footer.astro";
+import SiteHeader from "../components/site-header.astro";
+import StorySection from "../components/story/story-section.astro";
+import Base from "../layouts/base.astro";
 ---
 
-<Page title="Lardon" description="Keep your family's recipes in one place and cook them together.">
-  <h1>Your family cookbook</h1>
-  <p>Keep your family's recipes in one place and cook them together.</p>
-</Page>
+<Base
+  title="Lardon"
+  description="A cookbook your family shares. Write down the dishes you grew up with, and everyone has them on their phone."
+>
+  <main class="overflow-x-clip">
+    <section class="overflow-hidden bg-linear-to-b from-accent-light to-accent text-card">
+      <SiteHeader class="max-w-5xl" />
+      <div class="mx-auto flex max-w-5xl flex-col items-center px-6 pt-14 text-center sm:pt-20">
+        <h1
+          class="text-5xl leading-[1.05] font-medium tracking-tight sm:text-7xl lg:text-8xl"
+        >
+          Grandma's <span
+            class="inline-block -rotate-3 font-handwritten text-[1.3em] leading-[0.75] font-normal tracking-normal text-butter"
+            >quiche</span
+          >,<br class="max-sm:hidden" /> on everyone's phone.
+        </h1>
+        <p class="mt-8 max-w-md text-base leading-relaxed text-card/80 sm:text-lg">
+          Lardon is a cookbook your family shares. Write a recipe down once and the whole family
+          has it the next time they cook.
+        </p>
+        <a
+          href={appDownloadUrl}
+          class="mt-8 inline-flex min-h-12 items-center rounded-full bg-butter px-7 text-base font-medium text-accent hover:bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-card/60"
+        >
+          Start your cookbook
+        </a>
+      </div>
+      <div
+        class="mt-16 flex w-full min-w-0 items-start justify-center max-sm:mt-10 max-sm:-mb-44 max-sm:origin-top max-sm:scale-[0.56] sm:mt-20 sm:-mb-28"
+      >
+        <RecipeCard
+          emoji="🍲"
+          title="Pot-au-feu"
+          ingredients={["1 kg beef", "4 carrots", "2 leeks", "1 onion"]}
+          ruledLineCount={6}
+          isFeatured={false}
+          class="mt-10 -mr-4 w-52 -rotate-6 motion-safe:animate-float"
+        />
+        <RecipeCard
+          emoji="🥧"
+          title="Quiche lorraine"
+          ingredients={["200 g lardons", "3 eggs", "200 ml cream", "1 pie crust"]}
+          ruledLineCount={7}
+          isFeatured
+          class="z-10 w-80 motion-safe:animate-float motion-safe:[animation-duration:4.2s]"
+        />
+        <RecipeCard
+          emoji="🥗"
+          title="Niçoise"
+          ingredients={["tuna", "olives", "2 eggs", "tomatoes"]}
+          ruledLineCount={6}
+          isFeatured={false}
+          class="mt-10 -ml-4 w-52 rotate-6 motion-safe:animate-float motion-safe:[animation-delay:-2s] motion-safe:[animation-duration:5.6s]"
+        />
+      </div>
+    </section>
+
+    <StorySection />
+
+
+    <section
+      id="get-the-app"
+      class="bg-linear-to-b from-accent-light to-accent px-6 py-24 text-center text-card sm:py-32"
+    >
+      <h2 class="font-handwritten text-7xl leading-none sm:text-9xl">À table !</h2>
+      <p class="mt-6 text-base text-card/80 sm:text-lg">
+        Lardon is coming soon to iPhone and Android.
+      </p>
+    </section>
+  </main>
+  <SiteFooter class="max-w-5xl" />
+</Base>

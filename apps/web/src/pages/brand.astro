@@ -9,19 +9,22 @@ import Base from "../layouts/base.astro";
 ---
 
 <Base title="Brand" description="The Lardon logo, colors and fonts.">
-  <SiteHeader class="max-w-5xl" />
-  <main class="mx-auto max-w-5xl px-6 pt-12 pb-24 sm:pt-20">
-    <h1 class="text-5xl leading-[1.05] font-medium tracking-tight text-ink-strong">Brand</h1>
-    <p class="mt-4 text-base leading-relaxed">Our logo, colors and fonts.</p>
-    <a
-      href="/brand/lardon-brand-assets.zip"
-      download
-      class="mt-6 inline-flex min-h-11 items-center gap-2 rounded-full bg-accent px-5 text-sm font-medium text-white hover:bg-[#4A5818] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-    >
-      Download all files
-      <span class="font-normal text-white/70">ZIP, 0.6 MB</span>
-    </a>
-
+  <div class="bg-linear-to-b from-accent-light to-accent text-card">
+    <SiteHeader class="max-w-5xl" />
+    <div class="mx-auto max-w-5xl px-6 pt-16 pb-16 sm:pt-24 sm:pb-20">
+      <h1 class="text-5xl leading-[1.05] font-medium tracking-tight sm:text-7xl">Brand</h1>
+      <p class="mt-5 text-base text-card/70">Our logo, colors and fonts.</p>
+      <a
+        href="/brand/lardon-brand-assets.zip"
+        download
+        class="mt-8 inline-flex min-h-11 items-center gap-2 rounded-full bg-butter px-5 text-sm font-medium text-accent hover:bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-card/60"
+      >
+        Download all files
+        <span class="font-normal text-accent/70">ZIP, 0.6 MB</span>
+      </a>
+    </div>
+  </div>
+  <main class="mx-auto max-w-5xl px-6 pt-4 pb-24">
     <section class="mt-20" aria-labelledby="logo">
       <h2 id="logo" class="text-2xl font-medium tracking-tight text-ink-strong">Logo</h2>
       <div class="mt-6 grid gap-4 sm:grid-cols-3">

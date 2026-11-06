@@ -6,12 +6,19 @@ interface Props {
 const { sections } = Astro.props;
 ---
 
-<nav aria-label="Contents">
-  <ol class="gap-x-8 *:my-0! *:py-0.5 sm:columns-2">
+<nav aria-labelledby="contents">
+  <h2 id="contents" class="text-sm font-medium text-ink-strong">Contents</h2>
+  <ol class="mt-3 flex flex-col text-sm">
     {
-      sections.map((section) => (
+      sections.map((section, index) => (
         <li>
-          <a href={`#${section.id}`}>{section.title}</a>
+          <a
+            href={`#${section.id}`}
+            class="-mx-2 flex gap-2 rounded-sm px-2 py-1.5 hover:text-ink-strong focus-visible:outline-2 focus-visible:outline-line-strong"
+          >
+            <span class="w-5 shrink-0 text-muted-soft tabular-nums">{index + 1}.</span>
+            {section.title}
+          </a>
         </li>
       ))
     }

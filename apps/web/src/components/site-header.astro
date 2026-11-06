@@ -1,4 +1,5 @@
 ---
+import { appDownloadUrl } from "../app-download";
 import Logo from "../assets/logo.svg";
 
 interface Props {
@@ -8,11 +9,17 @@ interface Props {
 const { class: className } = Astro.props;
 ---
 
-<header class:list={["mx-auto w-full px-6 pt-16", className]}>
+<header class:list={["mx-auto flex w-full items-center justify-between px-6 pt-8", className]}>
   <a
     href="/"
-    class="-m-2 inline-flex min-h-11 items-center rounded-sm p-2 text-ink-strong hover:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-line-strong"
+    class="-m-2 inline-flex min-h-11 items-center rounded-sm p-2 hover:text-card/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-card/60"
   >
     <Logo class="h-6 w-auto" />
+  </a>
+  <a
+    href={appDownloadUrl}
+    class="inline-flex min-h-10 items-center rounded-full bg-card px-4 text-sm font-medium text-accent hover:bg-butter focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-card/60"
+  >
+    Get the app
   </a>
 </header>
