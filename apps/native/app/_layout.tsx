@@ -1,20 +1,54 @@
 import "@/global.css";
+import { ReenieBeanie_400Regular } from "@expo-google-fonts/reenie-beanie";
+import {
+  HankenGrotesk_400Regular,
+  HankenGrotesk_500Medium,
+  HankenGrotesk_600SemiBold,
+  HankenGrotesk_700Bold,
+  useFonts,
+} from "@expo-google-fonts/hanken-grotesk";
 import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import { HeroUINativeProvider } from "heroui-native";
+import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 
-import { AppThemeProvider } from "@/contexts/app-theme-context";
+import { authClient } from "@/lib/auth-client";
 
-export const unstable_settings = {
-  anchor: "(drawer)",
-};
+void SplashScreen.preventAutoHideAsync();
 
 function StackLayout() {
+  const { data: session, isPending } = authClient.useSession();
+
+  const [fontsLoaded, fontError] = useFonts({
+    HankenGrotesk_400Regular,
+    HankenGrotesk_500Medium,
+    HankenGrotesk_600SemiBold,
+    HankenGrotesk_700Bold,
+    ReenieBeanie_400Regular,
+  });
+
+  const areFontsReady = fontsLoaded || fontError !== null;
+
+  useEffect(() => {
+    if (!isPending && areFontsReady) {
+      SplashScreen.hide();
+    }
+  }, [isPending, areFontsReady]);
+
+  if (!areFontsReady) {
+    return null;
+  }
+
   return (
-    <Stack screenOptions={{}}>
-      <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
-      <Stack.Screen name="modal" options={{ title: "Modal", presentation: "modal" }} />
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Protected guard={!!session}>
+        <Stack.Screen name="(app)" />
+      </Stack.Protected>
+      <Stack.Protected guard={!session}>
+        <Stack.Screen name="sign-in" />
+      </Stack.Protected>
     </Stack>
   );
 }
@@ -23,11 +57,9 @@ export default function Layout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <KeyboardProvider>
-        <AppThemeProvider>
-          <HeroUINativeProvider>
-            <StackLayout />
-          </HeroUINativeProvider>
-        </AppThemeProvider>
+        <HeroUINativeProvider config={{ toast: false }}>
+          <StackLayout />
+        </HeroUINativeProvider>
       </KeyboardProvider>
     </GestureHandlerRootView>
   );

@@ -20,6 +20,7 @@ export class RateLimits extends Context.Service<
 const AUTH_PATHS = [
   "/api/auth/sign-in",
   "/api/auth/sign-up",
+  "/api/auth/email-otp",
   "/api/auth/request-password-reset",
   "/api/auth/forget-password",
   "/api/auth/reset-password",

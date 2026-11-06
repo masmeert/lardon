@@ -23,6 +23,7 @@
 - Keep needed info and options visible — don't make users remember across screens.
 - Show only what serves the user's goal.
 - Error messages: plain language, the exact problem, how to fix it.
+- No toasts (lint). Show errors inline, right below the control they concern (`InlineError`), and keep them until the next attempt.
 
 ## Committing
 

@@ -3,19 +3,20 @@ import { expo } from "@better-auth/expo";
 import type { Database } from "@lardon/db";
 import * as schema from "@lardon/db/schema/auth";
 import { betterAuth } from "better-auth";
+import { emailOTP } from "better-auth/plugins";
 
 export type AuthConfig = {
   BETTER_AUTH_URL: string;
   BETTER_AUTH_SECRET: string;
   CORS_ORIGIN: string;
+  GOOGLE_CLIENT_ID: string;
+  GOOGLE_CLIENT_SECRET: string;
+  APPLE_BUNDLE_ID: string;
 };
 
-export type AuthEmail = {
-  kind: "verify-email" | "reset-password";
-  to: string;
-  name: string;
-  url: string;
-};
+export type AuthEmail =
+  | { kind: "verify-email" | "reset-password"; to: string; name: string; url: string }
+  | { kind: "sign-in-code"; to: string; code: string };
 
 export type AuthHooks = {
   sendEmail(email: AuthEmail): Promise<void>;
@@ -43,6 +44,20 @@ export function createAuth(env: AuthConfig, database: Database, hooks: AuthHooks
       sendVerificationEmail: ({ user, url }) =>
         hooks.sendEmail({ kind: "verify-email", to: user.email, name: user.name, url }),
     },
+    socialProviders: {
+      google: {
+        enabled: env.GOOGLE_CLIENT_ID !== "" && env.GOOGLE_CLIENT_SECRET !== "",
+        clientId: env.GOOGLE_CLIENT_ID,
+        clientSecret: env.GOOGLE_CLIENT_SECRET,
+        prompt: "select_account",
+      },
+      apple: {
+        enabled: env.APPLE_BUNDLE_ID !== "",
+        clientId: env.APPLE_BUNDLE_ID,
+        clientSecret: "",
+        appBundleIdentifier: env.APPLE_BUNDLE_ID,
+      },
+    },
     user: {
       deleteUser: {
         enabled: true,
@@ -58,7 +73,17 @@ export function createAuth(env: AuthConfig, database: Database, hooks: AuthHooks
         httpOnly: true,
       },
     },
-    plugins: [expo()],
+    plugins: [
+      expo(),
+      emailOTP({
+        storeOTP: "hashed",
+        sendVerificationOTP: async ({ email, otp, type }) => {
+          if (type === "sign-in") {
+            await hooks.sendEmail({ kind: "sign-in-code", to: email, code: otp });
+          }
+        },
+      }),
+    ],
   });
 }
 

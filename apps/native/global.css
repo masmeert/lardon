@@ -1,3 +1,101 @@
 @import "tailwindcss";
 @import "uniwind";
 @import "heroui-native/styles";
+
+@layer theme {
+  :root {
+    @variant light {
+      --background: oklch(0.9798 0.0045 78.3);
+      --foreground: oklch(0.232 0.0121 55.72);
+
+      --surface: var(--white);
+      --surface-foreground: var(--foreground);
+      --surface-secondary: oklch(0.9591 0.0074 80.72);
+      --surface-secondary-foreground: var(--foreground);
+      --surface-tertiary: oklch(0.9355 0.0091 78.28);
+      --surface-tertiary-foreground: var(--foreground);
+
+      --overlay: var(--white);
+      --overlay-foreground: var(--foreground);
+      --backdrop: oklch(0.232 0.0121 55.72 / 30%);
+
+      --muted: oklch(0.5276 0.0177 61.1);
+
+      --default: oklch(0.9415 0.0091 78.28);
+      --default-foreground: var(--foreground);
+
+      --accent: oklch(0.4951 0.1007 120.6);
+      --accent-foreground: var(--white);
+
+      --field-background: var(--white);
+      --field-foreground: var(--foreground);
+      --field-placeholder: var(--muted);
+      --field-border: transparent;
+
+      --success: oklch(0.5186 0.1098 151.41);
+      --success-foreground: var(--white);
+
+      --warning: oklch(0.6803 0.1356 74.4);
+      --warning-foreground: var(--foreground);
+
+      --danger: oklch(0.6 0.14 33);
+      --danger-foreground: var(--white);
+
+      --segment: var(--white);
+      --segment-foreground: var(--foreground);
+
+      --border: oklch(0.9145 0.0121 79.78);
+      --separator: oklch(0.899 0.0133 82.4);
+      --focus: var(--accent);
+      --link: var(--foreground);
+
+      --surface-shadow:
+        0 2px 4px 0 rgba(34, 28, 24, 0.04), 0 1px 2px 0 rgba(34, 28, 24, 0.06),
+        0 0 1px 0 rgba(34, 28, 24, 0.06);
+      --overlay-shadow:
+        0 2px 8px 0 rgba(34, 28, 24, 0.03), 0 -6px 12px 0 rgba(34, 28, 24, 0.01),
+        0 14px 28px 0 rgba(34, 28, 24, 0.05);
+      --field-shadow:
+        0 2px 4px 0 rgba(34, 28, 24, 0.04), 0 1px 2px 0 rgba(34, 28, 24, 0.06),
+        0 0 1px 0 rgba(34, 28, 24, 0.06);
+    }
+  }
+}
+
+@theme {
+  --font-normal: "HankenGrotesk_400Regular";
+  --font-medium: "HankenGrotesk_500Medium";
+  --font-semibold: "HankenGrotesk_600SemiBold";
+  --font-bold: "HankenGrotesk_700Bold";
+  --font-handwritten: "ReenieBeanie_400Regular";
+}
+
+@theme inline static {
+  --color-accent-hover: color-mix(in oklab, var(--foreground) 16%, transparent);
+}
+
+@layer components {
+  .button__root--variant-primary {
+    border-width: 0.5px;
+    border-color: #2a3213;
+    background-image: linear-gradient(170deg, #748639, #5a6a20 35%, #343e0a);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+      0 1px 2px 0 rgba(34, 28, 24, 0.24),
+      0 4px 14px 0 rgba(34, 28, 24, 0.18);
+  }
+
+  .button__root--variant-secondary {
+    border-width: 1px;
+    border-color: #e8e3e0;
+    background-color: var(--color-surface);
+    background-image: linear-gradient(to bottom, #ffffff 45%, #f4f3f2);
+    box-shadow:
+      0 1px 2px 0 rgba(34, 28, 24, 0.14),
+      0 3px 10px 0 rgba(34, 28, 24, 0.08);
+  }
+
+  .button__label--variant-secondary {
+    color: var(--color-foreground);
+  }
+}

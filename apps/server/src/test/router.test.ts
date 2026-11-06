@@ -83,4 +83,12 @@ describe("auth emails", () => {
     expect(email.html).toContain("Alice &lt;script&gt;");
     expect(email.html).toContain('href="https://lardon.example/reset?token=a&amp;b=c"');
   });
+
+  it("puts the sign-in code in the subject and body", () => {
+    const email = authEmail({ kind: "sign-in-code", to: "alice@example.com", code: "482913" });
+
+    expect(email.subject).toBe("482913 is your Lardon code");
+    expect(email.text).toContain("482913");
+    expect(email.html).toContain("482913");
+  });
 });

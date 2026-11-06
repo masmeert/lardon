@@ -29,6 +29,18 @@ export default defineConfig({
     ],
     rules: {
       "oxc/no-accumulating-spread": "error",
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "heroui-native",
+              importNames: ["useToast", "Toast"],
+              message: "No toasts. Show the error inline next to what caused it (InlineError).",
+            },
+          ],
+        },
+      ],
       "anti-slop/no-array-filter-map": "error",
       "anti-slop/no-reduce-accumulator-copy": "error",
       "anti-slop/no-chained-type-assertions": "error",
