@@ -1,0 +1,21 @@
+packages:
+  - apps/*
+  - packages/*
+allowBuilds:
+  esbuild: true
+  sharp: true
+  msgpackr-extract: true
+  workerd: true
+  lefthook: true
+overrides:
+  vite@*: npm:@voidzero-dev/vite-plus-core@1.4.0
+catalog:
+  zod: ^4.5.4
+  "@types/node": ^26.4.1
+  varlock: 1.23.0
+  "@cloudflare/workers-types": ^5.20260906.1
+  "@trpc/server": ^11.19.0
+  better-auth: 1.7.12
+  "@trpc/client": ^11.19.0
+  "@better-auth/expo": 1.7.12
+  drizzle-orm: 1.0.0-rc.5

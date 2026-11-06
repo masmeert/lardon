@@ -1,0 +1,3 @@
+{
+  "extends": "@lardon/config/tsconfig.base.json"
+}

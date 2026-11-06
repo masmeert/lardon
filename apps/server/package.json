@@ -1,0 +1,31 @@
+{
+  "name": "server",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "tsdown",
+    "check-types": "tsc --noEmit",
+    "compile": "bun build --compile --no-compile-autoload-dotenv --minify --sourcemap --bytecode ./src/index.ts --outfile server",
+    "env:generate": "varlock codegen"
+  },
+  "dependencies": {
+    "@hono/trpc-server": "^0.4.2",
+    "@lardon/api": "workspace:*",
+    "@lardon/auth": "workspace:*",
+    "@lardon/db": "workspace:*",
+    "@trpc/server": "catalog:",
+    "better-auth": "catalog:",
+    "evlog": "^2.33.1",
+    "hono": "^4.13.7",
+    "varlock": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "catalog:",
+    "@lardon/config": "workspace:*",
+    "@lardon/infra": "workspace:*",
+    "@types/node": "catalog:",
+    "tsdown": "^0.23.0",
+    "typescript": "^6.0.3"
+  }
+}

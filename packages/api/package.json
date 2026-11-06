@@ -1,0 +1,22 @@
+{
+  "name": "@lardon/api",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@lardon/auth": "workspace:*",
+    "@lardon/db": "workspace:*",
+    "@trpc/client": "catalog:",
+    "@trpc/server": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@lardon/config": "workspace:*",
+    "typescript": "^6.0.3"
+  }
+}
