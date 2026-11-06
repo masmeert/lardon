@@ -8,6 +8,7 @@ import { ScrollView, View } from "react-native";
 import { InlineError } from "@/components/inline-error";
 import { UserAvatar } from "@/components/user-avatar";
 import { authClient } from "@/lib/auth-client";
+import { ENV } from "@/src/env";
 
 export default function SettingsScreen() {
   const { data: session } = authClient.useSession();
@@ -52,8 +53,8 @@ export default function SettingsScreen() {
 
       <View className="border-t border-default py-2">
         {[
-          { title: "Privacy policy", url: "https://lardon.masmeert.com/privacy" },
-          { title: "Terms of use", url: "https://lardon.masmeert.com/terms" },
+          { title: "Privacy policy", url: `${ENV.EXPO_PUBLIC_WEBSITE_URL}/privacy` },
+          { title: "Terms of use", url: `${ENV.EXPO_PUBLIC_WEBSITE_URL}/terms` },
         ].map(({ title, url }) => (
           <ListGroup.Item
             key={url}

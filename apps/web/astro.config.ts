@@ -2,7 +2,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, fontProviders } from "astro/config";
 
 export default defineConfig({
-  site: "https://lardon.masmeert.com",
+  site: "https://lardon.app",
   output: "static",
   build: { format: "file" },
   fonts: [

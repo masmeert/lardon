@@ -45,7 +45,7 @@ export const server = Cloudflare.Worker("server", {
     APPLE_BUNDLE_ID: Config.String("APPLE_BUNDLE_ID").pipe(Config.withDefault("")),
     BETTER_AUTH_URL: Cloudflare.Worker.URL,
   },
-  domain: process.env.APP_ENV === "production" ? "api.lardon.masmeert.org" : undefined,
+  domain: process.env.APP_ENV === "production" ? "api.lardon.app" : undefined,
   dev: {
     port: 3000,
   },
@@ -57,7 +57,7 @@ export const website = Cloudflare.Website.Astro("website", {
   rootDir: "../../apps/web",
   astro: { output: "static" },
   assets: { notFoundHandling: "404-page" },
-  domain: process.env.APP_ENV === "production" ? "lardon.masmeert.com" : undefined,
+  domain: process.env.APP_ENV === "production" ? "lardon.app" : undefined,
 });
 
 export default Alchemy.Stack(
