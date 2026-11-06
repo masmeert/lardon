@@ -37,7 +37,7 @@ function StackLayout() {
     }
   }, [isPending, areFontsReady]);
 
-  if (!areFontsReady) {
+  if (!areFontsReady || isPending) {
     return null;
   }
 

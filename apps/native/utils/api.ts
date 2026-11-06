@@ -23,3 +23,7 @@ export class ApiClient extends AtomHttpApi.Service<ApiClient>()("lardon/native/A
 }) {}
 
 export const familiesAtom = ApiClient.query("families", "list", { reactivityKeys: ["families"] });
+
+export const uploadImageAtom = ApiClient.mutation("images", "upload");
+
+export const deleteImageAtom = ApiClient.mutation("images", "delete");

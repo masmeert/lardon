@@ -16,6 +16,7 @@ import { InlineError } from "@/components/inline-error";
 import { RollingNumber } from "@/components/rolling-number/rolling-number";
 import { KeyboardFooter } from "@/components/sign-in/keyboard-footer";
 import { authClient } from "@/lib/auth-client";
+import { describeSignInCodeError } from "@/lib/credentials";
 
 export default function CodeScreen() {
   const { email } = useLocalSearchParams<{ email: string }>();
@@ -70,11 +71,7 @@ export default function CodeScreen() {
 
     void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     setError(
-      {
-        INVALID_OTP: "That code isn't right. Check it and try again",
-        OTP_EXPIRED: "That code has expired. Request a new one",
-        TOO_MANY_ATTEMPTS: "Too many wrong codes. Request a new one",
-      }[verifyError.code ?? ""] ??
+      describeSignInCodeError(verifyError.code) ??
         (verifyError.message || "Couldn't check the code. Check your connection"),
     );
   }
