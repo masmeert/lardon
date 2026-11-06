@@ -9,6 +9,7 @@ import { cors } from "hono/cors";
 
 import { createContext } from "./context";
 import { ENV } from "./env.server";
+import { routes } from "./routes";
 import { createAuth } from "./services";
 
 initLogger({
@@ -32,13 +33,15 @@ app.use(
   "/*",
   cors({
     origin: ENV.CORS_ORIGIN,
-    allowMethods: ["GET", "POST", "OPTIONS"],
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   }),
 );
 
 app.on(["POST", "GET"], "/api/auth/*", async (c) => (await createAuth()).handler(c.req.raw));
+
+app.route("/", routes);
 
 app.use(
   "/trpc/*",

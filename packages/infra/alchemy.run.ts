@@ -10,6 +10,8 @@ export const db = Cloudflare.D1.Database("database", {
   migrations: "../../packages/db/src/migrations",
 });
 
+export const images = Cloudflare.R2.Bucket("images");
+
 export const observability = Effect.gen(function* () {
   const { stage } = yield* Alchemy.Stack;
   const datasetName = `lardon-${stage}-logs`;
@@ -53,6 +55,7 @@ export const server = Cloudflare.Worker("server", {
   },
   env: {
     DB: db,
+    IMAGES: images,
     CORS_ORIGIN: Config.String("CORS_ORIGIN"),
     BETTER_AUTH_SECRET: Config.Redacted("BETTER_AUTH_SECRET"),
     BETTER_AUTH_URL: Cloudflare.Worker.URL,

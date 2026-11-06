@@ -1,8 +1,7 @@
 import type { Context as ApiContext } from "@lardon/api/context";
 import type { Context as HonoContext } from "hono";
 
-import { getDb } from "./services";
-import { createAuth } from "./services";
+import { createAuth, getDb, getImageStore } from "./services";
 
 export type CreateContextOptions = {
   context: HonoContext;
@@ -18,6 +17,7 @@ export async function createContext({ context }: CreateContextOptions): Promise<
   return {
     db,
     session,
+    images: getImageStore(),
   };
 }
 
