@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@alchemy.run/frontend-frameworks": "2.0.0-beta.85",
+    "@lardon/brand": "workspace:*",
     "@tailwindcss/typography": "0.5.19",
     "@tailwindcss/vite": "4.3.4",
     "astro": "7.4.5",

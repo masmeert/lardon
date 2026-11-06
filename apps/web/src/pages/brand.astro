@@ -1,8 +1,9 @@
 ---
-import Logo from "../assets/logo.svg";
-import LogoStacked from "../assets/logo-stacked.svg";
-import Mark from "../assets/mark.svg";
-import Wordmark from "../assets/wordmark.svg";
+import Logo from "@lardon/brand/assets/logo.svg";
+import LogoStacked from "@lardon/brand/assets/logo-stacked.svg";
+import Mark from "@lardon/brand/assets/mark.svg";
+import Wordmark from "@lardon/brand/assets/wordmark.svg";
+import { colors } from "@lardon/brand";
 import SiteFooter from "../components/site-footer.astro";
 import SiteHeader from "../components/site-header.astro";
 import Base from "../layouts/base.astro";
@@ -31,7 +32,7 @@ import Base from "../layouts/base.astro";
         {
           [
             "border border-line bg-white text-ink-strong",
-            "bg-accent text-[#FBF6EC]",
+            "bg-accent text-bacon",
             "bg-ink-strong text-paper",
           ].map((tile) => (
             <div class:list={["flex h-40 items-center justify-center rounded-2xl px-8", tile]}>
@@ -72,14 +73,14 @@ import Base from "../layouts/base.astro";
       <div class="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
         {
           [
-            ["Olive", "#5A6A1F", "bg-accent text-white"],
-            ["Paper", "#FAF8F5", "bg-paper text-ink-strong ring-1 ring-line ring-inset"],
-            ["Ink", "#221C18", "bg-ink-strong text-paper"],
-            ["Bacon", "#FBF6EC", "bg-[#FBF6EC] text-ink-strong ring-1 ring-line ring-inset"],
+            ["Olive", colors.accent, "bg-accent text-white"],
+            ["Paper", colors.paper, "bg-paper text-ink-strong ring-1 ring-line ring-inset"],
+            ["Ink", colors.inkStrong, "bg-ink-strong text-paper"],
+            ["Bacon", colors.bacon, "bg-bacon text-ink-strong ring-1 ring-line ring-inset"],
           ].map(([name, hex, swatch]) => (
             <div class:list={["flex h-28 flex-col justify-end rounded-2xl p-4", swatch]}>
               <span class="text-sm font-medium">{name}</span>
-              <span class="font-mono text-xs opacity-75">{hex}</span>
+              <span class="font-mono text-xs opacity-75">{hex.toUpperCase()}</span>
             </div>
           ))
         }
@@ -87,11 +88,11 @@ import Base from "../layouts/base.astro";
       <ul class="mt-4 flex flex-wrap gap-x-6 gap-y-3">
         {
           [
-            ["Muted", "#5F554D"],
-            ["Line", "#E8E2DB"],
-            ["Success", "#2E7A47"],
-            ["Warning", "#C98A1E"],
-            ["Danger", "#C55C46"],
+            ["Muted", colors.muted],
+            ["Line", colors.line],
+            ["Success", colors.success],
+            ["Warning", colors.warning],
+            ["Danger", colors.danger],
           ].map(([name, hex]) => (
             <li class="flex items-center gap-2">
               <span
@@ -99,7 +100,7 @@ import Base from "../layouts/base.astro";
                 style={`background-color: ${hex}`}
               />
               <span class="text-ink">{name}</span>
-              <span class="font-mono text-xs">{hex}</span>
+              <span class="font-mono text-xs">{hex.toUpperCase()}</span>
             </li>
           ))
         }
@@ -144,11 +145,11 @@ import Base from "../layouts/base.astro";
       </p>
       <div class="mt-6 grid gap-4 sm:grid-cols-2">
         <div class="rounded-2xl border border-line bg-white p-6">
-          <p class="text-xs font-medium text-[#2E7A47]">Yes</p>
+          <p class="text-xs font-medium text-success">Yes</p>
           <p class="mt-2 text-ink-strong">Couldn't reach Lardon. Check your connection.</p>
         </div>
         <div class="rounded-2xl border border-line bg-white p-6">
-          <p class="text-xs font-medium text-[#C55C46]">No</p>
+          <p class="text-xs font-medium text-danger">No</p>
           <p class="mt-2 text-ink-strong">Error 503: network request failed.</p>
         </div>
       </div>
@@ -160,7 +161,7 @@ import Base from "../layouts/base.astro";
         {
           [
             ["Stretch it", "text-ink-strong", "scale-x-150"],
-            ["Recolor it", "text-[#C55C46]", ""],
+            ["Recolor it", "text-danger", ""],
             ["Add effects", "text-accent", "drop-shadow-[0_0_10px_rgb(122_140_48/0.9)]"],
           ].map(([caption, color, effect]) => (
             <figure>
@@ -173,7 +174,7 @@ import Base from "../layouts/base.astro";
                 <Logo class:list={["h-7 w-auto", effect]} />
               </div>
               <figcaption class="mt-2 flex items-center gap-2 text-ink">
-                <span aria-hidden="true" class="text-[#C55C46]">
+                <span aria-hidden="true" class="text-danger">
                   ✕
                 </span>
                 {caption}

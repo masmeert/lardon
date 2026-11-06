@@ -6,6 +6,4 @@ export const operator = {
   contactEmail: "pro@masmeert.com",
 };
 
-export const lastUpdated = "6 November 2026";
-
-export const sourceCodeUrl = "https://github.com/masmeert/lardon";
+export const websiteUrl = "https://lardon.app";

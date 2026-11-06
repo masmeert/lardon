@@ -1,0 +1,19 @@
+{
+  "name": "@lardon/brand",
+  "license": "PolyForm-Strict-1.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./theme.css": "./src/theme.css",
+    "./assets/*": "./assets/*"
+  },
+  "scripts": {
+    "test": "vp test run"
+  },
+  "devDependencies": {
+    "@lardon/config": "workspace:*",
+    "@types/node": "catalog:",
+    "typescript": "^6.0.3",
+    "vite-plus": "catalog:"
+  }
+}

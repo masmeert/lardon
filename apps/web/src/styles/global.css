@@ -1,23 +1,9 @@
 @import "tailwindcss";
+@import "@lardon/brand/theme.css";
 @plugin "@tailwindcss/typography";
 
 @theme {
   --font-sans: var(--font-hanken-grotesk);
-  --color-paper: #faf8f5;
-  --color-ink-strong: #221c18;
-  --color-ink: #3a312b;
-  --color-muted: #5f554d;
-  --color-muted-soft: #776b62;
-  --color-line: #e8e2db;
-  --color-line-strong: #d8d0c6;
-  --color-accent-soft: #f0ebe4;
-  --color-accent: #5a6a1f;
-  --color-accent-light: #6f812c;
-  --color-accent-dark: #4a5818;
-  --color-butter: #f3db8c;
-  --color-card: #fffdf6;
-  --color-card-margin: #e9b3a1;
-  --color-card-rule: #e4e7d4;
   --font-handwritten: var(--font-reenie-beanie);
   --font-cursive: var(--font-la-belle-aurore);
   --animate-float: float 6s ease-in-out infinite;
