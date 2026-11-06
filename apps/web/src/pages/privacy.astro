@@ -41,9 +41,9 @@ import { lastUpdated, sourceCodeUrl } from "../legal";
 
   <h2 id="who-we-are">1. Who we are</h2>
   <p>
-    Lardon is made and run by {operator.name}, registered as a business in {operator.country} ("we",
-    "us"). We decide how your personal data is used, which
-    makes us its controller under the EU General Data Protection Regulation (GDPR). You can reach
+    Lardon is made and run by {operator.tradeName}, the trade name of {operator.name}, registered
+    as a business in {operator.country} ("we", "us"). We decide how your personal data is used,
+    which makes us its controller under the EU General Data Protection Regulation (GDPR). You can reach
     us at{" "}
     <a href={`mailto:${operator.contactEmail}`}>{operator.contactEmail}</a>.
   </p>
@@ -300,8 +300,8 @@ import { lastUpdated, sourceCodeUrl } from "../legal";
 
   <h2 id="contact">12. Contact</h2>
   <p>
-    {operator.name}, {operator.address}, {operator.country}. Enterprise and VAT number{" "}
-    {operator.enterpriseNumber}. Questions about privacy:{" "}
-    <a href={`mailto:${operator.contactEmail}`}>{operator.contactEmail}</a>.
+    Questions about privacy:{" "}
+    <a href={`mailto:${operator.contactEmail}`}>{operator.contactEmail}</a>. Our address and
+    enterprise number are in the <a href="/terms#contact">Terms of Use</a>.
   </p>
 </Page>

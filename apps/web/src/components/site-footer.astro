@@ -12,7 +12,7 @@ const { class: className } = Astro.props;
 <footer class="overflow-hidden bg-accent-dark text-card/80">
   <div class:list={["mx-auto w-full px-6 pt-10 pb-12", className]}>
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <p class="text-sm">© {new Date().getFullYear()} {operator.name}</p>
+      <p class="text-sm">© {new Date().getFullYear()} {operator.tradeName}</p>
       <nav aria-label="Footer" class="flex flex-wrap gap-x-5 gap-y-1 text-sm">
         <a
           href={`mailto:${operator.contactEmail}`}

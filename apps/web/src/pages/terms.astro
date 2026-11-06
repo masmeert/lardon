@@ -8,9 +8,9 @@ import { lastUpdated, sourceCodeUrl } from "../legal";
 
 <Page title="Terms of Use" lastUpdated={lastUpdated} description="The rules for using Lardon, and what you can expect from us.">
   <p>
-    These terms are the agreement between you and {operator.name} ("we", "us") for using Lardon, the
-    family cookbook app, and this website. By creating an account or using Lardon, you agree to
-    them. If you don't agree, please don't use Lardon. Our{" "}
+    These terms are the agreement between you and {operator.tradeName}, the trade name of{" "}
+    {operator.name} ("we", "us"), for using Lardon, the family cookbook app, and this website. By
+    creating an account or using Lardon, you agree to them. If you don't agree, please don't use Lardon. Our{" "}
     <a href="/privacy">Privacy Policy</a> explains how we handle your data.
   </p>
 
@@ -247,7 +247,7 @@ import { lastUpdated, sourceCodeUrl } from "../legal";
 
   <h2 id="contact">14. Contact</h2>
   <p>
-    {operator.name}, {operator.address}, {operator.country}. Enterprise and VAT number{" "}
+    {operator.tradeName}, {operator.address}, {operator.country}. Enterprise and VAT number{" "}
     {operator.enterpriseNumber}. Questions about these terms:{" "}
     <a href={`mailto:${operator.contactEmail}`}>{operator.contactEmail}</a>.
   </p>

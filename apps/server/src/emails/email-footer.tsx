@@ -15,7 +15,7 @@ export function EmailFooter() {
           style={{ padding: "40px 24px 48px", color: colors.card, fontSize: 14, lineHeight: 1.6 }}
         >
           <p style={{ margin: 0 }}>
-            © {new Date().getFullYear()} {operator.name}
+            © {new Date().getFullYear()} {operator.tradeName}
           </p>
           <p style={{ margin: "8px 0 0", lineHeight: 2 }}>
             {[
