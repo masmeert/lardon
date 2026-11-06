@@ -1,6 +1,7 @@
 import { recipeEvents } from "@lardon/recipes/events";
 import { RecipeSyncPayload } from "@lardon/recipes/sync-payload";
 import {
+  type Env,
   type ForwardedHeaders,
   handleSyncRequest,
   makeDurableObject,
@@ -12,9 +13,11 @@ import { Effect, Option, Schema } from "effect";
 import { set, withLogger } from "evlog/effect";
 
 import { Authentication } from "./authentication";
+import { ENV } from "./env.server";
 import { Families } from "./families";
 import { serverRuntime } from "./layers";
 import { RateLimits, tooManyRequests } from "./rate-limits";
+import { inEuropeanUnion } from "./recipe-store-backend";
 
 function authorizeRecipeStore(
   phase: "connect" | "push" | "pull",
@@ -102,6 +105,11 @@ export class SyncBackendDO extends makeDurableObject({
   }
 }
 
+// LiveStore looks the Durable Object up by binding name, so hand it an env whose binding is EU-scoped.
+function europeanSyncEnv(): Env {
+  return { SYNC_BACKEND: inEuropeanUnion(ENV.SYNC_BACKEND) };
+}
+
 export function matchRecipeSyncRequest(request: Request) {
   return new URL(request.url).pathname === "/sync" ? matchSyncRequest(request) : undefined;
 }
@@ -131,6 +139,7 @@ export async function handleRecipeSyncRequest(
     request,
     searchParams,
     ctx: executionContext,
+    env: europeanSyncEnv(),
     syncBackendBinding: "SYNC_BACKEND",
     syncPayloadSchema: RecipeSyncPayload,
     validatePayload: async (payload, { storeId, headers }) => {

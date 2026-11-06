@@ -6,10 +6,11 @@ import * as Redacted from "effect/Redacted";
 import "varlock/auto-load";
 
 export const db = Cloudflare.D1.Database("database", {
+  jurisdiction: "eu",
   migrations: "../../packages/db/src/migrations",
 });
 
-export const images = Cloudflare.R2.Bucket("images");
+export const images = Cloudflare.R2.Bucket("images", { jurisdiction: "eu" });
 
 export const server = Cloudflare.Worker("server", {
   main: "../../apps/server/src/index.ts",

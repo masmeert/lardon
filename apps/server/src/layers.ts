@@ -13,12 +13,14 @@ import { AppRoutes } from "./http/app";
 import { ImageStorage } from "./image-storage";
 import { Mailer, authEmail } from "./mailer";
 import { RateLimits } from "./rate-limits";
-import { RecipeStoreBackend } from "./recipe-store-backend";
+import { RecipeStoreBackend, inEuropeanUnion } from "./recipe-store-backend";
 
 const InfrastructureLive = Layer.mergeAll(
   Layer.sync(Database, () => Database.make(createDb(ENV))),
   Layer.sync(ImageStorage, () => ImageStorage.fromR2(ENV.IMAGES)),
-  Layer.sync(RecipeStoreBackend, () => RecipeStoreBackend.fromDurableObjects(ENV.SYNC_BACKEND)),
+  Layer.sync(RecipeStoreBackend, () =>
+    RecipeStoreBackend.fromDurableObjects(inEuropeanUnion(ENV.SYNC_BACKEND)),
+  ),
   Layer.sync(Mailer, () =>
     ENV.EMAIL ? Mailer.fromCloudflare(ENV.EMAIL, ENV.EMAIL_FROM) : Mailer.logOnly(),
   ),
