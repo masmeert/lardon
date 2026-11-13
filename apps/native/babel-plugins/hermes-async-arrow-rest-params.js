@@ -9,6 +9,7 @@ module.exports = function hermesAsyncArrowRestParams({ types: t }) {
     visitor: {
       ArrowFunctionExpression(path) {
         const { node } = path;
+
         if (!node.async || !node.params.some((param) => t.isRestElement(param))) {
           return;
         }

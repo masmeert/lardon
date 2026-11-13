@@ -5,6 +5,7 @@ const { wrapWithReanimatedMetroConfig } = require("react-native-reanimated/metro
 
 /** @type {import('expo/metro-config').MetroConfig} */
 const config = getDefaultConfig(__dirname);
+
 // Alchemy writes runtime state here; block it to avoid Metro refresh loops.
 const blockList = config.resolver.blockList ?? [];
 const blockListPatterns = Array.isArray(blockList) ? blockList : [blockList];
