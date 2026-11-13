@@ -540,6 +540,9 @@ importers:
       '@alchemy.run/cloudflare':
         specifier: 2.0.0-beta.85
         version: 2.0.0-beta.85(5ec23ce5a65471c812283c4cb3b85fbf)
+      '@alchemy.run/github':
+        specifier: 2.0.0-beta.85
+        version: 2.0.0-beta.85(alchemy@2.0.0-beta.85(@alchemy.run/frontend-frameworks@2.0.0-beta.85(@effect/platform-bun@4.1.4(effect@4.1.4))(@types/node@26.6.6)(@volar/typescript@2.4.31(typescript@6.0.3))(astro@7.4.5(@types/node@26.6.6)(@volar/typescript@2.4.31(typescript@6.0.3))(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript@6.0.3)(yaml@2.9.1))(effect@4.1.4)(hono@4.13.16)(jiti@2.7.0)(redis@6.3.1)(terser@5.51.2)(typescript@6.0.3)(yaml@2.9.1))(@effect/platform-bun@4.1.4(effect@4.1.4))(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@types/node@26.6.6)(@types/react@19.3.0)(@volar/typescript@2.4.31(typescript@6.0.3))(effect@4.1.4)(esbuild@0.28.2)(jiti@2.7.0)(react-devtools-core@6.1.5)(terser@5.51.2)(typescript@6.0.3)(ws@8.22.2))(effect@4.1.4)
       '@effect/platform-bun':
         specifier: 4.1.4
         version: 4.1.4(effect@4.1.4)
@@ -696,6 +699,12 @@ packages:
         optional: true
       waku:
         optional: true
+
+  '@alchemy.run/github@2.0.0-beta.85':
+    resolution: {integrity: sha512-lKQZTlqYo/iOK4Zbskd7riff9nqkMNgtStdlmgAUD/IvR+FweXftfcjZD9u9k/Z3h4RguJi4IduwFudSpLl6QQ==}
+    peerDependencies:
+      alchemy: 2.0.0-beta.85
+      effect: 4.1.4
 
   '@alchemy.run/node-utils@2.0.0-beta.85':
     resolution: {integrity: sha512-2gxqMNMoJdx13w7wlDJw+gaXQ8e1VxQFsKldOvweqpd7JEgB5TGn3oO8r1sb/GB9+UzqXdh8tKp2MOVgFOrmbg==}
@@ -1472,6 +1481,11 @@ packages:
 
   '@distilled.cloud/core@1.0.0-rc.18':
     resolution: {integrity: sha512-Iui60+sNl1CwUu7NKGLuFf3VC4H9xYzfm0Fc8ZQvd87qwf1sDMB3EAWZrq/QFgrwzSY16z2mJ0PNHaBUnGet8A==}
+    peerDependencies:
+      effect: 4.1.4
+
+  '@distilled.cloud/github@1.0.0-rc.18':
+    resolution: {integrity: sha512-SX5EofqqjaHRnTw0RC83qvEQZr11/RcNxqjdsn7kteHvni+1DIgnlRfeHoUD2rVyQEyEPWCYnIOFWysgXUOvSg==}
     peerDependencies:
       effect: 4.1.4
 
@@ -5220,6 +5234,12 @@ packages:
     resolution: {integrity: sha512-qsda+H8jTaUaN/x5vzW2rzc+8Rw4TAQ/4KjB46IwK5VH+IlVeeeje/EoZRpiXvIqjFgK84QffqPztGI3VBLG1A==}
     engines: {node: '>=6'}
 
+  libsodium-wrappers@0.8.4:
+    resolution: {integrity: sha512-mu8aAWucZjTB5O/BtGXtW4e1agy7uHxNYG7zPthmmD1jU43LCDmSWZLN4JhflbdPXj3yDO4lxM1O9hLDgIOXDw==}
+
+  libsodium@0.8.4:
+    resolution: {integrity: sha512-lMcYaRi0zcs7tarATsQUYC7rstliIXZuoq0c6zXSgNtSNtdvBgkSegjWhpMJAXzKX3SUSwIp7+zEsob+j3LuRw==}
+
   libsql@0.5.29:
     resolution: {integrity: sha512-8lMP8iMgiBzzoNbAPQ59qdVcj6UaE/Vnm+fiwX4doX4Narook0a4GPKWBEv+CR8a1OwbfkgL18uBfBjWdF0Fzg==}
     cpu: [x64, arm64, wasm32, arm]
@@ -7178,6 +7198,14 @@ snapshots:
       - vue-tsc
       - yaml
 
+  '@alchemy.run/github@2.0.0-beta.85(alchemy@2.0.0-beta.85(@alchemy.run/frontend-frameworks@2.0.0-beta.85(@effect/platform-bun@4.1.4(effect@4.1.4))(@types/node@26.6.6)(@volar/typescript@2.4.31(typescript@6.0.3))(astro@7.4.5(@types/node@26.6.6)(@volar/typescript@2.4.31(typescript@6.0.3))(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript@6.0.3)(yaml@2.9.1))(effect@4.1.4)(hono@4.13.16)(jiti@2.7.0)(redis@6.3.1)(terser@5.51.2)(typescript@6.0.3)(yaml@2.9.1))(@effect/platform-bun@4.1.4(effect@4.1.4))(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@types/node@26.6.6)(@types/react@19.3.0)(@volar/typescript@2.4.31(typescript@6.0.3))(effect@4.1.4)(esbuild@0.28.2)(jiti@2.7.0)(react-devtools-core@6.1.5)(terser@5.51.2)(typescript@6.0.3)(ws@8.22.2))(effect@4.1.4)':
+    dependencies:
+      '@distilled.cloud/core': 1.0.0-rc.18(effect@4.1.4)
+      '@distilled.cloud/github': 1.0.0-rc.18(effect@4.1.4)
+      alchemy: 2.0.0-beta.85(@alchemy.run/frontend-frameworks@2.0.0-beta.85(@effect/platform-bun@4.1.4(effect@4.1.4))(@types/node@26.6.6)(@volar/typescript@2.4.31(typescript@6.0.3))(astro@7.4.5(@types/node@26.6.6)(@volar/typescript@2.4.31(typescript@6.0.3))(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript@6.0.3)(yaml@2.9.1))(effect@4.1.4)(hono@4.13.16)(jiti@2.7.0)(redis@6.3.1)(terser@5.51.2)(typescript@6.0.3)(yaml@2.9.1))(@effect/platform-bun@4.1.4(effect@4.1.4))(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@types/node@26.6.6)(@types/react@19.3.0)(@volar/typescript@2.4.31(typescript@6.0.3))(effect@4.1.4)(esbuild@0.28.2)(jiti@2.7.0)(react-devtools-core@6.1.5)(terser@5.51.2)(typescript@6.0.3)(ws@8.22.2)
+      effect: 4.1.4
+      libsodium-wrappers: 0.8.4
+
   '@alchemy.run/node-utils@2.0.0-beta.85':
     dependencies:
       chokidar: 5.0.0
@@ -8438,6 +8466,11 @@ snapshots:
 
   '@distilled.cloud/core@1.0.0-rc.18(effect@4.1.4)':
     dependencies:
+      effect: 4.1.4
+
+  '@distilled.cloud/github@1.0.0-rc.18(effect@4.1.4)':
+    dependencies:
+      '@distilled.cloud/core': 1.0.0-rc.18(effect@4.1.4)
       effect: 4.1.4
 
   '@distilled.cloud/iceberg@1.0.0-rc.18(effect@4.1.4)':
@@ -12498,6 +12531,12 @@ snapshots:
   lan-network@0.2.1: {}
 
   leven@3.1.0: {}
+
+  libsodium-wrappers@0.8.4:
+    dependencies:
+      libsodium: 0.8.4
+
+  libsodium@0.8.4: {}
 
   libsql@0.5.29:
     dependencies:

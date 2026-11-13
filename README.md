@@ -54,10 +54,17 @@ Alchemy applies migrations on deploy.
 
 ## Deploying
 
-Check the plan first. It only reads, and Alchemy deletes any resource that is no longer declared:
+Every push to `main` that passes CI deploys to production through `.github/workflows/deploy.yml`. Other branches never deploy. The job plans first and stops if the plan deletes or replaces anything, since Alchemy deletes every resource that is no longer declared. Deploy those by hand after reading the plan:
 
 ```bash
 cd packages/infra
 APP_ENV=production vp exec alchemy plan --stage prod
 APP_ENV=production vp exec alchemy deploy --stage prod
+```
+
+CI signs in to Infisical as a machine identity through GitHub's OIDC token, so no Infisical secret is stored in GitHub. Its Cloudflare token and account ID come from `packages/infra/stacks/github.ts`, which creates a deploy token limited to this account and writes both into the `production` environment. Run it again to rotate the token, with a Cloudflare credential that can create API tokens:
+
+```bash
+cd packages/infra
+vp exec alchemy deploy --config stacks/github.ts --stage prod --profile admin
 ```
