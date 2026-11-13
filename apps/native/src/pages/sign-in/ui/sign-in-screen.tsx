@@ -7,15 +7,14 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { authClient } from "#/shared/auth";
 import { Button, ButtonLabel, GoogleLogo, Icon, InlineError, LardonLogo } from "#/shared/ui";
-import { iconSize, useThemeColor } from "#/shared/lib";
+import { iconSize, useThemeColors } from "#/shared/lib";
 
 import { Hero } from "./hero";
 import { LegalFooter } from "./legal-footer";
 
 export function SignInScreen() {
   const insets = useSafeAreaInsets();
-  const whiteColor = useThemeColor("white");
-  const foregroundColor = useThemeColor("foreground");
+  const { white, foreground } = useThemeColors("white", "foreground");
   const [pendingProvider, setPendingProvider] = useState<"apple" | "google">();
   const [error, setError] = useState<string>();
   const [isAppleAvailable, setIsAppleAvailable] = useState(false);
@@ -95,7 +94,7 @@ export function SignInScreen() {
         <Hero />
 
         <View className="items-center gap-4 px-8">
-          <LardonLogo height={40} color={foregroundColor} />
+          <LardonLogo height={40} color={foreground} />
           <Text className="text-center font-normal text-body text-muted">
             Keep your family's recipes in one place and cook them together.
           </Text>
@@ -113,7 +112,7 @@ export function SignInScreen() {
           accessibilityLabel="Continue with email"
           onPress={() => router.push("/sign-in/email")}
         >
-          <Icon name="at" size={iconSize.md} color={whiteColor} />
+          <Icon name="at" size={iconSize.md} color={white} />
           <ButtonLabel>Continue with email</ButtonLabel>
         </Button>
 
@@ -127,7 +126,7 @@ export function SignInScreen() {
               className="flex-1"
               isLoading={pendingProvider === "apple"}
             >
-              <Icon name="apple.logo" size={iconSize.md} color={foregroundColor} />
+              <Icon name="apple.logo" size={iconSize.md} color={foreground} />
             </Button>
           )}
           <Button

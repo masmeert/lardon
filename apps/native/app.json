@@ -35,6 +35,14 @@
           "resizeMode": "contain",
           "backgroundColor": "#627224"
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "26.0"
+          }
+        }
       ]
     ],
     "experiments": {

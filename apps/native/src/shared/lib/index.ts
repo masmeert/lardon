@@ -1,6 +1,6 @@
 export { cn } from "./cn";
 
-export { useThemeColor } from "./use-theme-color";
+export { useThemeColors } from "./use-theme-colors";
 
 export { iconSize } from "./icon-size";
 

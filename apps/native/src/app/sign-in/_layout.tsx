@@ -1,7 +1,7 @@
 import { Stack } from "expo-router";
 
 import { useHeaderOptions } from "#/_app/nav/use-header-options";
-import { useThemeColor } from "#/shared/lib";
+import { useThemeColors } from "#/shared/lib";
 
 export default function SignInLayout() {
   const headerOptions = useHeaderOptions();
@@ -10,7 +10,7 @@ export default function SignInLayout() {
     <Stack
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: useThemeColor("background") },
+        contentStyle: { backgroundColor: useThemeColors("background").background },
       }}
     >
       <Stack.Screen name="email" options={headerOptions({})} />

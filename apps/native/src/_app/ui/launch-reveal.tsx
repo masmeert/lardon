@@ -14,7 +14,7 @@ import Animated, {
 import Svg, { G, Path } from "react-native-svg";
 import { scheduleOnRN } from "react-native-worklets";
 
-import { motionMs, useThemeColor } from "#/shared/lib";
+import { motionMs, useThemeColors } from "#/shared/lib";
 
 const AnimatedG = Animated.createAnimatedComponent(G<{ matrix?: number[] }>);
 const AnimatedPath = Animated.createAnimatedComponent(Path);
@@ -22,8 +22,7 @@ const AnimatedPath = Animated.createAnimatedComponent(Path);
 export function LaunchReveal() {
   const { width, height } = useWindowDimensions();
   const reduceMotion = useReducedMotion();
-  const splashColor = useThemeColor("splash");
-  const baconColor = useThemeColor("bacon");
+  const { splash, bacon } = useThemeColors("splash", "bacon");
   const [isRevealed, setIsRevealed] = useState(false);
   const hasStarted = useRef(false);
   const overlayOpacity = useSharedValue(1);
@@ -128,13 +127,13 @@ export function LaunchReveal() {
         >
           <Path
             fillRule="evenodd"
-            fill={splashColor}
+            fill={splash}
             d={`M ${frameLeft} ${frameTop} h ${frameWidth} v ${frameHeight} h ${-frameWidth} Z ${markOutline}`}
           />
-          <AnimatedPath animatedProps={fillProps} fill={baconColor} d={markOutline} />
+          <AnimatedPath animatedProps={fillProps} fill={bacon} d={markOutline} />
           <AnimatedPath
             animatedProps={stripesProps}
-            fill={splashColor}
+            fill={splash}
             d={mark.path.slice(mark.path.indexOf("Z") + 1)}
           />
         </AnimatedG>

@@ -1,10 +1,9 @@
 import type { NativeStackNavigationOptions } from "expo-router";
 
-import { useThemeColor } from "#/shared/lib";
+import { useThemeColors } from "#/shared/lib";
 
 export function useHeaderOptions() {
-  const foregroundColor = useThemeColor("foreground");
-  const backgroundColor = useThemeColor("background");
+  const { foreground, background } = useThemeColors("foreground", "background");
 
   return function headerOptions({
     title = "",
@@ -19,8 +18,8 @@ export function useHeaderOptions() {
       headerShown: true,
       title,
       headerBackButtonDisplayMode: "minimal",
-      headerTintColor: foregroundColor,
-      headerStyle: { backgroundColor },
+      headerTintColor: foreground,
+      headerStyle: { backgroundColor: background },
       headerShadowVisible: false,
     };
   };

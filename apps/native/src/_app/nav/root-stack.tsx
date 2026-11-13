@@ -1,3 +1,5 @@
+import { Eczar_600SemiBold } from "@expo-google-fonts/eczar";
+import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useState } from "react";
@@ -9,6 +11,7 @@ void SplashScreen.preventAutoHideAsync();
 
 export function RootStack() {
   const { data: session, isPending } = authClient.useSession();
+  const [areFontsLoaded] = useFonts({ Eczar_600SemiBold });
 
   const [hasCheckedSession, setHasCheckedSession] = useState(false);
 
@@ -16,7 +19,7 @@ export function RootStack() {
     setHasCheckedSession(true);
   }
 
-  if (!hasCheckedSession) {
+  if (!hasCheckedSession || !areFontsLoaded) {
     return null;
   }
 

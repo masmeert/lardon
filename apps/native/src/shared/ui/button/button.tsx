@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
 import { ActivityIndicator, View } from "react-native";
 
-import { cn, useThemeColor } from "#/shared/lib";
+import { cn, useThemeColors } from "#/shared/lib";
 
+import { Glass } from "../glass";
 import { PressableScale } from "../pressable-scale";
 
 import { type ButtonVariant, ButtonVariantContext } from "./button-variant";
@@ -28,8 +29,7 @@ export function Button({
   className?: string;
   children: ReactNode;
 }) {
-  const whiteColor = useThemeColor("white");
-  const foregroundColor = useThemeColor("foreground");
+  const colors = useThemeColors("white", "foreground", "accent", "danger");
 
   return (
     <PressableScale
@@ -42,21 +42,26 @@ export function Button({
         "flex-row items-center justify-center rounded-full",
         size === "lg" && (isIconOnly ? "size-control-lg" : "h-control-lg px-5"),
         size === "md" && (isIconOnly ? "size-control" : "h-control px-4"),
-        variant === "primary" && "accent-raised",
-        variant === "secondary" && "surface-raised",
-        variant === "danger" && "bg-danger",
         isDisabled && "opacity-50",
         className,
       )}
     >
+      <Glass
+        isInteractive
+        tintColor={{ primary: colors.accent, secondary: undefined, danger: colors.danger }[variant]}
+        className="absolute inset-0 rounded-full"
+      />
       <ButtonVariantContext value={variant}>
-        <View className={cn("flex-row items-center gap-1.5", isLoading && "opacity-0")}>
+        <View
+          pointerEvents="none"
+          className={cn("flex-row items-center gap-1.5", isLoading && "opacity-0")}
+        >
           {children}
         </View>
       </ButtonVariantContext>
       {isLoading && (
         <ActivityIndicator
-          color={variant === "secondary" ? foregroundColor : whiteColor}
+          color={variant === "secondary" ? colors.foreground : colors.white}
           className="absolute"
         />
       )}
