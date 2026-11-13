@@ -9,7 +9,11 @@ export function RootLayout() {
   return (
     <PersistQueryClientProvider
       client={queryClient}
-      persistOptions={{ persister: queryPersister, maxAge: queryCacheMaxAgeMs }}
+      persistOptions={{
+        persister: queryPersister,
+        maxAge: queryCacheMaxAgeMs,
+        dehydrateOptions: { shouldDehydrateQuery: (query) => query.state.data !== undefined },
+      }}
     >
       <KeyboardProvider>
         <RootStack />
