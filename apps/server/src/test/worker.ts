@@ -5,7 +5,10 @@ import { fileURLToPath } from "node:url";
 
 import { Miniflare } from "miniflare";
 import { rolldown } from "rolldown";
-import { Schema } from "effect";
+import { Api, sendSessionCookie } from "@lardon/api";
+import { Effect, Layer, Schema } from "effect";
+import { FetchHttpClient, HttpClient, HttpClientRequest } from "effect/http";
+import { HttpApiClient } from "effect/http-api";
 import { WebSocket } from "ws";
 
 import type { FamilyStore } from "../family-store";
@@ -129,6 +132,26 @@ export async function startWorker() {
     return fetch(`${origin}${path}`, { ...init, headers });
   }
 
+  const apiClient = HttpApiClient.make(Api, {
+    baseUrl: origin,
+    transformClient: HttpClient.mapRequest(HttpClientRequest.setHeader("origin", appOrigin)),
+  });
+
+  function api(cookie: string) {
+    return function call<Success, Failure>(
+      request: (client: Effect.Success<typeof apiClient>) => Effect.Effect<Success, Failure>,
+    ) {
+      return Effect.runPromise(
+        apiClient.pipe(
+          Effect.flatMap(request),
+          Effect.provide(
+            Layer.mergeAll(FetchHttpClient.layer, sendSessionCookie(Effect.succeed(cookie))),
+          ),
+        ),
+      );
+    };
+  }
+
   function syncSocket(cookie: string, familyId: string) {
     return new WebSocket(`${origin.replace("http", "ws")}/sync/${familyId}`, {
       headers: { cookie },
@@ -147,6 +170,7 @@ export async function startWorker() {
     origin,
     signIn,
     request,
+    api,
     syncSocket,
     cleanUp,
     images: () => miniflare.getR2Bucket("IMAGES"),

@@ -1,6 +1,7 @@
 import { createRecipe, emptyDraft, recipeDetail, saveRecipe, setVisibility } from "@lardon/recipes";
 import { recipeDraft } from "@lardon/recipes/commands";
 import { createRecipeStore, readRows } from "@lardon/recipes/tables";
+import { Effect } from "effect";
 import { createWsSynchronizer } from "tinybase/synchronizers/synchronizer-ws-client";
 import { afterAll, beforeAll, describe, expect, it } from "vite-plus/test";
 import type { WebSocket } from "ws";
@@ -24,13 +25,6 @@ beforeAll(async () => {
 
 afterAll(() => worker.dispose());
 
-async function json<Body>(response: Response) {
-  expect(response.ok).toBe(true);
-
-  // SAFETY: each call names the success schema of the endpoint it requested, and the response is ok.
-  return (await response.json()) as Body;
-}
-
 async function device(cookie: string, familyId: string) {
   const socket = worker.syncSocket(cookie, familyId);
   const closed = new Promise<number>((resolve) => socket.on("close", (code) => resolve(code)));
@@ -52,25 +46,17 @@ async function familyOf(names: string[]) {
 
   const [owner, ...others] = accounts;
 
-  const family = await json<{ id: string }>(
-    await worker.request(owner!.cookie, "/api/families", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ name: "Meerts" }),
-    }),
+  const family = await worker.api(owner!.cookie)((client) =>
+    client.families.create({ payload: { name: "Meerts" } }),
   );
 
-  const invite = await json<{ code: string }>(
-    await worker.request(owner!.cookie, `/api/families/${family.id}/invites`, { method: "POST" }),
+  const invite = await worker.api(owner!.cookie)((client) =>
+    client.families.createInvite({ params: { familyId: family.id } }),
   );
 
   for (const account of others) {
-    await json(
-      await worker.request(account.cookie, "/api/families/join", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ code: invite.code }),
-      }),
+    await worker.api(account.cookie)((client) =>
+      client.families.join({ payload: { code: invite.code } }),
     );
   }
 
@@ -81,9 +67,7 @@ describe("the worker in workerd", () => {
   it("creates a personal family when someone signs in for the first time", async () => {
     const alice = await worker.signIn("first-sign-in@example.com");
 
-    const families = await json<Array<{ personal: boolean }>>(
-      await worker.request(alice.cookie, "/api/families"),
-    );
+    const families = await worker.api(alice.cookie)((client) => client.families.list());
 
     expect(families.map((family) => family.personal)).toEqual([true]);
   });
@@ -152,12 +136,8 @@ describe("the worker in workerd", () => {
 
     const upload = async () =>
       (
-        await json<{ imageKey: string }>(
-          await worker.request(alice!.cookie, `/api/families/${familyId}/images`, {
-            method: "PUT",
-            headers: { "content-type": "application/octet-stream" },
-            body: TINY_PNG,
-          }),
+        await worker.api(alice!.cookie)((client) =>
+          client.images.upload({ params: { familyId }, payload: TINY_PNG }),
         )
       ).imageKey;
 
@@ -166,15 +146,17 @@ describe("the worker in workerd", () => {
     createRecipe(aliceDevice.store, { ...emptyDraft(), title: "Soup", imageKey: used }, alice!.id);
     await new Promise((resolve) => setTimeout(resolve, 300));
 
-    const downloaded = await worker.request(
-      alice!.cookie,
-      `/api/families/${familyId}/images/${used}`,
+    const download = { params: { familyId, imageKey: used } };
+
+    expect(await worker.api(alice!.cookie)((client) => client.images.download(download))).toEqual(
+      TINY_PNG,
     );
 
-    expect(new Uint8Array(await downloaded.arrayBuffer())).toEqual(TINY_PNG);
-    expect(
-      (await worker.request(outsider.cookie, `/api/families/${familyId}/images/${used}`)).status,
-    ).toBe(404);
+    const outsiderError = await worker.api(outsider.cookie)((client) =>
+      client.images.download(download).pipe(Effect.flip),
+    );
+
+    expect(outsiderError._tag).toBe("NotFound");
 
     const stored = async () =>
       (await (await worker.images()).list({ prefix: `families/${familyId}/` })).objects

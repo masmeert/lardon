@@ -3,6 +3,7 @@ import { QueryClient, focusManager, onlineManager } from "@tanstack/react-query"
 import { addNetworkStateListener } from "expo-network";
 import Storage from "expo-sqlite/kv-store";
 import { AppState } from "react-native";
+import superjson from "superjson";
 
 export const queryCacheMaxAgeMs = 30 * 24 * 60 * 60 * 1000;
 
@@ -10,7 +11,11 @@ export const queryClient = new QueryClient({
   defaultOptions: { queries: { gcTime: queryCacheMaxAgeMs } },
 });
 
-export const queryPersister = createAsyncStoragePersister({ storage: Storage });
+export const queryPersister = createAsyncStoragePersister({
+  storage: Storage,
+  serialize: superjson.stringify,
+  deserialize: superjson.parse,
+});
 
 focusManager.setEventListener((setFocused) => {
   const subscription = AppState.addEventListener("change", (state) =>

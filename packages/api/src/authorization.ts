@@ -1,4 +1,5 @@
-import { Context, Schema } from "effect";
+import { Context, Effect, Schema } from "effect";
+import { HttpClientRequest } from "effect/http";
 import { HttpApiMiddleware } from "effect/http-api";
 
 import { Unauthorized } from "./errors";
@@ -23,3 +24,9 @@ export class Authorization extends HttpApiMiddleware.Service<
   requiredForClient: true,
   error: Unauthorized,
 }) {}
+
+export function sendSessionCookie(cookie: Effect.Effect<string>) {
+  return HttpApiMiddleware.layerClient(Authorization, ({ next, request }) =>
+    Effect.flatMap(cookie, (value) => next(HttpClientRequest.setHeader(request, "cookie", value))),
+  );
+}
