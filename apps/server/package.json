@@ -12,6 +12,7 @@
   "dependencies": {
     "@lardon/auth": "workspace:*",
     "@lardon/db": "workspace:*",
+    "@varlock/infisical-plugin": "2.1.3",
     "better-auth": "catalog:",
     "evlog": "catalog:",
     "hono": "^4.13.7",
