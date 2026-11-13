@@ -54,7 +54,7 @@ Alchemy applies migrations on deploy.
 
 ## Deploying
 
-Every push to `main` that passes CI deploys to production through `.github/workflows/deploy.yml`. Other branches never deploy. The job plans first and stops if the plan deletes or replaces anything, since Alchemy deletes every resource that is no longer declared. Deploy those by hand after reading the plan:
+Work happens on `develop`. Every push to `main` that passes CI deploys to production through `.github/workflows/deploy.yml`; other branches never deploy. Release by fast-forwarding `main` to a `develop` commit that passed CI: `main` only accepts commits whose CI check already passed, and neither branch accepts force pushes or deletion. The job plans first and stops if the plan deletes or replaces anything, since Alchemy deletes every resource that is no longer declared. Deploy those by hand after reading the plan:
 
 ```bash
 cd packages/infra

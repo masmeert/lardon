@@ -44,6 +44,26 @@ export default Alchemy.Stack(
       ],
     });
 
+    yield* GitHub.Ruleset("main-ruleset", {
+      ...repository,
+      name: "main",
+      conditions: { include: ["refs/heads/main"] },
+      deletion: true,
+      nonFastForward: true,
+      requiredLinearHistory: true,
+      requiredStatusChecks: {
+        checks: [{ context: "check", integrationId: 15368 }],
+      },
+    });
+
+    yield* GitHub.Ruleset("develop-ruleset", {
+      ...repository,
+      name: "develop",
+      conditions: { include: ["refs/heads/develop"] },
+      deletion: true,
+      nonFastForward: true,
+    });
+
     const production = yield* GitHub.Environment("production", {
       ...repository,
       name: "production",
