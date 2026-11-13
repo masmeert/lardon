@@ -179,7 +179,9 @@ export function CollectionScreen() {
         items={recipes.map((recipe) => ({
           key: recipeKey(recipe),
           title: recipe.title,
-          cover: (sizePt) => <RecipeCover recipe={recipe} sizePt={sizePt} />,
+          photo: recipe.imageKey ? (
+            <RecipeCover recipe={{ familyId: recipe.familyId, imageKey: recipe.imageKey }} />
+          ) : undefined,
           facts: recipeFacts(recipe),
           isSelected: selectedKeys ? selectedKeys.has(recipeKey(recipe)) : undefined,
           onPress: selectedKeys ? () => toggle(recipeKey(recipe)) : undefined,

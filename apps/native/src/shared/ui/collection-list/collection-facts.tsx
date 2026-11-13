@@ -8,12 +8,12 @@ import type { CollectionItem } from "./collection-item";
 
 export function CollectionFacts({
   facts,
-  isOnPhoto = false,
+  isOnCover = false,
 }: {
   facts: NonNullable<CollectionItem["facts"]>;
-  isOnPhoto?: boolean;
+  isOnCover?: boolean;
 }) {
-  const { muted, white } = useThemeColors("muted", "white");
+  const { muted } = useThemeColors("muted");
 
   if (facts.length === 0) return null;
 
@@ -21,15 +21,15 @@ export function CollectionFacts({
     <View
       className={cn(
         "flex-row items-center gap-2.5 self-start rounded-full px-2.5 py-1",
-        isOnPhoto ? "bg-black/40" : "bg-fill",
+        isOnCover ? "bg-paper shadow-rim" : "bg-fill",
       )}
     >
       {facts.map((fact) => (
         <View key={fact.label} className="flex-row items-center gap-1">
-          {fact.icon && (
-            <Icon name={fact.icon} size={iconSize.sm} color={isOnPhoto ? white : muted} />
-          )}
-          <Text className={cn("text-label font-medium", isOnPhoto ? "text-white" : "text-muted")}>
+          {fact.icon && <Icon name={fact.icon} size={iconSize.sm} color={muted} />}
+          <Text
+            className={cn("text-label font-medium", isOnCover ? "text-foreground" : "text-muted")}
+          >
             {fact.label}
           </Text>
         </View>

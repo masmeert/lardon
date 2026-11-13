@@ -3,6 +3,7 @@ import { Stack, router } from "expo-router";
 
 import { familiesQuery } from "#/entities/family";
 import {
+  type LibraryRecipe,
   RecipeCover,
   libraryFolders,
   scopeParams,
@@ -13,6 +14,14 @@ import { CollectionList, listLayoutMenu, useListLayout } from "#/shared/ui";
 
 function recipeCount(amount: number) {
   return amount === 1 ? "1 recipe" : `${amount} recipes`;
+}
+
+function coverPhoto(recipes: readonly LibraryRecipe[]) {
+  const recipe = recipes.find((candidate) => candidate.imageKey);
+
+  return recipe?.imageKey ? (
+    <RecipeCover recipe={{ familyId: recipe.familyId, imageKey: recipe.imageKey }} />
+  ) : undefined;
 }
 
 export function FoldersScreen() {
@@ -33,13 +42,8 @@ export function FoldersScreen() {
           ...libraryFolders(familyTables).map((folder) => ({
             key: folder.name,
             title: folder.name,
-            cover: (sizePt: number) => (
-              <RecipeCover
-                recipe={folder.recipes.find((recipe) => recipe.imageKey)}
-                sizePt={sizePt}
-                placeholderIcon="folder"
-              />
-            ),
+            photo: coverPhoto(folder.recipes),
+            placeholderIcon: "folder" as const,
             facts: [{ label: recipeCount(folder.recipes.length) }],
             onPress: () =>
               router.push({
@@ -50,13 +54,8 @@ export function FoldersScreen() {
           {
             key: "unsorted",
             title: "Unsorted",
-            cover: (sizePt: number) => (
-              <RecipeCover
-                recipe={unsorted.find((recipe) => recipe.imageKey)}
-                sizePt={sizePt}
-                placeholderIcon="tray"
-              />
-            ),
+            photo: coverPhoto(unsorted),
+            placeholderIcon: "tray" as const,
             facts: [{ label: recipeCount(unsorted.length) }],
             onPress: () =>
               router.push({ pathname: "/collection", params: scopeParams({ kind: "unsorted" }) }),
