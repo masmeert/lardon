@@ -71,5 +71,3 @@ export function createAuth(env: AuthConfig, database: Database, hooks: AuthHooks
     ],
   });
 }
-
-export type Session = ReturnType<typeof createAuth>["$Infer"]["Session"];

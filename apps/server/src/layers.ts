@@ -22,36 +22,6 @@ const InfrastructureLive = Layer.mergeAll(
   Layer.sync(FamilyStores, () =>
     FamilyStores.fromDurableObjects(inEuropeanUnion(ENV.FAMILY_STORES)),
   ),
-);
-
-const ServicesLive = Layer.mergeAll(
-  Layer.effect(
-    Authentication,
-    Effect.gen(function* () {
-      const database = yield* Database;
-      const mailer = yield* Mailer;
-      const families = yield* Families;
-
-      return Authentication.fromBetterAuth(
-        createAuth(ENV, database.client, {
-          sendSignInCode: (email) =>
-            Effect.runPromise(
-              mailer
-                .send(signInCodeEmail(email))
-                .pipe(
-                  Effect.andThen(
-                    ENV.LOG_SIGN_IN_CODES === "true"
-                      ? Effect.logInfo(`Sign-in code for ${email.to}: ${email.code}`)
-                      : Effect.void,
-                  ),
-                ),
-            ),
-          afterCreateUser: (userId) => Effect.runPromise(families.createPersonal(userId)),
-          beforeDeleteUser: (userId) => Effect.runPromise(families.forgetUser(userId)),
-        }),
-      );
-    }),
-  ).pipe(Layer.provideMerge(Families.layer), Layer.provideMerge(InfrastructureLive)),
   Layer.sync(RateLimits, () =>
     RateLimits.fromCloudflare({
       auth: ENV.AUTH_RATE_LIMIT,
@@ -60,6 +30,34 @@ const ServicesLive = Layer.mergeAll(
     }),
   ),
 );
+
+const ServicesLive = Layer.effect(
+  Authentication,
+  Effect.gen(function* () {
+    const database = yield* Database;
+    const mailer = yield* Mailer;
+    const families = yield* Families;
+
+    return Authentication.fromBetterAuth(
+      createAuth(ENV, database.client, {
+        sendSignInCode: (email) =>
+          Effect.runPromise(
+            mailer
+              .send(signInCodeEmail(email))
+              .pipe(
+                Effect.andThen(
+                  ENV.LOG_SIGN_IN_CODES === "true"
+                    ? Effect.logInfo(`Sign-in code for ${email.to}: ${email.code}`)
+                    : Effect.void,
+                ),
+              ),
+          ),
+        afterCreateUser: (userId) => Effect.runPromise(families.createPersonal(userId)),
+        beforeDeleteUser: (userId) => Effect.runPromise(families.forgetUser(userId)),
+      }),
+    );
+  }),
+).pipe(Layer.provideMerge(Families.layer), Layer.provideMerge(InfrastructureLive));
 
 export const serverRuntime = ManagedRuntime.make(ServicesLive);
 

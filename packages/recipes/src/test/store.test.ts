@@ -3,23 +3,22 @@ import { describe, expect, it } from "vite-plus/test";
 
 import {
   type RecipeDraft,
+  addToCollection,
+  cleanUp,
   clearMeal,
   copyRecipe,
-  createFolder,
+  createCollection,
   createRecipe,
-  createTag,
-  deleteOwner,
+  deleteCollection,
   deleteRecipes,
   emptyDraft,
-  link,
   moveRecipe,
   planMeal,
   recipeDraft,
-  cleanUp,
   saveRecipe,
   setVisibility,
 } from "../commands";
-import { everyRecipe, folderList, mealPlan, recipeDetail, recipeList, tagList } from "../queries";
+import { collectionList, everyRecipe, mealPlan, recipeDetail, recipeList } from "../queries";
 import { createRecipeStore, isValidCell, isValidRowId, readRows } from "../tables";
 
 function draft(changes: Partial<RecipeDraft> = {}): RecipeDraft {
@@ -223,8 +222,8 @@ describe("recipes", () => {
   it("deletes a recipe with its lines, links and meals", () => {
     const store = createRecipeStore();
     const recipeId = createRecipe(store, draft(), "alice");
-    const tagId = createTag(store, "Soup");
-    link(store, "recipeTags", tagId, [recipeId]);
+    const tagId = createCollection(store, "tags", "Soup");
+    addToCollection(store, "tags", tagId, [recipeId]);
     planMeal(store, "2026-11-13", { recipeId, servings: null });
 
     deleteRecipes(store, [recipeId]);
@@ -265,7 +264,7 @@ describe("recipes", () => {
     const personal = createRecipeStore();
     const family = createRecipeStore();
     const recipeId = createRecipe(personal, draft(), "alice");
-    link(personal, "recipeTags", createTag(personal, "Soup"), [recipeId]);
+    addToCollection(personal, "tags", createCollection(personal, "tags", "Soup"), [recipeId]);
 
     expect(moveRecipe(personal, family, recipeId, null)).toBe(true);
 
@@ -298,13 +297,13 @@ describe("tags and folders", () => {
     const store = createRecipeStore();
     const soup = createRecipe(store, draft(), "alice");
     const stew = createRecipe(store, draft({ title: "Stew" }), "alice");
-    const tagId = createTag(store, "Winter");
+    const tagId = createCollection(store, "tags", "Winter");
 
-    expect(createTag(store, " winter ")).toBe(tagId);
-    link(store, "recipeTags", tagId, [soup, stew, "missing"]);
-    expect(tagList(store)).toEqual([{ id: tagId, name: "Winter", recipeCount: 2 }]);
+    expect(createCollection(store, "tags", " winter ")).toBe(tagId);
+    addToCollection(store, "tags", tagId, [soup, stew, "missing"]);
+    expect(collectionList(store, "tags")).toEqual([{ id: tagId, name: "Winter", recipeCount: 2 }]);
 
-    deleteOwner(store, "tags", tagId);
+    deleteCollection(store, "tags", tagId);
     expect(store.getTable("recipeTags")).toEqual({});
   });
 
@@ -322,10 +321,10 @@ describe("tags and folders", () => {
       "alice",
     );
 
-    const sweet = createTag(store, "Sweet");
-    const folderId = createFolder(store, "Weekend");
-    link(store, "recipeTags", sweet, [crepes]);
-    link(store, "recipeFolders", folderId, [soup, crepes]);
+    const sweet = createCollection(store, "tags", "Sweet");
+    const folderId = createCollection(store, "folders", "Weekend");
+    addToCollection(store, "tags", sweet, [crepes]);
+    addToCollection(store, "folders", folderId, [soup, crepes]);
 
     const titles = (query: Partial<typeof everyRecipe>) =>
       recipeList(store, { ...everyRecipe, ...query }).map((recipe) => recipe.title);
@@ -337,7 +336,9 @@ describe("tags and folders", () => {
       "Crêpes",
       "Tomato soup",
     ]);
-    expect(folderList(store)).toEqual([{ id: folderId, name: "Weekend", recipeCount: 2 }]);
+    expect(collectionList(store, "folders")).toEqual([
+      { id: folderId, name: "Weekend", recipeCount: 2 },
+    ]);
   });
 });
 

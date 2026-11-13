@@ -11,7 +11,6 @@
     "ios": "expo run:ios",
     "prebuild": "expo prebuild",
     "web": "expo start --web",
-    "check-types": "tsc --noEmit",
     "env:generate": "varlock codegen"
   },
   "dependencies": {
@@ -51,8 +50,7 @@
     "tailwind-variants": "^3.3.1",
     "tailwindcss": "catalog:",
     "uniwind": "^1.12.2",
-    "varlock": "catalog:",
-    "zod": "catalog:"
+    "varlock": "catalog:"
   },
   "devDependencies": {
     "@lardon/config": "workspace:*",

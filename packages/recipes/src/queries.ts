@@ -1,6 +1,6 @@
 import type { MergeableStore } from "tinybase";
 
-import { type Stored, readRow, readRows } from "./tables";
+import { type Collection, type Stored, collections, readRow, readRows } from "./tables";
 
 export type RecipeSort = "updated" | "created" | "title";
 
@@ -45,53 +45,52 @@ export function stepsOf(store: MergeableStore, recipeId: string) {
     .sort(byPosition);
 }
 
-export function linkedIds(
-  store: MergeableStore,
-  tableId: "recipeTags" | "recipeFolders",
-  recipeId: string,
-) {
-  const ownerTable = tableId === "recipeTags" ? "tags" : "folders";
+function byName(first: { name: string }, second: { name: string }) {
+  return first.name.localeCompare(second.name);
+}
 
-  return readRows(store, tableId).flatMap((link) => {
-    const ownerId = "tagId" in link ? link.tagId : link.folderId;
+function links(store: MergeableStore, collection: Collection) {
+  return readRows(store, collections[collection].linkTable).map((link) => ({
+    recipeId: link.recipeId,
+    ownerId: "tagId" in link ? link.tagId : link.folderId,
+  }));
+}
 
-    return link.recipeId === recipeId && readRow(store, ownerTable, ownerId) ? [ownerId] : [];
-  });
+export function linkedIds(store: MergeableStore, collection: Collection, recipeId: string) {
+  return links(store, collection).flatMap((link) =>
+    link.recipeId === recipeId && readRow(store, collection, link.ownerId) ? [link.ownerId] : [],
+  );
+}
+
+function recipeIdsIn(store: MergeableStore, collection: Collection, ownerId: string) {
+  return new Set(
+    links(store, collection).flatMap((link) => (link.ownerId === ownerId ? [link.recipeId] : [])),
+  );
 }
 
 export function recipeDetail(store: MergeableStore, recipeId: string) {
   const recipe = readRow(store, "recipes", recipeId);
 
   if (!recipe) return undefined;
-  const tagIds = new Set(linkedIds(store, "recipeTags", recipeId));
-  const folderIds = new Set(linkedIds(store, "recipeFolders", recipeId));
+
+  const linked = (collection: Collection) => {
+    const ownerIds = new Set(linkedIds(store, collection, recipeId));
+
+    return readRows(store, collection)
+      .filter((owner) => ownerIds.has(owner.id))
+      .sort(byName);
+  };
 
   return {
     ...recipe,
     ingredients: ingredientsOf(store, recipeId),
     steps: stepsOf(store, recipeId),
-    tags: readRows(store, "tags")
-      .filter((tag) => tagIds.has(tag.id))
-      .sort((first, second) => first.name.localeCompare(second.name)),
-    folders: readRows(store, "folders")
-      .filter((folder) => folderIds.has(folder.id))
-      .sort((first, second) => first.name.localeCompare(second.name)),
+    tags: linked("tags"),
+    folders: linked("folders"),
   };
 }
 
 export type RecipeDetail = NonNullable<ReturnType<typeof recipeDetail>>;
-
-function recipeIdsLinkedTo(
-  store: MergeableStore,
-  tableId: "recipeTags" | "recipeFolders",
-  ownerId: string,
-) {
-  return new Set(
-    readRows(store, tableId).flatMap((link) =>
-      ("tagId" in link ? link.tagId : link.folderId) === ownerId ? [link.recipeId] : [],
-    ),
-  );
-}
 
 const sorters = {
   updated: (first: Stored<"recipes">, second: Stored<"recipes">) =>
@@ -104,11 +103,8 @@ const sorters = {
 
 export function recipeList(store: MergeableStore, query: RecipeQuery) {
   const terms = searchable(query.search).split(/\s+/).filter(Boolean);
-  const requiredTags = query.tagIds.map((tagId) => recipeIdsLinkedTo(store, "recipeTags", tagId));
-
-  const inFolder =
-    query.folderId === null ? null : recipeIdsLinkedTo(store, "recipeFolders", query.folderId);
-
+  const requiredTags = query.tagIds.map((tagId) => recipeIdsIn(store, "tags", tagId));
+  const inFolder = query.folderId === null ? null : recipeIdsIn(store, "folders", query.folderId);
   const ingredientNames = new Map<string, string[]>();
 
   if (terms.length > 0) {
@@ -119,8 +115,6 @@ export function recipeList(store: MergeableStore, query: RecipeQuery) {
       ]);
     }
   }
-
-  const direction = query.direction === "ascending" ? 1 : -1;
 
   return readRows(store, "recipes")
     .filter(
@@ -133,32 +127,23 @@ export function recipeList(store: MergeableStore, query: RecipeQuery) {
             (ingredientNames.get(recipe.id) ?? []).some((name) => name.includes(term)),
         ),
     )
-    .sort((first, second) => direction * sorters[query.sort](first, second));
+    .sort(
+      (first, second) =>
+        (query.direction === "ascending" ? 1 : -1) * sorters[query.sort](first, second),
+    );
 }
 
-function withRecipeCounts<Owner extends { id: string; name: string }>(
-  store: MergeableStore,
-  owners: readonly Owner[],
-  tableId: "recipeTags" | "recipeFolders",
-) {
+export function collectionList(store: MergeableStore, collection: Collection) {
   const recipeIds = new Set(readRows(store, "recipes").map((recipe) => recipe.id));
 
-  return owners
+  return readRows(store, collection)
     .map((owner) => ({
       ...owner,
-      recipeCount: [...recipeIdsLinkedTo(store, tableId, owner.id)].filter((recipeId) =>
+      recipeCount: [...recipeIdsIn(store, collection, owner.id)].filter((recipeId) =>
         recipeIds.has(recipeId),
       ).length,
     }))
-    .sort((first, second) => first.name.localeCompare(second.name));
-}
-
-export function tagList(store: MergeableStore) {
-  return withRecipeCounts(store, readRows(store, "tags"), "recipeTags");
-}
-
-export function folderList(store: MergeableStore) {
-  return withRecipeCounts(store, readRows(store, "folders"), "recipeFolders");
+    .sort(byName);
 }
 
 export function mealPlan(store: MergeableStore, dates: readonly string[]) {

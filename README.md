@@ -1,118 +1,63 @@
-# lardon
+# Lardon
 
-This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines React Native, Expo, Hono, and more.
+Recipes for the whole family. Every device keeps a full copy of its families' recipes, tags, folders and meal plan, works offline, and syncs through Cloudflare when it's online.
 
-## Features
+How it fits together is in [ARCHITECTURE.md](ARCHITECTURE.md). How to write code here is in [AGENTS.md](AGENTS.md).
 
-- **TypeScript** - For type safety and improved developer experience
-- **Astro** - The web framework for content-driven websites
-- **React Native** - Build mobile apps using React
-- **Expo** - Tools for React Native development
-- **TailwindCSS** - Utility-first CSS for rapid UI development
-- **Hono** - Lightweight, performant server framework
-- **workers** - Runtime environment
-- **Drizzle** - TypeScript-first ORM
-- **Cloudflare D1** - Database engine
-- **Authentication** - Better-Auth
-- **Vite+** - Unified Vite toolchain, workspace task runner, linting, and formatting
-- **Oxlint** - Oxlint + Oxfmt (linting & formatting)
+## Repository
 
-## Getting Started
+| Path               | Holds                                                                                               |
+| ------------------ | --------------------------------------------------------------------------------------------------- |
+| `apps/native`      | The Expo app                                                                                        |
+| `apps/server`      | The Cloudflare Worker: the Effect `HttpApi`, better-auth, sync and the `FamilyStore` Durable Object |
+| `apps/web`         | The static Astro website on lardon.app                                                              |
+| `packages/recipes` | The TinyBase data model, commands and queries, shared by the app and the server                     |
+| `packages/api`     | The `HttpApi` definition and its errors, shared by the server and its clients                       |
+| `packages/auth`    | The better-auth setup                                                                               |
+| `packages/db`      | The Drizzle schema and migrations for D1                                                            |
+| `packages/brand`   | Colours, logo and operator details shared by the website and emails                                 |
+| `packages/infra`   | The Alchemy stack                                                                                   |
 
-First, install the dependencies:
-
-```bash
-pnpm install
-```
-
-## Database Setup
-
-This project uses Cloudflare D1 (SQLite) with Drizzle ORM.
-
-Runtime database access uses the Cloudflare `DB` binding from `packages/infra/alchemy.run.ts`. If a local `DATABASE_URL` is present, it is only for database tooling.
-
-Alchemy provisions the D1 database and applies migrations during `deploy`.
-
-1. Generate migration files:
+## Getting started
 
 ```bash
-pnpm run db:generate
+vp install
 ```
 
-Then, run the development server:
+Secrets come from Infisical through varlock. The machine identity that reads them goes in the gitignored `apps/server/.env.local` as `INFISICAL_CLIENT_ID` and `INFISICAL_CLIENT_SECRET`.
 
 ```bash
-pnpm run dev
+vp run dev          # the Worker on :3000 and the website, through alchemy dev
+vp run dev:native   # Metro for the app
 ```
 
-Open [http://localhost:4321](http://localhost:4321) in your browser to see the web application.
-From `apps/native`, run the `ios` script for iOS or the `android` script for Android to build and launch the app. See [Expo development builds](https://docs.expo.dev/develop/development-builds/introduction/) for device setup.
-The API is running at [http://localhost:3000](http://localhost:3000).
+Locally, sign-in codes are printed in the server log instead of being emailed.
 
-## Environment Configuration
-
-Each app owns its environment schema in `.env.schema`. Varlock generates `src/env.ts` during installation; run `pnpm run env:generate` after changing a schema. Commit schemas, and keep secrets in ignored env files or your deployment platform.
-
-Import the generated `ENV` accessor in application code. Shared database and auth packages receive configuration or initialized clients from the application. See [Varlock's monorepo guide](https://varlock.dev/guides/monorepos/).
-
-For Cloudflare, Alchemy loads and validates deployment inputs with `varlock/auto-load` in its Node/Bun deployment process. Worker code reads native bindings; web clients use the framework's public env API through `src/env.public.ts` where needed. Alchemy supplies resource URLs and managed database credentials. In-Worker Varlock protections are deferred until an official Alchemy integration is available; see [the non-Wrangler deployment guidance](https://varlock.dev/integrations/cloudflare/#non-wrangler-deploy-tools-alchemy-sst-pulumi).
-
-Bun's automatic env loading is disabled in `bunfig.toml`; the framework integration or server bootstrap loads Varlock. Node deployments must include Varlock and its dependencies alongside the app schema.
-
-Run standalone Node/Bun tools that use Varlock from the owning app directory so they load that app's schema and env files. `env:generate` only generates TypeScript files; it does not initialize environment values in a subsequent command.
-
-## Deployment
-
-### Alchemy
-
-- Target: web on Cloudflare + server on Cloudflare + Axiom observability
-- Configure provider accounts: `cd packages/infra && pnpm exec alchemy profile edit`
-- Dev: pnpm run dev
-- Deploy: pnpm run deploy
-- Destroy: pnpm run destroy
-
-`alchemy profile edit` stores the selected Axiom, Cloudflare, Neon, PlanetScale, and/or Prisma provider profiles under `~/.alchemy`; no provider-specific setup command is required by this scaffold.
-
-Deploys are staged and default to a personal `dev_<username>` stage. For production, run the deploy with an explicit stage from `packages/infra`:
+## Checks
 
 ```bash
-cd packages/infra && pnpm exec alchemy deploy --stage production
+vp check            # format, lint and types
+vp run -r test      # every package's tests, including the Worker running in workerd
 ```
 
-Alchemy creates a stage-specific Axiom dataset and a least-privilege ingest token. `dev` injects the credentials into the observed apps without writing the token to an env file.
+CI runs both, plus `vp run -r build`, on every push to `main` and every pull request.
 
-### Production origins
+## Database changes
 
-- Required after the first deploy: set `CORS_ORIGIN` in `apps/server/.env` to the exact deployed web origin, such as `https://app.example.com`, then deploy the server again.
+Edit `packages/db/src/schema`, then generate a migration:
 
-## Git Hooks and Formatting
-
-- Optional native Vite+ hooks: `pnpm run hooks:setup`
-- Docs: [Vite+ commit hooks](https://viteplus.dev/guide/commit-hooks)
-- Run checks: `pnpm run check`
-
-## Project Structure
-
-```
-lardon/
-├── apps/
-│   ├── web/         # Frontend application (Astro)
-│   ├── native/      # Mobile application (React Native, Expo)
-│   └── server/      # Backend API (Hono)
-├── packages/
-│   ├── auth/        # Authentication configuration & logic
-│   └── db/          # Database schema & queries
+```bash
+vp run db:generate
 ```
 
-## Available Scripts
+Alchemy applies migrations on deploy.
 
-- `pnpm run dev`: Start all applications in development mode
-- `pnpm run build`: Build all applications
-- `pnpm run check-types`: Check TypeScript types across all apps
-- `pnpm run dev:native`: Start the React Native/Expo development server
-- `pnpm run db:generate`: Generate database client/types
-- `pnpm run check`: Run Vite+ format/lint checks and workspace TypeScript checks
-- `pnpm run lint`: Run Vite+ lint checks
-- `pnpm run format`: Run Vite+ formatting
-- `pnpm run staged`: Run Vite+ checks against staged files
-- `pnpm run hooks:setup`: Install Vite+ native Git hooks with `vp config`
+## Deploying
+
+Check the plan first. It only reads, and Alchemy deletes any resource that is no longer declared:
+
+```bash
+cd packages/infra
+APP_ENV=production vp exec alchemy plan --stage prod
+APP_ENV=production vp exec alchemy deploy --stage prod
+```

@@ -191,9 +191,6 @@ catalogs:
     vite-plus:
       specifier: 1.4.0
       version: 1.4.0
-    zod:
-      specifier: ^4.5.4
-      version: 4.6.7
 
 overrides:
   effect: 4.1.4
@@ -204,10 +201,6 @@ overrides:
 importers:
 
   .:
-    dependencies:
-      zod:
-        specifier: 'catalog:'
-        version: 4.6.7
     devDependencies:
       '@cloudflare/workers-types':
         specifier: 'catalog:'
@@ -347,9 +340,6 @@ importers:
       varlock:
         specifier: 'catalog:'
         version: 1.23.0
-      zod:
-        specifier: 'catalog:'
-        version: 4.6.7
     devDependencies:
       '@lardon/config':
         specifier: workspace:*
@@ -533,9 +523,6 @@ importers:
       libsql:
         specifier: 0.5.29
         version: 0.5.29
-      zod:
-        specifier: 'catalog:'
-        version: 4.6.7
     devDependencies:
       '@lardon/config':
         specifier: workspace:*

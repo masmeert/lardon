@@ -3,7 +3,16 @@ import { generateKeyBetween, generateNKeysBetween } from "fractional-indexing";
 import { type Cell, type MergeableStore, getUniqueId } from "tinybase";
 
 import { ingredientsOf, linkedIds, stepsOf } from "./queries";
-import { type TableId, type Visibility, linkId, readRow, readRows, tables } from "./tables";
+import {
+  type Collection,
+  type TableId,
+  type Visibility,
+  collections,
+  linkId,
+  readRow,
+  readRows,
+  tables,
+} from "./tables";
 import type { UnitCode } from "./units";
 
 export type DraftIngredient = {
@@ -27,19 +36,6 @@ export type RecipeDraft = {
   tagIds: readonly string[];
   folderIds: readonly string[];
 };
-
-const detailCells = [
-  "title",
-  "servings",
-  "prepMinutes",
-  "cookMinutes",
-  "notes",
-  "imageKey",
-] as const;
-
-const ingredientCells = ["quantity", "unit", "name"] as const;
-
-const stepCells = ["text"] as const;
 
 const childTables = ["ingredients", "steps", "recipeTags", "recipeFolders", "meals"] as const;
 
@@ -74,17 +70,11 @@ function writeCell(
   else store.setCell(tableId, rowId, cellId, value);
 }
 
-function cleanText(text: string | null) {
-  const cleaned = text?.trim() ?? "";
-
-  return cleaned === "" ? null : cleaned;
-}
-
 function cleanDraft(draft: RecipeDraft): RecipeDraft {
   return {
     ...draft,
     title: draft.title.trim(),
-    notes: cleanText(draft.notes),
+    notes: draft.notes?.trim() || null,
     ingredients: draft.ingredients.flatMap((ingredient) => {
       const name = ingredient.name.trim().replace(/\s+/g, " ");
 
@@ -132,9 +122,19 @@ export function recipeDraft(store: MergeableStore, recipeId: string): RecipeDraf
       name: ingredient.name,
     })),
     steps: stepsOf(store, recipeId).map((step) => ({ id: step.id, text: step.text })),
-    tagIds: linkedIds(store, "recipeTags", recipeId),
-    folderIds: linkedIds(store, "recipeFolders", recipeId),
+    tagIds: linkedIds(store, "tags", recipeId),
+    folderIds: linkedIds(store, "folders", recipeId),
   };
+}
+
+function writeLink(
+  store: MergeableStore,
+  collection: Collection,
+  ownerId: string,
+  recipeId: string,
+) {
+  const { linkTable, ownerCell } = collections[collection];
+  store.setRow(linkTable, linkId(ownerId, recipeId), { recipeId, [ownerCell]: ownerId });
 }
 
 function writeRecipe(
@@ -143,7 +143,6 @@ function writeRecipe(
   draft: RecipeDraft,
   owner: { createdById: string; createdAt: number; visibility: Visibility },
 ) {
-  const now = Date.now();
   const ingredientPositions = generateNKeysBetween(null, null, draft.ingredients.length);
   const stepPositions = generateNKeysBetween(null, null, draft.steps.length);
 
@@ -160,7 +159,7 @@ function writeRecipe(
       visibility: owner.visibility,
       createdById: owner.createdById,
       createdAt: owner.createdAt,
-      updatedAt: now,
+      updatedAt: Date.now(),
     }),
   );
 
@@ -186,13 +185,9 @@ function writeRecipe(
     ),
   );
 
-  for (const tagId of draft.tagIds) {
-    store.setRow("recipeTags", linkId(tagId, recipeId), { recipeId, tagId });
-  }
+  for (const tagId of draft.tagIds) writeLink(store, "tags", tagId, recipeId);
 
-  for (const folderId of draft.folderIds) {
-    store.setRow("recipeFolders", linkId(folderId, recipeId), { recipeId, folderId });
-  }
+  for (const folderId of draft.folderIds) writeLink(store, "folders", folderId, recipeId);
 }
 
 export function createRecipe(store: MergeableStore, draft: RecipeDraft, createdById: string) {
@@ -207,14 +202,6 @@ export function createRecipe(store: MergeableStore, draft: RecipeDraft, createdB
   );
 
   return recipeId;
-}
-
-function between(lower: string | undefined, upper: string | undefined) {
-  if (lower !== undefined && upper !== undefined && lower >= upper) {
-    return generateKeyBetween(lower, null);
-  }
-
-  return generateKeyBetween(lower ?? null, upper ?? null);
 }
 
 function longestRunInOrder(ids: readonly string[], baseIds: readonly string[]) {
@@ -312,7 +299,13 @@ function reconcileList<
       (lower === undefined || lower < currentPosition) &&
       (upper === undefined || currentPosition < upper);
 
-    const position = isInPlace ? currentPosition : between(lower, upper);
+    const position = isInPlace
+      ? currentPosition
+      : generateKeyBetween(
+          lower ?? null,
+          lower !== undefined && upper !== undefined && lower >= upper ? null : (upper ?? null),
+        );
+
     lineup.splice(lineupIndex, 0, { ...item, position });
 
     if (isInPlace) return;
@@ -339,12 +332,10 @@ function reconcileList<
 
 function reconcileLinks(
   store: MergeableStore,
-  tableId: "recipeTags" | "recipeFolders",
+  collection: Collection,
   recipeId: string,
   lists: { base: readonly string[]; revision: readonly string[]; current: readonly string[] },
 ) {
-  const ownerCell = tableId === "recipeTags" ? "tagId" : "folderId";
-
   const added = lists.revision.filter(
     (ownerId) => !lists.base.includes(ownerId) && !lists.current.includes(ownerId),
   );
@@ -353,11 +344,11 @@ function reconcileLinks(
     (ownerId) => !lists.revision.includes(ownerId) && lists.current.includes(ownerId),
   );
 
-  for (const ownerId of added) {
-    store.setRow(tableId, linkId(ownerId, recipeId), { recipeId, [ownerCell]: ownerId });
-  }
+  for (const ownerId of added) writeLink(store, collection, ownerId, recipeId);
 
-  for (const ownerId of removed) store.delRow(tableId, linkId(ownerId, recipeId));
+  for (const ownerId of removed) {
+    store.delRow(collections[collection].linkTable, linkId(ownerId, recipeId));
+  }
 
   return added.length + removed.length;
 }
@@ -374,15 +365,17 @@ export function saveRecipe(
   const cleanBase = cleanDraft(base);
   const cleanRevision = cleanDraft(revision);
 
-  const currentPositions = {
-    ingredients: ingredientsOf(store, recipeId),
-    steps: stepsOf(store, recipeId),
-  };
-
   store.transaction(() => {
     let writes = 0;
 
-    for (const cellId of detailCells) {
+    for (const cellId of [
+      "title",
+      "servings",
+      "prepMinutes",
+      "cookMinutes",
+      "notes",
+      "imageKey",
+    ] as const) {
       if (
         cleanRevision[cellId] !== cleanBase[cellId] &&
         cleanRevision[cellId] !== current[cellId]
@@ -392,10 +385,10 @@ export function saveRecipe(
       }
     }
 
-    writes += reconcileList(store, "ingredients", recipeId, ingredientCells, {
+    writes += reconcileList(store, "ingredients", recipeId, ["quantity", "unit", "name"], {
       base: cleanBase.ingredients,
       revision: cleanRevision.ingredients,
-      current: currentPositions.ingredients.map((ingredient) => ({
+      current: ingredientsOf(store, recipeId).map((ingredient) => ({
         id: ingredient.id,
         position: ingredient.position,
         quantity: ingredient.quantity ?? null,
@@ -404,19 +397,19 @@ export function saveRecipe(
       })),
     });
 
-    writes += reconcileList(store, "steps", recipeId, stepCells, {
+    writes += reconcileList(store, "steps", recipeId, ["text"], {
       base: cleanBase.steps,
       revision: cleanRevision.steps,
-      current: currentPositions.steps,
+      current: stepsOf(store, recipeId),
     });
 
-    writes += reconcileLinks(store, "recipeTags", recipeId, {
+    writes += reconcileLinks(store, "tags", recipeId, {
       base: cleanBase.tagIds,
       revision: cleanRevision.tagIds,
       current: current.tagIds,
     });
 
-    writes += reconcileLinks(store, "recipeFolders", recipeId, {
+    writes += reconcileLinks(store, "folders", recipeId, {
       base: cleanBase.folderIds,
       revision: cleanRevision.folderIds,
       current: current.folderIds,
@@ -497,75 +490,62 @@ export function moveRecipe(
   return true;
 }
 
-function sameName(first: string, second: string) {
-  return first.trim().toLocaleLowerCase() === second.trim().toLocaleLowerCase();
-}
-
-function createNamed(store: MergeableStore, tableId: "tags" | "folders", name: string) {
-  const existing = readRows(store, tableId).find((row) => sameName(row.name, name));
+export function createCollection(store: MergeableStore, collection: Collection, name: string) {
+  const existing = readRows(store, collection).find(
+    (owner) => owner.name.toLocaleLowerCase() === name.trim().toLocaleLowerCase(),
+  );
 
   if (existing) return existing.id;
   const id = getUniqueId();
-  store.setRow(tableId, id, { name: name.trim() });
+  store.setRow(collection, id, { name: name.trim() });
 
   return id;
 }
 
-export function createTag(store: MergeableStore, name: string) {
-  return createNamed(store, "tags", name);
-}
-
-export function createFolder(store: MergeableStore, name: string) {
-  return createNamed(store, "folders", name);
-}
-
-export function rename(
+export function renameCollection(
   store: MergeableStore,
-  tableId: "tags" | "folders",
+  collection: Collection,
   id: string,
   name: string,
 ) {
-  if (store.hasRow(tableId, id)) store.setCell(tableId, id, "name", name.trim());
+  if (store.hasRow(collection, id)) store.setCell(collection, id, "name", name.trim());
 }
 
-export function deleteOwner(store: MergeableStore, tableId: "tags" | "folders", id: string) {
-  const linkTable = tableId === "tags" ? "recipeTags" : "recipeFolders";
-  const ownerCell = tableId === "tags" ? "tagId" : "folderId";
+export function deleteCollection(store: MergeableStore, collection: Collection, id: string) {
+  const { linkTable, ownerCell } = collections[collection];
 
   store.transaction(() => {
     for (const rowId of store.getRowIds(linkTable)) {
       if (store.getCell(linkTable, rowId, ownerCell) === id) store.delRow(linkTable, rowId);
     }
 
-    store.delRow(tableId, id);
+    store.delRow(collection, id);
   });
 }
 
-export function link(
+export function addToCollection(
   store: MergeableStore,
-  tableId: "recipeTags" | "recipeFolders",
-  ownerId: string,
+  collection: Collection,
+  id: string,
   recipeIds: readonly string[],
 ) {
-  const ownerCell = tableId === "recipeTags" ? "tagId" : "folderId";
-
   store.transaction(() => {
     for (const recipeId of recipeIds) {
-      if (store.hasRow("recipes", recipeId)) {
-        store.setRow(tableId, linkId(ownerId, recipeId), { recipeId, [ownerCell]: ownerId });
-      }
+      if (store.hasRow("recipes", recipeId)) writeLink(store, collection, id, recipeId);
     }
   });
 }
 
-export function unlink(
+export function removeFromCollection(
   store: MergeableStore,
-  tableId: "recipeTags" | "recipeFolders",
-  ownerId: string,
+  collection: Collection,
+  id: string,
   recipeIds: readonly string[],
 ) {
   store.transaction(() => {
-    for (const recipeId of recipeIds) store.delRow(tableId, linkId(ownerId, recipeId));
+    for (const recipeId of recipeIds) {
+      store.delRow(collections[collection].linkTable, linkId(id, recipeId));
+    }
   });
 }
 
@@ -600,8 +580,11 @@ export function cleanUp(store: MergeableStore) {
           onNone: () => true,
           onSome: (child) =>
             !store.hasRow("recipes", child.recipeId) ||
-            (child.tagId !== undefined && !store.hasRow("tags", child.tagId)) ||
-            (child.folderId !== undefined && !store.hasRow("folders", child.folderId)),
+            Record.keys(collections).some((collection) => {
+              const ownerId = child[collections[collection].ownerCell];
+
+              return ownerId !== undefined && !store.hasRow(collection, ownerId);
+            }),
         });
 
         if (isOrphan) {

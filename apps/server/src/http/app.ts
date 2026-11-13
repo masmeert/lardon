@@ -2,7 +2,7 @@ import { Effect, Layer } from "effect";
 import { HttpRouter, HttpServerRequest, HttpServerResponse } from "effect/http";
 
 import { Authentication } from "../authentication";
-import { RateLimits, rateLimitRuleFor, tooManyRequestsResponse } from "../rate-limits";
+import { RateLimits, clientKey, rateLimitRuleFor, tooManyRequestsResponse } from "../rate-limits";
 import { ApiRoutes } from "./api";
 
 const AuthRoutes = Layer.unwrap(
@@ -30,10 +30,7 @@ const RateLimitMiddleware = HttpRouter.middleware(
         const request = yield* HttpServerRequest.HttpServerRequest;
         const rule = rateLimitRuleFor(new URL(request.url, "http://localhost").pathname);
 
-        if (
-          rule &&
-          !(yield* rateLimits.allow(rule, request.headers["cf-connecting-ip"] ?? "unknown"))
-        ) {
+        if (rule && !(yield* rateLimits.allow(rule, clientKey(new Headers(request.headers))))) {
           return HttpServerResponse.fromWeb(tooManyRequestsResponse());
         }
 

@@ -16,7 +16,7 @@ const vulgarFractions = new Map([
 
 const quantityPattern = String.raw`(\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:[.,]\d+)?[⅛¼⅓⅜½⅝⅔¾⅞]?|[⅛¼⅓⅜½⅝⅔¾⅞])`;
 
-export function parseQuantity(text: string) {
+function parseQuantity(text: string) {
   return text
     .trim()
     .split(/\s+/)

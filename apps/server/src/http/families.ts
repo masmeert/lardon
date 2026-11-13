@@ -4,6 +4,12 @@ import { HttpApiBuilder } from "effect/http-api";
 
 import { Families } from "../families";
 
+function asCurrentUser<Success, Failure, Requirements>(
+  run: (userId: string) => Effect.Effect<Success, Failure, Requirements>,
+) {
+  return Effect.flatMap(CurrentUser, (user) => run(user.id));
+}
+
 export const FamiliesHandlers = HttpApiBuilder.group(
   Api,
   "families",
@@ -11,32 +17,23 @@ export const FamiliesHandlers = HttpApiBuilder.group(
     const families = yield* Families;
 
     return handlers.handleAll({
-      list: () => Effect.flatMap(CurrentUser, (user) => families.list(user.id)),
-      create: ({ payload }) =>
-        Effect.flatMap(CurrentUser, (user) => families.create(user.id, payload.name)),
-      join: ({ payload }) =>
-        Effect.flatMap(CurrentUser, (user) => families.join(user.id, payload.code)),
+      list: () => asCurrentUser((userId) => families.list(userId)),
+      create: ({ payload }) => asCurrentUser((userId) => families.create(userId, payload.name)),
+      join: ({ payload }) => asCurrentUser((userId) => families.join(userId, payload.code)),
       revokeInvite: ({ params }) =>
-        Effect.flatMap(CurrentUser, (user) => families.revokeInvite(user.id, params.code)),
-      get: ({ params }) =>
-        Effect.flatMap(CurrentUser, (user) => families.get(user.id, params.familyId)),
+        asCurrentUser((userId) => families.revokeInvite(userId, params.code)),
+      get: ({ params }) => asCurrentUser((userId) => families.get(userId, params.familyId)),
       rename: ({ params, payload }) =>
-        Effect.flatMap(CurrentUser, (user) =>
-          families.rename(user.id, params.familyId, payload.name),
-        ),
-      delete: ({ params }) =>
-        Effect.flatMap(CurrentUser, (user) => families.delete(user.id, params.familyId)),
+        asCurrentUser((userId) => families.rename(userId, params.familyId, payload.name)),
+      delete: ({ params }) => asCurrentUser((userId) => families.delete(userId, params.familyId)),
       createInvite: ({ params }) =>
-        Effect.flatMap(CurrentUser, (user) => families.createInvite(user.id, params.familyId)),
-      leave: ({ params }) =>
-        Effect.flatMap(CurrentUser, (user) => families.leave(user.id, params.familyId)),
+        asCurrentUser((userId) => families.createInvite(userId, params.familyId)),
+      leave: ({ params }) => asCurrentUser((userId) => families.leave(userId, params.familyId)),
       removeMember: ({ params }) =>
-        Effect.flatMap(CurrentUser, (user) =>
-          families.removeMember(user.id, params.familyId, params.userId),
-        ),
+        asCurrentUser((userId) => families.removeMember(userId, params.familyId, params.userId)),
       setMemberRole: ({ params, payload }) =>
-        Effect.flatMap(CurrentUser, (user) =>
-          families.setMemberRole(user.id, params.familyId, params.userId, payload.role),
+        asCurrentUser((userId) =>
+          families.setMemberRole(userId, params.familyId, params.userId, payload.role),
         ),
     });
   }),

@@ -20,6 +20,14 @@ import { formatInviteCode, generateInviteCode, normalizeInviteCode } from "./inv
 const INVITE_LIFETIME_MS = 7 * 24 * 60 * 60 * 1000;
 const joinOrder = [asc(familyMember.joinedAt), asc(sql`${familyMember}.rowid`)];
 
+export const missingFamily = new NotFound({ message: "This family doesn't exist." });
+
+const missingMember = new NotFound({ message: "This person isn't a member of the family." });
+
+function membershipOf(familyId: string, userId: string) {
+  return and(eq(familyMember.familyId, familyId), eq(familyMember.userId, userId));
+}
+
 export class Families extends Context.Service<
   Families,
   {
@@ -74,10 +82,10 @@ export class Families extends Context.Service<
             .select({ role: familyMember.role, personalForUserId: family.personalForUserId })
             .from(familyMember)
             .innerJoin(family, eq(family.id, familyMember.familyId))
-            .where(and(eq(familyMember.familyId, familyId), eq(familyMember.userId, userId))),
+            .where(membershipOf(familyId, userId)),
         );
 
-        if (!membership) return yield* new NotFound({ message: "This family doesn't exist." });
+        if (!membership) return yield* missingFamily;
 
         return { role: membership.role, personal: membership.personalForUserId !== null };
       });
@@ -133,7 +141,7 @@ export class Families extends Context.Service<
           ]),
         );
 
-        if (!row) return yield* new NotFound({ message: "This family doesn't exist." });
+        if (!row) return yield* missingFamily;
 
         return {
           id: row.id,
@@ -148,6 +156,21 @@ export class Families extends Context.Service<
             expiresAt: invite.expiresAt,
           })),
         };
+      });
+
+      const insert = Effect.fn("Families.insert")(function* (
+        userId: string,
+        values: { name: string; personalForUserId?: string },
+      ) {
+        const familyId = crypto.randomUUID();
+        yield* database.use((client) =>
+          client.batch([
+            client.insert(family).values({ id: familyId, ...values }),
+            client.insert(familyMember).values({ familyId, userId, role: "owner" }),
+          ]),
+        );
+
+        return familyId;
       });
 
       const destroy = Effect.fn("Families.destroy")(function* (familyId: string) {
@@ -173,25 +196,20 @@ export class Families extends Context.Service<
 
         if (!successor) return yield* destroy(familyId);
 
-        const departing = and(eq(familyMember.familyId, familyId), eq(familyMember.userId, userId));
-
         if (role === "owner" && !otherMembers.some((member) => member.role === "owner")) {
           yield* database.use((client) =>
             client.batch([
               client
                 .update(familyMember)
                 .set({ role: "owner" })
-                .where(
-                  and(
-                    eq(familyMember.familyId, familyId),
-                    eq(familyMember.userId, successor.userId),
-                  ),
-                ),
-              client.delete(familyMember).where(departing),
+                .where(membershipOf(familyId, successor.userId)),
+              client.delete(familyMember).where(membershipOf(familyId, userId)),
             ]),
           );
         } else {
-          yield* database.use((client) => client.delete(familyMember).where(departing));
+          yield* database.use((client) =>
+            client.delete(familyMember).where(membershipOf(familyId, userId)),
+          );
         }
 
         yield* familyStores.disconnect(familyId, userId);
@@ -228,15 +246,7 @@ export class Families extends Context.Service<
         get,
 
         create: Effect.fn("Families.create")(function* (userId: string, name: string) {
-          const familyId = crypto.randomUUID();
-          yield* database.use((client) =>
-            client.batch([
-              client.insert(family).values({ id: familyId, name }),
-              client.insert(familyMember).values({ familyId, userId, role: "owner" }),
-            ]),
-          );
-
-          return yield* get(userId, familyId).pipe(Effect.orDie);
+          return yield* get(userId, yield* insert(userId, { name })).pipe(Effect.orDie);
         }),
 
         rename: Effect.fn("Families.rename")(function* (
@@ -355,14 +365,11 @@ export class Families extends Context.Service<
           yield* requireOwner(familyId, userId);
 
           const [removed] = yield* database.use((client) =>
-            client
-              .delete(familyMember)
-              .where(and(eq(familyMember.familyId, familyId), eq(familyMember.userId, memberId)))
-              .returning(),
+            client.delete(familyMember).where(membershipOf(familyId, memberId)).returning(),
           );
 
           if (!removed) {
-            return yield* new NotFound({ message: "This person isn't a member of the family." });
+            return yield* missingMember;
           }
 
           yield* familyStores.disconnect(familyId, memberId);
@@ -397,27 +404,23 @@ export class Families extends Context.Service<
             client
               .update(familyMember)
               .set({ role })
-              .where(and(eq(familyMember.familyId, familyId), eq(familyMember.userId, memberId)))
+              .where(membershipOf(familyId, memberId))
               .returning(),
           );
 
           if (!updated) {
-            return yield* new NotFound({ message: "This person isn't a member of the family." });
+            return yield* missingMember;
           }
 
           return yield* get(userId, familyId);
         }),
 
-        isMember: Effect.fn("Families.isMember")(function* (userId: string, familyId: string) {
-          const [membership] = yield* database.use((client) =>
-            client
-              .select({ familyId: familyMember.familyId })
-              .from(familyMember)
-              .where(and(eq(familyMember.familyId, familyId), eq(familyMember.userId, userId))),
-          );
-
-          return membership !== undefined;
-        }),
+        isMember: Effect.fn("Families.isMember")((userId: string, familyId: string) =>
+          requireMember(familyId, userId).pipe(
+            Effect.as(true),
+            Effect.catchTag("NotFound", () => Effect.succeed(false)),
+          ),
+        ),
 
         createPersonal: Effect.fn("Families.createPersonal")(function* (userId: string) {
           const [existing] = yield* database.use((client) =>
@@ -427,16 +430,7 @@ export class Families extends Context.Service<
               .where(eq(family.personalForUserId, userId)),
           );
 
-          if (existing) return;
-          const familyId = crypto.randomUUID();
-          yield* database.use((client) =>
-            client.batch([
-              client
-                .insert(family)
-                .values({ id: familyId, name: "Personal", personalForUserId: userId }),
-              client.insert(familyMember).values({ familyId, userId, role: "owner" }),
-            ]),
-          );
+          if (!existing) yield* insert(userId, { name: "Personal", personalForUserId: userId });
         }),
 
         forgetUser: Effect.fn("Families.forgetUser")(function* (userId: string) {

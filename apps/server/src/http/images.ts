@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { HttpServerResponse } from "effect/http";
 import { HttpApiBuilder } from "effect/http-api";
 
-import { Families } from "../families";
+import { Families, missingFamily } from "../families";
 import { ImageStorage, familyImagePrefix } from "../image-storage";
 
 const IMAGE_SIGNATURES = [
@@ -17,7 +17,7 @@ const IMAGE_SIGNATURES = [
   { contentType: "image/webp", extension: "webp", offset: 8, bytes: [0x57, 0x45, 0x42, 0x50] },
 ] as const;
 
-export function sniffImageType(bytes: Uint8Array) {
+function sniffImageType(bytes: Uint8Array) {
   return IMAGE_SIGNATURES.find(
     (signature) =>
       signature.bytes.every((byte, index) => bytes[signature.offset + index] === byte) &&
@@ -26,7 +26,6 @@ export function sniffImageType(bytes: Uint8Array) {
   );
 }
 
-const missingFamily = new NotFound({ message: "This family doesn't exist." });
 const missingPicture = new NotFound({ message: "This picture doesn't exist." });
 
 export const ImagesHandlers = HttpApiBuilder.group(

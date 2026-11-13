@@ -35,8 +35,6 @@ export const Visibility = Schema.Literals(["private", "followers"]);
 
 export type Visibility = typeof Visibility.Type;
 
-export const Unit = Schema.Literals(unitCodes);
-
 export const TagName = text(40);
 
 export const FolderName = text(60);
@@ -58,7 +56,7 @@ export const tables = {
     recipeId: Id,
     position: Position,
     quantity: Schema.optionalKey(Quantity),
-    unit: Schema.optionalKey(Unit),
+    unit: Schema.optionalKey(Schema.Literals(unitCodes)),
     name: text(200),
   }),
   steps: Schema.Struct({ recipeId: Id, position: Position, text: text(5000) }),
@@ -71,9 +69,16 @@ export const tables = {
 
 export type TableId = keyof typeof tables;
 
-export type Row<Table extends TableId> = (typeof tables)[Table]["Type"];
+export type Stored<Table extends TableId> = (typeof tables)[Table]["Type"] & { id: string };
 
-export type Stored<Table extends TableId> = Row<Table> & { id: string };
+export const collections = {
+  tags: { linkTable: "recipeTags", ownerCell: "tagId" },
+  folders: { linkTable: "recipeFolders", ownerCell: "folderId" },
+} as const;
+
+export type Collection = keyof typeof collections;
+
+const linkTables = new Set<string>(Object.values(collections).map(({ linkTable }) => linkTable));
 
 export function createRecipeStore() {
   return createMergeableStore().setTablesSchema(createEffectSchematizer().toTablesSchema(tables));
@@ -83,41 +88,30 @@ export function linkId(ownerId: string, recipeId: string) {
   return `${ownerId}:${recipeId}`;
 }
 
-const datePattern = /^\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])$/;
-
-export function isMealDate(date: string) {
-  return datePattern.test(date) && new Date(`${date}T00:00:00Z`).toISOString().startsWith(date);
-}
-
-const linkOwners = { recipeTags: "tagId", recipeFolders: "folderId" } as const;
-
-function isTableId(tableId: string): tableId is TableId {
-  return Object.hasOwn(tables, tableId);
-}
-
 export function isValidRowId(tableId: string, rowId: string) {
-  if (tableId === "meals") return isMealDate(rowId);
+  if (tableId === "meals") {
+    return (
+      /^\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])$/.test(rowId) &&
+      new Date(`${rowId}T00:00:00Z`).toISOString().startsWith(rowId)
+    );
+  }
 
-  if (tableId === "recipeTags" || tableId === "recipeFolders") {
+  if (linkTables.has(tableId)) {
     const [ownerId = "", recipeId = "", ...rest] = rowId.split(":");
 
     return rest.length === 0 && idPattern.test(ownerId) && idPattern.test(recipeId);
   }
 
-  return isTableId(tableId) && idPattern.test(rowId);
-}
-
-function cellDecoder(field: Schema.Codec<unknown, unknown>) {
-  return Schema.decodeUnknownOption(Schema.Struct({ cell: field }));
+  return Object.hasOwn(tables, tableId) && idPattern.test(rowId);
 }
 
 const cellDecoders: Record.ReadonlyRecord<
   string,
-  Record.ReadonlyRecord<string, ReturnType<typeof cellDecoder>>
+  Record.ReadonlyRecord<string, (cell: { cell: Cell }) => Option.Option<object>>
 > = Record.map(tables, (table) => {
   const fields: Record.ReadonlyRecord<string, Schema.Codec<unknown, unknown>> = table.fields;
 
-  return Record.map(fields, cellDecoder);
+  return Record.map(fields, (field) => Schema.decodeUnknownOption(Schema.Struct({ cell: field })));
 });
 
 export function isValidCell(
@@ -132,7 +126,7 @@ export function isValidCell(
 
   if (cell === undefined) return true;
 
-  if (tableId in linkOwners) {
+  if (linkTables.has(tableId)) {
     const [ownerId, recipeId] = rowId.split(":");
     const expected = cellId === "recipeId" ? recipeId : ownerId;
 

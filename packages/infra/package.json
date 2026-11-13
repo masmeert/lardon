@@ -4,7 +4,6 @@
   "license": "PolyForm-Strict-1.0.0",
   "type": "module",
   "scripts": {
-    "check-types": "tsc --noEmit",
     "dev": "alchemy dev",
     "deploy": "alchemy deploy",
     "destroy": "alchemy destroy"
