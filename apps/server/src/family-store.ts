@@ -78,31 +78,34 @@ export class FamilyStore extends WsServerDurableObject<Env> {
     await this.ctx.storage.deleteAll();
   }
 
-  async alarm() {
+  async cleanUp(nowMs: number) {
     const familyId = this.ctx.storage.kv.get<string>("familyId");
 
     if (familyId === undefined) return;
     cleanUp(this.store);
     const recipes = readRows(this.store, "recipes");
 
-    if (recipes.length > 0) {
-      const referenced = new Set(
-        recipes.flatMap((recipe) => (recipe.imageKey ? [recipe.imageKey] : [])),
-      );
+    if (recipes.length === 0) return;
 
-      const images = ImageStorage.fromR2(this.env.IMAGES);
+    const referenced = new Set(
+      recipes.flatMap((recipe) => (recipe.imageKey ? [recipe.imageKey] : [])),
+    );
 
-      await Effect.runPromise(
-        images
-          .list(familyImagePrefix(familyId))
-          .pipe(
-            Effect.flatMap((listed) =>
-              images.deleteMany(unreferencedImageKeys(listed, referenced, Date.now())),
-            ),
+    const images = ImageStorage.fromR2(this.env.IMAGES);
+
+    await Effect.runPromise(
+      images
+        .list(familyImagePrefix(familyId))
+        .pipe(
+          Effect.flatMap((listed) =>
+            images.deleteMany(unreferencedImageKeys(listed, referenced, nowMs)),
           ),
-      );
-    }
+        ),
+    );
+  }
 
+  async alarm() {
+    await this.cleanUp(Date.now());
     await this.ctx.storage.setAlarm(Date.now() + DAY_MS);
   }
 }

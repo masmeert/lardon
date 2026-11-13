@@ -28,7 +28,11 @@
     "@lardon/infra": "workspace:*",
     "@libsql/client": "0.18.0",
     "@types/node": "catalog:",
+    "@types/ws": "8.18.1",
+    "miniflare": "4.20260730.0",
+    "rolldown": "1.2.15",
     "typescript": "^6.0.3",
-    "vite-plus": "catalog:"
+    "vite-plus": "catalog:",
+    "ws": "8.22.1"
   }
 }
