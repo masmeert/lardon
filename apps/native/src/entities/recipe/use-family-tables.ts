@@ -1,9 +1,9 @@
-import { everyRecipe, recipeList } from "@lardon/recipes";
 import { useRef, useSyncExternalStore } from "react";
-import type { Tables } from "tinybase";
 import { useStores } from "tinybase/ui-react";
 
-function useFamilyTables(familyIds: readonly string[]) {
+import type { FamilyTables } from "./model/library";
+
+export function useFamilyTables(familyIds: readonly string[]) {
   const stores = useStores();
 
   const familyStores = familyIds.flatMap((familyId) => {
@@ -12,10 +12,7 @@ function useFamilyTables(familyIds: readonly string[]) {
     return store ? [{ familyId, store }] : [];
   });
 
-  const snapshot = useRef<{ key: string; tables: readonly { familyId: string; tables: Tables }[] }>(
-    undefined,
-  );
-
+  const snapshot = useRef<{ key: string; familyTables: readonly FamilyTables[] }>(undefined);
   const changeCount = useRef(0);
 
   return useSyncExternalStore(
@@ -38,22 +35,14 @@ function useFamilyTables(familyIds: readonly string[]) {
       if (snapshot.current?.key !== key) {
         snapshot.current = {
           key,
-          tables: familyStores.map(({ familyId, store }) => ({
+          familyTables: familyStores.map(({ familyId, store }) => ({
             familyId,
             tables: store.getTables(),
           })),
         };
       }
 
-      return snapshot.current.tables;
+      return snapshot.current.familyTables;
     },
   );
-}
-
-export function useRecipes(familyIds: readonly string[], search: string) {
-  return useFamilyTables(familyIds)
-    .flatMap(({ familyId, tables }) =>
-      recipeList(tables, { ...everyRecipe, search }).map((recipe) => ({ ...recipe, familyId })),
-    )
-    .sort((first, second) => second.updatedAt - first.updatedAt);
 }

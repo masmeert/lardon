@@ -4,13 +4,25 @@ export { ButtonLabel } from "./button/button-label";
 
 export { CodeInput } from "./code-input";
 
+export { EmptyState } from "./empty-state";
+
+export { FilterPill } from "./filter-pill";
+
 export { GoogleLogo } from "./google-logo";
+
+export { GroupedRow } from "./grouped-row";
+
+export { GroupedSection } from "./grouped-section";
+
+export type { IconName } from "./icon";
 
 export { Icon } from "./icon";
 
 export { InlineError } from "./inline-error";
 
 export { LardonLogo } from "./lardon-logo";
+
+export { LardonMark } from "./lardon-mark";
 
 export { PhotoFrame } from "./photo-frame";
 

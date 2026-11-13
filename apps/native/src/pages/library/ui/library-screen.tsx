@@ -1,165 +1,148 @@
 import { useQuery } from "@tanstack/react-query";
-import { Stack } from "expo-router";
-import { useState } from "react";
-import { ActivityIndicator, Alert, FlatList, StyleSheet, View } from "react-native";
-import { useStoreIds } from "tinybase/ui-react";
+import { router } from "expo-router";
+import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 
-import { familiesQuery, useSignOut } from "#/entities/family";
-import { useRecipes } from "#/entities/recipe";
-import { useThemeColors } from "#/shared/lib";
-import { Button, ButtonLabel, InlineError } from "#/shared/ui";
+import { familiesQuery } from "#/entities/family";
+import {
+  type RecipeScope,
+  libraryFolders,
+  libraryTags,
+  scopeParams,
+  scopedRecipes,
+  useFamilyTables,
+} from "#/entities/recipe";
+import { Button, ButtonLabel, FilterPill } from "#/shared/ui";
 
-import { LibraryMessage } from "./library-message";
-import { RecipeRow } from "./recipe-row";
+import { CollectionSection } from "./collection-section";
+import { CollectionTile } from "./collection-tile";
+import { RecipeStickers } from "./recipe-stickers";
+
+function count(amount: number, singular: string, plural: string) {
+  return `${amount} ${amount === 1 ? singular : plural}`;
+}
+
+function openCollection(scope: RecipeScope) {
+  router.push({ pathname: "/collection", params: scopeParams(scope) });
+}
 
 export function LibraryScreen() {
-  const { accent } = useThemeColors("accent");
-  const familyList = useQuery(familiesQuery);
-  const families = familyList.data ?? [];
-  const [chosenFamilyId, setChosenFamilyId] = useState<string>();
-  const chosenFamily = families.find((family) => family.id === chosenFamilyId);
-  const shownFamilies = chosenFamily ? [chosenFamily] : families;
-  const [search, setSearch] = useState("");
+  const { data: families = [], isPending } = useQuery(familiesQuery);
+  const familyTables = useFamilyTables(families.map((family) => family.id));
+  const recipes = scopedRecipes(familyTables, { kind: "all" }, "");
+  const unsorted = scopedRecipes(familyTables, { kind: "unsorted" }, "");
+  const folders = libraryFolders(familyTables);
+  const tags = libraryTags(familyTables);
 
-  const recipes = useRecipes(
-    shownFamilies.map((family) => family.id),
-    search,
-  );
-
-  const openStoreIds = useStoreIds();
-
-  const isLoading =
-    familyList.isPending || shownFamilies.some((family) => !openStoreIds.includes(family.id));
-
-  const signOut = useSignOut();
-
-  function confirmSignOut() {
-    Alert.alert("Sign out?", "Your recipes stay in your account, ready when you sign back in.", [
-      { text: "Cancel", style: "cancel" },
-      { text: "Sign out", style: "destructive", onPress: () => signOut.mutate() },
-    ]);
-  }
-
-  function emptyState() {
-    if (familyList.isError && !familyList.data) {
-      return (
-        <LibraryMessage
-          title="Couldn't reach Lardon"
-          description="Your recipes download the first time you sign in. Check your connection and try again."
-        >
-          <Button
-            variant="secondary"
-            isLoading={familyList.isFetching}
-            onPress={() => void familyList.refetch()}
-          >
-            <ButtonLabel>Try again</ButtonLabel>
-          </Button>
-        </LibraryMessage>
-      );
-    }
-
-    if (isLoading) return <ActivityIndicator className="flex-1 pb-24" />;
-
-    if (search.trim() !== "") {
-      return (
-        <LibraryMessage
-          title="No matches"
-          description={`No recipe title or ingredient matches “${search.trim()}”.`}
-        />
-      );
-    }
-
-    return (
-      <LibraryMessage
-        title="No recipes yet"
-        description="Recipes you and your family add show up here."
-      />
-    );
-  }
+  if (isPending) return <ActivityIndicator className="flex-1" />;
 
   return (
-    <>
-      <Stack.Screen
-        options={{
-          title: "Recipes",
-          headerLargeTitleEnabled: true,
-          headerTransparent: true,
-          headerShadowVisible: false,
-          headerLargeTitleShadowVisible: false,
-          scrollEdgeEffects: { top: "soft" },
-          headerSearchBarOptions: {
-            placeholder: "Search recipes",
-            tintColor: accent,
-            hideWhenScrolling: false,
-            onChangeText: (event) => setSearch(event.nativeEvent.text),
-          },
-        }}
-      />
-      <Stack.Toolbar placement="right">
-        {families.length > 1 && (
-          <Stack.Toolbar.Menu
-            icon="line.3.horizontal.decrease.circle"
-            accessibilityLabel="Choose a family"
-          >
-            <Stack.Toolbar.MenuAction
-              isOn={chosenFamily === undefined}
-              onPress={() => setChosenFamilyId(undefined)}
-            >
-              All families
-            </Stack.Toolbar.MenuAction>
-            <Stack.Toolbar.Menu inline>
-              {families.map((family) => (
-                <Stack.Toolbar.MenuAction
-                  key={family.id}
-                  isOn={family.id === chosenFamily?.id}
-                  onPress={() => setChosenFamilyId(family.id)}
-                >
-                  {family.name}
-                </Stack.Toolbar.MenuAction>
-              ))}
-            </Stack.Toolbar.Menu>
-          </Stack.Toolbar.Menu>
-        )}
-        {signOut.isPending ? (
-          <Stack.Toolbar.View>
-            <ActivityIndicator />
-          </Stack.Toolbar.View>
+    <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerClassName="pb-16">
+      <View className="items-center gap-5 px-5 pt-2 pb-8">
+        <View className="items-center">
+          <Text className="text-display font-bold text-foreground">{recipes.length}</Text>
+          <Text className="text-caption font-semibold text-muted">
+            {recipes.length === 1 ? "Saved recipe" : "Saved recipes"}
+          </Text>
+        </View>
+        {recipes.length > 0 ? (
+          <>
+            <Button onPress={() => openCollection({ kind: "all" })}>
+              <ButtonLabel>All recipes</ButtonLabel>
+            </Button>
+            <RecipeStickers recipeIds={recipes.slice(0, 9).map((recipe) => recipe.id)} />
+          </>
         ) : (
-          <Stack.Toolbar.Menu icon="person.crop.circle" accessibilityLabel="Account">
-            <Stack.Toolbar.MenuAction
-              icon="rectangle.portrait.and.arrow.right"
-              destructive
-              onPress={confirmSignOut}
-            >
-              Sign out
-            </Stack.Toolbar.MenuAction>
-          </Stack.Toolbar.Menu>
+          <Text className="max-w-xs text-center text-body text-muted">
+            Recipes you and your family add show up here.
+          </Text>
         )}
-      </Stack.Toolbar>
-      <FlatList
-        data={recipes}
-        keyExtractor={(recipe) => `${recipe.familyId}:${recipe.id}`}
-        contentInsetAdjustmentBehavior="automatic"
-        keyboardDismissMode="on-drag"
-        className="flex-1 bg-background"
-        contentContainerClassName="grow pt-2 pb-12"
-        ListHeaderComponent={
-          signOut.isError ? (
-            <View className="items-start px-4 pb-3">
-              <InlineError>Couldn't sign out. Check your connection and try again</InlineError>
-            </View>
-          ) : undefined
+      </View>
+      {families.length > 1 && (
+        <CollectionSection title="Families" subtitle={count(families.length, "family", "families")}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerClassName="gap-3 px-5"
+          >
+            {families.map((family) => {
+              const familyRecipes = scopedRecipes(
+                familyTables,
+                { kind: "family", familyId: family.id },
+                "",
+              );
+
+              return (
+                <CollectionTile
+                  key={family.id}
+                  name={family.name}
+                  recipeCount={familyRecipes.length}
+                  hasPreview={familyRecipes.length > 0}
+                  icon="person.2"
+                  onPress={() => openCollection({ kind: "family", familyId: family.id })}
+                />
+              );
+            })}
+          </ScrollView>
+        </CollectionSection>
+      )}
+      <CollectionSection
+        title="Folders"
+        subtitle={
+          folders.length > 0 ? count(folders.length, "folder", "folders") : "No folders yet"
         }
-        ListEmptyComponent={emptyState()}
-        ItemSeparatorComponent={() => (
-          <View className="mx-4 bg-paper pl-18">
-            <View style={{ height: StyleSheet.hairlineWidth }} className="bg-hairline" />
+      >
+        {folders.length > 0 ? (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerClassName="gap-3 px-5"
+          >
+            {folders.map((folder) => (
+              <CollectionTile
+                key={`${folder.familyId}:${folder.id}`}
+                name={folder.name}
+                recipeCount={folder.recipeCount}
+                hasPreview={folder.preview !== undefined}
+                icon="folder"
+                onPress={() =>
+                  openCollection({ kind: "folder", familyId: folder.familyId, folderId: folder.id })
+                }
+              />
+            ))}
+            <CollectionTile
+              name="Unsorted"
+              recipeCount={unsorted.length}
+              hasPreview={unsorted.length > 0}
+              icon="tray"
+              onPress={() => openCollection({ kind: "unsorted" })}
+            />
+          </ScrollView>
+        ) : (
+          <Text className="px-5 text-body text-muted">
+            Group recipes into folders, like Sunday dinners or Grandma's classics.
+          </Text>
+        )}
+      </CollectionSection>
+      <CollectionSection
+        title="Tags"
+        subtitle={tags.length > 0 ? count(tags.length, "tag", "tags") : "No tags yet"}
+      >
+        {tags.length > 0 ? (
+          <View className="flex-row flex-wrap gap-2.5 px-5">
+            {tags.map((tag) => (
+              <FilterPill
+                key={tag.name}
+                label={tag.name}
+                onPress={() => openCollection({ kind: "tag", name: tag.name })}
+              />
+            ))}
           </View>
+        ) : (
+          <Text className="px-5 text-body text-muted">
+            Tag recipes to find them by dish, diet or season.
+          </Text>
         )}
-        renderItem={({ item, index }) => (
-          <RecipeRow recipe={item} isFirst={index === 0} isLast={index === recipes.length - 1} />
-        )}
-      />
-    </>
+      </CollectionSection>
+    </ScrollView>
   );
 }
