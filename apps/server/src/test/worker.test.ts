@@ -115,23 +115,27 @@ describe("the worker in workerd", () => {
       alice!.id,
     );
 
-    const received = await waitFor(() => recipeDetail(bobDevice.store, recipeId));
+    const received = await waitFor(() => recipeDetail(bobDevice.store.getTables(), recipeId));
     expect(received.ingredients.map((ingredient) => ingredient.name)).toEqual(["onion"]);
 
     const base = recipeDraft(bobDevice.store, recipeId)!;
     saveRecipe(bobDevice.store, recipeId, base, { ...base, servings: 4 });
-    await waitFor(() => recipeDetail(aliceDevice.store, recipeId)?.servings);
+    await waitFor(() => recipeDetail(aliceDevice.store.getTables(), recipeId)?.servings);
 
     setVisibility(bobDevice.store, recipeId, "followers");
     const spoofedId = createRecipe(bobDevice.store, { ...emptyDraft(), title: "Fake" }, alice!.id);
     await waitFor(() => aliceDevice.store.getCell("recipes", spoofedId, "title"));
     await waitFor(() =>
-      recipeDetail(bobDevice.store, recipeId)?.visibility === "private" ? true : undefined,
+      recipeDetail(bobDevice.store.getTables(), recipeId)?.visibility === "private"
+        ? true
+        : undefined,
     );
 
-    expect(recipeDetail(aliceDevice.store, recipeId)?.visibility).toBe("private");
+    expect(recipeDetail(aliceDevice.store.getTables(), recipeId)?.visibility).toBe("private");
     expect(aliceDevice.store.getCell("recipes", spoofedId, "createdById")).toBeUndefined();
-    expect(readRows(aliceDevice.store, "recipes").map((recipe) => recipe.id)).toEqual([recipeId]);
+    expect(readRows(aliceDevice.store.getTables(), "recipes").map((recipe) => recipe.id)).toEqual([
+      recipeId,
+    ]);
 
     await worker.cleanUp(familyId, Date.now());
     await waitFor(() => (aliceDevice.store.hasRow("recipes", spoofedId) ? undefined : true));

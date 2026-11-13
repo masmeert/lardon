@@ -104,7 +104,8 @@ export function emptyDraft(): RecipeDraft {
 }
 
 export function recipeDraft(store: MergeableStore, recipeId: string): RecipeDraft | undefined {
-  const recipe = readRow(store, "recipes", recipeId);
+  const content = store.getTables();
+  const recipe = readRow(content, "recipes", recipeId);
 
   if (!recipe) return undefined;
 
@@ -115,15 +116,15 @@ export function recipeDraft(store: MergeableStore, recipeId: string): RecipeDraf
     cookMinutes: recipe.cookMinutes ?? null,
     notes: recipe.notes ?? null,
     imageKey: recipe.imageKey ?? null,
-    ingredients: ingredientsOf(store, recipeId).map((ingredient) => ({
+    ingredients: ingredientsOf(content, recipeId).map((ingredient) => ({
       id: ingredient.id,
       quantity: ingredient.quantity ?? null,
       unit: ingredient.unit ?? null,
       name: ingredient.name,
     })),
-    steps: stepsOf(store, recipeId).map((step) => ({ id: step.id, text: step.text })),
-    tagIds: linkedIds(store, "tags", recipeId),
-    folderIds: linkedIds(store, "folders", recipeId),
+    steps: stepsOf(content, recipeId).map((step) => ({ id: step.id, text: step.text })),
+    tagIds: linkedIds(content, "tags", recipeId),
+    folderIds: linkedIds(content, "folders", recipeId),
   };
 }
 
@@ -388,7 +389,7 @@ export function saveRecipe(
     writes += reconcileList(store, "ingredients", recipeId, ["quantity", "unit", "name"], {
       base: cleanBase.ingredients,
       revision: cleanRevision.ingredients,
-      current: ingredientsOf(store, recipeId).map((ingredient) => ({
+      current: ingredientsOf(store.getTables(), recipeId).map((ingredient) => ({
         id: ingredient.id,
         position: ingredient.position,
         quantity: ingredient.quantity ?? null,
@@ -400,7 +401,7 @@ export function saveRecipe(
     writes += reconcileList(store, "steps", recipeId, ["text"], {
       base: cleanBase.steps,
       revision: cleanRevision.steps,
-      current: stepsOf(store, recipeId),
+      current: stepsOf(store.getTables(), recipeId),
     });
 
     writes += reconcileLinks(store, "tags", recipeId, {
@@ -477,7 +478,7 @@ export function moveRecipe(
   recipeId: string,
   imageKey: string | null,
 ) {
-  const recipe = readRow(source, "recipes", recipeId);
+  const recipe = readRow(source.getTables(), "recipes", recipeId);
   const draft = recipeDraft(source, recipeId);
 
   if (!recipe || !draft || source === target) return false;
@@ -491,7 +492,7 @@ export function moveRecipe(
 }
 
 export function createCollection(store: MergeableStore, collection: Collection, name: string) {
-  const existing = readRows(store, collection).find(
+  const existing = readRows(store.getTables(), collection).find(
     (owner) => owner.name.toLocaleLowerCase() === name.trim().toLocaleLowerCase(),
   );
 
@@ -565,9 +566,11 @@ export function cleanUp(store: MergeableStore) {
   let removed = 0;
 
   store.transaction(() => {
+    const content = store.getTables();
+
     for (const tableId of Record.keys(tables)) {
       for (const rowId of store.getRowIds(tableId)) {
-        if (!readRow(store, tableId, rowId)) {
+        if (!readRow(content, tableId, rowId)) {
           store.delRow(tableId, rowId);
           removed += 1;
         }

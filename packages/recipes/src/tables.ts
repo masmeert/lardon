@@ -1,5 +1,5 @@
 import { Option, Record, Schema } from "effect";
-import { type Cell, type MergeableStore, createMergeableStore } from "tinybase";
+import { type Cell, type Tables, createMergeableStore } from "tinybase";
 import { createEffectSchematizer } from "tinybase/schematizers/schematizer-effect";
 
 import { unitCodes } from "./units";
@@ -137,21 +137,21 @@ export function isValidCell(
 }
 
 export function readRow<Table extends TableId>(
-  store: MergeableStore,
+  content: Tables,
   tableId: Table,
   rowId: string,
 ): Stored<Table> | undefined {
   return Option.getOrUndefined(
-    Option.map(
-      Schema.decodeUnknownOption(tables[tableId])(store.getRow(tableId, rowId)),
-      (row) => ({ ...row, id: rowId }),
-    ),
+    Option.map(Schema.decodeUnknownOption(tables[tableId])(content[tableId]?.[rowId]), (row) => ({
+      ...row,
+      id: rowId,
+    })),
   );
 }
 
-export function readRows<Table extends TableId>(store: MergeableStore, tableId: Table) {
-  return store.getRowIds(tableId).flatMap((rowId) => {
-    const row = readRow(store, tableId, rowId);
+export function readRows<Table extends TableId>(content: Tables, tableId: Table) {
+  return Object.keys(content[tableId] ?? {}).flatMap((rowId) => {
+    const row = readRow(content, tableId, rowId);
 
     return row ? [row] : [];
   });

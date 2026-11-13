@@ -83,7 +83,7 @@ export class FamilyStore extends WsServerDurableObject<Env> {
 
     if (familyId === undefined) return;
     cleanUp(this.store);
-    const recipes = readRows(this.store, "recipes");
+    const recipes = readRows(this.store.getTables(), "recipes");
 
     if (recipes.length === 0) return;
 

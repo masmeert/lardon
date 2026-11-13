@@ -40,7 +40,9 @@ function draft(changes: Partial<RecipeDraft> = {}): RecipeDraft {
 }
 
 function names(store: ReturnType<typeof createRecipeStore>, recipeId: string) {
-  return recipeDetail(store, recipeId)?.ingredients.map((ingredient) => ingredient.name);
+  return recipeDetail(store.getTables(), recipeId)?.ingredients.map(
+    (ingredient) => ingredient.name,
+  );
 }
 
 describe("tables", () => {
@@ -100,7 +102,7 @@ describe("tables", () => {
   it("hides rows until their required cells have arrived", () => {
     const store = createRecipeStore();
     store.setRow("recipes", "soup", { servings: 2 });
-    expect(readRows(store, "recipes")).toEqual([]);
+    expect(readRows(store.getTables(), "recipes")).toEqual([]);
 
     store.setPartialRow("recipes", "soup", {
       title: "Soup",
@@ -109,7 +111,7 @@ describe("tables", () => {
       createdAt: 1,
       updatedAt: 1,
     });
-    expect(readRows(store, "recipes").map((recipe) => recipe.id)).toEqual(["soup"]);
+    expect(readRows(store.getTables(), "recipes").map((recipe) => recipe.id)).toEqual(["soup"]);
   });
 });
 
@@ -130,7 +132,7 @@ describe("recipes", () => {
       "alice",
     );
 
-    const recipe = recipeDetail(store, recipeId);
+    const recipe = recipeDetail(store.getTables(), recipeId);
     expect(recipe).toMatchObject({
       title: "Tomato soup",
       servings: 4,
@@ -142,7 +144,7 @@ describe("recipes", () => {
     expect(recipe?.steps.map((step) => step.text)).toEqual(["Chop the onion."]);
 
     setVisibility(store, recipeId, "followers");
-    expect(recipeDetail(store, recipeId)?.visibility).toBe("followers");
+    expect(recipeDetail(store.getTables(), recipeId)?.visibility).toBe("followers");
   });
 
   it("saves only what the edit changed, keeping edits made meanwhile on another device", () => {
@@ -170,7 +172,7 @@ describe("recipes", () => {
       ],
     });
 
-    const recipe = recipeDetail(phone, recipeId)!;
+    const recipe = recipeDetail(phone.getTables(), recipeId)!;
     expect(recipe).toMatchObject({
       title: "Roasted tomato soup",
       servings: 6,
@@ -202,7 +204,7 @@ describe("recipes", () => {
       ),
     });
 
-    expect(recipeDetail(phone, recipeId)?.title).toBe("Tablet title");
+    expect(recipeDetail(phone.getTables(), recipeId)?.title).toBe("Tablet title");
     expect(names(phone, recipeId)).toEqual(["tomatoes", "salt"]);
   });
 
@@ -245,8 +247,10 @@ describe("recipes", () => {
     });
     phone.merge(tablet);
 
-    expect(recipeList(phone, everyRecipe)).toEqual([]);
-    expect(readRows(phone, "ingredients").map((ingredient) => ingredient.id)).toEqual(["cream"]);
+    expect(recipeList(phone.getTables(), everyRecipe)).toEqual([]);
+    expect(readRows(phone.getTables(), "ingredients").map((ingredient) => ingredient.id)).toEqual([
+      "cream",
+    ]);
     expect(cleanUp(phone)).toBeGreaterThanOrEqual(1);
     expect(phone.getTables()).toEqual({});
   });
@@ -268,8 +272,8 @@ describe("recipes", () => {
 
     expect(moveRecipe(personal, family, recipeId, null)).toBe(true);
 
-    expect(recipeList(personal, everyRecipe)).toEqual([]);
-    expect(recipeDetail(family, recipeId)).toMatchObject({
+    expect(recipeList(personal.getTables(), everyRecipe)).toEqual([]);
+    expect(recipeDetail(family.getTables(), recipeId)).toMatchObject({
       title: "Tomato soup",
       createdById: "alice",
       tags: [],
@@ -283,12 +287,12 @@ describe("recipes", () => {
     const copyId = copyRecipe(store, store, recipeId, { createdById: "bob", imageKey: null })!;
 
     expect(copyId).not.toBe(recipeId);
-    expect(recipeDetail(store, copyId)).toMatchObject({
+    expect(recipeDetail(store.getTables(), copyId)).toMatchObject({
       title: "Tomato soup (copy)",
       createdById: "bob",
     });
     expect(names(store, copyId)).toEqual(["tomatoes", "onion", "salt"]);
-    expect(readRows(store, "ingredients")).toHaveLength(6);
+    expect(readRows(store.getTables(), "ingredients")).toHaveLength(6);
   });
 });
 
@@ -301,7 +305,9 @@ describe("tags and folders", () => {
 
     expect(createCollection(store, "tags", " winter ")).toBe(tagId);
     addToCollection(store, "tags", tagId, [soup, stew, "missing"]);
-    expect(collectionList(store, "tags")).toEqual([{ id: tagId, name: "Winter", recipeCount: 2 }]);
+    expect(collectionList(store.getTables(), "tags")).toEqual([
+      { id: tagId, name: "Winter", recipeCount: 2 },
+    ]);
 
     deleteCollection(store, "tags", tagId);
     expect(store.getTable("recipeTags")).toEqual({});
@@ -327,7 +333,7 @@ describe("tags and folders", () => {
     addToCollection(store, "folders", folderId, [soup, crepes]);
 
     const titles = (query: Partial<typeof everyRecipe>) =>
-      recipeList(store, { ...everyRecipe, ...query }).map((recipe) => recipe.title);
+      recipeList(store.getTables(), { ...everyRecipe, ...query }).map((recipe) => recipe.title);
 
     expect(titles({ search: "crepe" })).toEqual(["Crêpes"]);
     expect(titles({ search: "onion" })).toEqual(["Tomato soup"]);
@@ -336,7 +342,7 @@ describe("tags and folders", () => {
       "Crêpes",
       "Tomato soup",
     ]);
-    expect(collectionList(store, "folders")).toEqual([
+    expect(collectionList(store.getTables(), "folders")).toEqual([
       { id: folderId, name: "Weekend", recipeCount: 2 },
     ]);
   });
@@ -357,7 +363,7 @@ describe("meal plan", () => {
     phone.merge(tablet);
 
     expect(
-      mealPlan(phone, ["2026-11-12", "2026-11-13", "2026-11-14"]).map((meal) => [
+      mealPlan(phone.getTables(), ["2026-11-12", "2026-11-13", "2026-11-14"]).map((meal) => [
         meal.date,
         meal.recipe.title,
         meal.servings,
@@ -369,6 +375,6 @@ describe("meal plan", () => {
 
     clearMeal(phone, "2026-11-14");
     deleteRecipes(phone, [stew]);
-    expect(mealPlan(phone, ["2026-11-13", "2026-11-14"])).toEqual([]);
+    expect(mealPlan(phone.getTables(), ["2026-11-13", "2026-11-14"])).toEqual([]);
   });
 });
