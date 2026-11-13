@@ -34,7 +34,7 @@ A family is the unit of data: its recipes, tags, folders and meal plan live toge
 
 TinyBase `MergeableStore` on both sides. Each cell carries a hybrid logical clock timestamp, and the latest write to a cell wins on every peer.
 
-**On the device**: one `MergeableStore` per family, each saved with `createExpoSqlitePersister` and synced over its own WebSocket with `createWsSynchronizer`. The library can show every family's recipes together. Device-only preferences live in a separate plain `Store`.
+**On the device**: one `MergeableStore` per family, each saved with `createExpoSqlitePersister` in its own database file (`family-<id>.db`, as one JSON row, the only mode a `MergeableStore` supports) and synced over its own WebSocket with `createWsSynchronizer`, which reconnects with backoff and right away when the app returns to the foreground. The family list is cached on the device, so the library opens offline. Signing out erases every family database. Leaving a family erases its database. The library can show every family's recipes together. Device-only preferences live in a separate plain `Store`.
 
 **On the server**: `FamilyStore extends WsServerDurableObject`, persisted with `createDurableObjectSqlStoragePersister` in `fragmented` mode, so a change rewrites one SQL row per changed TinyBase row instead of the whole store. WebSockets hibernate, so idle families cost no duration.
 
