@@ -4,6 +4,7 @@ import * as Alchemy from "alchemy";
 import * as Config from "effect/Config";
 import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
+import * as Redacted from "effect/Redacted";
 import "varlock/auto-load";
 
 export const db = Cloudflare.D1.Database("database", {
@@ -58,6 +59,14 @@ export const server = Cloudflare.Worker("server", {
     CORS_ORIGIN: Config.String("CORS_ORIGIN"),
     BETTER_AUTH_SECRET: Config.Redacted("BETTER_AUTH_SECRET"),
     BETTER_AUTH_URL: Cloudflare.Worker.URL,
+    GOOGLE_CLIENT_ID: Config.String("GOOGLE_CLIENT_ID").pipe(Config.withDefault("")),
+    GOOGLE_CLIENT_SECRET: Config.Redacted("GOOGLE_CLIENT_SECRET").pipe(
+      Config.withDefault(Redacted.make("")),
+    ),
+    APPLE_BUNDLE_ID: Config.String("APPLE_BUNDLE_ID").pipe(Config.withDefault("")),
+    EMAIL: Cloudflare.Email.SendEmail("Email"),
+    EMAIL_FROM: Config.String("EMAIL_FROM"),
+    LOG_SIGN_IN_CODES: Alchemy.ALCHEMY_DEV.pipe(Config.map((isDev) => (isDev ? "true" : "false"))),
     AUTH_RATE_LIMIT: Cloudflare.RateLimit("AUTH_RATE_LIMIT", {
       namespaceId: 1001,
       simple: { limit: 20, period: 60 },

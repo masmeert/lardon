@@ -9,19 +9,39 @@ import { Authentication } from "./authentication";
 import { Database } from "./database";
 import { ENV } from "./env.server";
 import { AppRoutes } from "./http/app";
+import { Mailer, signInCodeEmail } from "./mailer";
 import { RateLimits } from "./rate-limits";
 
-const DatabaseLive = Layer.sync(Database, () => Database.make(createDb(ENV)));
+const InfrastructureLive = Layer.mergeAll(
+  Layer.sync(Database, () => Database.make(createDb(ENV))),
+  Layer.sync(Mailer, () => Mailer.fromCloudflare(ENV.EMAIL, ENV.EMAIL_FROM)),
+);
 
 const ServicesLive = Layer.mergeAll(
   Layer.effect(
     Authentication,
     Effect.gen(function* () {
       const database = yield* Database;
+      const mailer = yield* Mailer;
 
-      return Authentication.fromBetterAuth(createAuth(ENV, database.client));
+      return Authentication.fromBetterAuth(
+        createAuth(ENV, database.client, {
+          sendSignInCode: (email) =>
+            Effect.runPromise(
+              mailer
+                .send(signInCodeEmail(email))
+                .pipe(
+                  Effect.andThen(
+                    ENV.LOG_SIGN_IN_CODES === "true"
+                      ? Effect.logInfo(`Sign-in code for ${email.to}: ${email.code}`)
+                      : Effect.void,
+                  ),
+                ),
+            ),
+        }),
+      );
     }),
-  ).pipe(Layer.provideMerge(DatabaseLive)),
+  ).pipe(Layer.provideMerge(InfrastructureLive)),
   Layer.sync(RateLimits, () =>
     RateLimits.fromCloudflare({ auth: ENV.AUTH_RATE_LIMIT, api: ENV.API_RATE_LIMIT }),
   ),
