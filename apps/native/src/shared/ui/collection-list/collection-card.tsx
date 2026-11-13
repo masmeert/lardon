@@ -17,7 +17,7 @@ export function CollectionCard({ item, coverWidth }: { item: CollectionItem; cov
             style={{ top: Math.round(coverWidth * 0.08), right: Math.round(coverWidth * 0.08) }}
             className="absolute"
           >
-            <SelectionCheck isSelected={item.isSelected} />
+            <SelectionCheck isSelected={item.isSelected} isOnPhoto />
           </View>
         )}
       </View>

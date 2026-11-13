@@ -1,20 +1,27 @@
+import { View } from "react-native";
+
 import { cn, iconSize, useThemeColors } from "#/shared/lib";
 
-import { Glass } from "./glass";
 import { Icon } from "./icon";
 
-export function SelectionCheck({ isSelected }: { isSelected: boolean }) {
-  const { accent, white } = useThemeColors("accent", "white");
+export function SelectionCheck({
+  isSelected,
+  isOnPhoto = false,
+}: {
+  isSelected: boolean;
+  isOnPhoto?: boolean;
+}) {
+  const { white } = useThemeColors("white");
 
   return (
-    <Glass
-      tintColor={isSelected ? accent : undefined}
+    <View
       className={cn(
-        "size-7 items-center justify-center rounded-full",
-        !isSelected && "border border-hairline",
+        "size-6 items-center justify-center rounded-full border-[1.5px]",
+        isSelected && "border-white bg-accent",
+        !isSelected && (isOnPhoto ? "border-white shadow-rim" : "border-muted/50"),
       )}
     >
-      {isSelected && <Icon name="checkmark" size={iconSize.sm} color={white} />}
-    </Glass>
+      {isSelected && <Icon name="checkmark" size={iconSize.xs} color={white} />}
+    </View>
   );
 }
