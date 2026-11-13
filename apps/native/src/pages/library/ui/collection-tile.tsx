@@ -1,23 +1,17 @@
+import type { ReactNode } from "react";
 import { Pressable, Text, View } from "react-native";
-
-import { type LibraryRecipe, RecipeThumbnail } from "#/entities/recipe";
-import { iconSize, useThemeColors } from "#/shared/lib";
-import { Icon, type IconName } from "#/shared/ui";
 
 export function CollectionTile({
   name,
   recipeCount,
-  preview,
-  icon,
+  cover,
   onPress,
 }: {
   name: string;
   recipeCount: number;
-  preview: LibraryRecipe | undefined;
-  icon: IconName;
+  cover: ReactNode;
   onPress: () => void;
 }) {
-  const { muted } = useThemeColors("muted");
   const recipeCountLabel = recipeCount === 1 ? "1 recipe" : `${recipeCount} recipes`;
 
   return (
@@ -31,11 +25,7 @@ export function CollectionTile({
         style={{ borderCurve: "continuous" }}
         className="size-24 items-center justify-center rounded-card bg-paper"
       >
-        {preview ? (
-          <RecipeThumbnail recipe={preview} width={58} />
-        ) : (
-          <Icon name={icon} size={iconSize.xl} color={muted} />
-        )}
+        {cover}
       </View>
       <View className="px-1">
         <Text numberOfLines={1} className="text-caption font-semibold text-foreground">

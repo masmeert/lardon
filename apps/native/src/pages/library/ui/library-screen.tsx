@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 
-import { familiesQuery } from "#/entities/family";
+import { FamilyFaces, familiesQuery } from "#/entities/family";
 import {
   type RecipeScope,
   libraryFolders,
@@ -15,6 +15,7 @@ import { Button, ButtonLabel, FilterPill } from "#/shared/ui";
 
 import { CollectionSection } from "./collection-section";
 import { CollectionTile } from "./collection-tile";
+import { FolderCover } from "./folder-cover";
 import { RecipeStickers } from "./recipe-stickers";
 
 function count(amount: number, singular: string, plural: string) {
@@ -76,8 +77,7 @@ export function LibraryScreen() {
                   key={family.id}
                   name={family.name}
                   recipeCount={familyRecipes.length}
-                  preview={familyRecipes.find((recipe) => recipe.imageKey)}
-                  icon="person.2"
+                  cover={<FamilyFaces familyId={family.id} />}
                   onPress={() => openCollection({ kind: "family", familyId: family.id })}
                 />
               );
@@ -102,8 +102,7 @@ export function LibraryScreen() {
                 key={`${folder.familyId}:${folder.id}`}
                 name={folder.name}
                 recipeCount={folder.recipeCount}
-                preview={folder.preview}
-                icon="folder"
+                cover={<FolderCover preview={folder.preview} icon="folder" />}
                 onPress={() =>
                   openCollection({ kind: "folder", familyId: folder.familyId, folderId: folder.id })
                 }
@@ -112,8 +111,9 @@ export function LibraryScreen() {
             <CollectionTile
               name="Unsorted"
               recipeCount={unsorted.length}
-              preview={unsorted.find((recipe) => recipe.imageKey)}
-              icon="tray"
+              cover={
+                <FolderCover preview={unsorted.find((recipe) => recipe.imageKey)} icon="tray" />
+              }
               onPress={() => openCollection({ kind: "unsorted" })}
             />
           </ScrollView>
