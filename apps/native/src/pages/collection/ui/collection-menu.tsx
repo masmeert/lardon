@@ -9,14 +9,20 @@ import {
   sortOptions,
   timeOptions,
 } from "#/entities/recipe";
+import { listLayoutMenu } from "#/shared/ui";
 
-export function filterMenu({
+export function collectionMenu({
   filters,
   onFiltersChange,
   tagNames,
   sortField,
   sortDirection,
   onSortChange,
+  layout,
+  onLayoutChange,
+  canSelect,
+  onSelect,
+  filteredTint,
 }: {
   filters: RecipeFilters;
   onFiltersChange: (filters: RecipeFilters) => void;
@@ -24,6 +30,11 @@ export function filterMenu({
   sortField: SortField;
   sortDirection: SortDirection;
   onSortChange: (field: SortField, direction: SortDirection) => void;
+  layout: "list" | "grid";
+  onLayoutChange: (layout: "list" | "grid") => void;
+  canSelect: boolean;
+  onSelect: () => void;
+  filteredTint: string;
 }) {
   const isFiltered =
     filters.tag !== null ||
@@ -31,34 +42,40 @@ export function filterMenu({
     filters.servings !== null ||
     filters.withPhoto;
 
-  const sort = sortOptions.find((option) => option.field === sortField) ?? sortOptions[0];
-  const otherDirection = sortDirection === "ascending" ? "descending" : "ascending";
-
   return (
     <Stack.Toolbar.Menu
-      icon={
-        isFiltered ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle"
-      }
-      accessibilityLabel={isFiltered ? "Sort and filter, filters on" : "Sort and filter"}
+      icon="ellipsis"
+      tintColor={isFiltered ? filteredTint : undefined}
+      accessibilityLabel={isFiltered ? "More, filters on" : "More"}
     >
-      <Stack.Toolbar.Menu inline title="Sort by">
-        {sortOptions.map((option) => (
-          <Stack.Toolbar.MenuAction
-            key={option.field}
-            isOn={option.field === sortField}
-            onPress={() =>
-              onSortChange(option.field, option.field === "title" ? "ascending" : "descending")
-            }
-          >
-            {option.label}
-          </Stack.Toolbar.MenuAction>
-        ))}
-        <Stack.Toolbar.MenuAction
-          icon="arrow.up.arrow.down"
-          onPress={() => onSortChange(sortField, otherDirection)}
-        >
-          {sort.directions[otherDirection]}
-        </Stack.Toolbar.MenuAction>
+      <Stack.Toolbar.MenuAction icon="checkmark.circle" disabled={!canSelect} onPress={onSelect}>
+        Select recipes
+      </Stack.Toolbar.MenuAction>
+      <Stack.Toolbar.Menu inline>
+        <Stack.Toolbar.Menu title="Sort by" icon="arrow.up.arrow.down">
+          {sortOptions.map((option) => (
+            <Stack.Toolbar.MenuAction
+              key={option.field}
+              isOn={option.field === sortField}
+              subtitle={option.field === sortField ? option.directions[sortDirection] : undefined}
+              onPress={() =>
+                onSortChange(
+                  option.field,
+                  option.field === sortField
+                    ? sortDirection === "ascending"
+                      ? "descending"
+                      : "ascending"
+                    : option.field === "title"
+                      ? "ascending"
+                      : "descending",
+                )
+              }
+            >
+              {option.label}
+            </Stack.Toolbar.MenuAction>
+          ))}
+        </Stack.Toolbar.Menu>
+        {listLayoutMenu({ layout, onChange: onLayoutChange })}
       </Stack.Toolbar.Menu>
       <Stack.Toolbar.Menu inline title="Filter">
         <Stack.Toolbar.Menu title="Time" icon="clock">
@@ -121,12 +138,12 @@ export function filterMenu({
         >
           With a photo
         </Stack.Toolbar.MenuAction>
+        {isFiltered && (
+          <Stack.Toolbar.MenuAction icon="xmark.circle" onPress={() => onFiltersChange(noFilters)}>
+            Clear filters
+          </Stack.Toolbar.MenuAction>
+        )}
       </Stack.Toolbar.Menu>
-      {isFiltered && (
-        <Stack.Toolbar.MenuAction icon="xmark.circle" onPress={() => onFiltersChange(noFilters)}>
-          Clear filters
-        </Stack.Toolbar.MenuAction>
-      )}
     </Stack.Toolbar.Menu>
   );
 }

@@ -1,8 +1,6 @@
 import type { ReactElement } from "react";
 import { FlatList, Pressable, StyleSheet, View, useWindowDimensions } from "react-native";
 
-import { cn } from "#/shared/lib";
-
 import { CollectionCard } from "./collection-card";
 import type { CollectionItem } from "./collection-item";
 import { CollectionRow } from "./collection-row";
@@ -17,7 +15,6 @@ export function CollectionList({
 }) {
   const [layout] = useListLayout();
   const { width } = useWindowDimensions();
-  const cardWidth = (width - 44) / 2;
 
   if (items.length === 0 && emptyState) return emptyState;
 
@@ -31,17 +28,17 @@ export function CollectionList({
       contentInsetAdjustmentBehavior="automatic"
       keyboardDismissMode="on-drag"
       className="flex-1"
-      contentContainerClassName={cn("grow px-4 pt-2 pb-16", layout === "grid" && "gap-3")}
+      contentContainerClassName={
+        layout === "grid" ? "grow gap-3 px-4 pt-2 pb-16" : "grow px-4 pb-16"
+      }
       ItemSeparatorComponent={
         layout === "list"
           ? () => (
-              <View className="bg-paper pl-23">
-                <View style={{ height: StyleSheet.hairlineWidth }} className="bg-hairline" />
-              </View>
+              <View style={{ height: StyleSheet.hairlineWidth }} className="ml-28 bg-muted/30" />
             )
           : undefined
       }
-      renderItem={({ item, index }) => (
+      renderItem={({ item }) => (
         <Pressable
           accessibilityRole={item.onPress ? "button" : undefined}
           accessibilityState={
@@ -50,16 +47,10 @@ export function CollectionList({
           disabled={!item.onPress && !item.onLongPress}
           onPress={item.onPress}
           onLongPress={item.onLongPress}
-          style={{ borderCurve: "continuous", width: layout === "grid" ? cardWidth : undefined }}
-          className={cn(
-            "bg-paper active:opacity-80",
-            layout === "grid" && "rounded-card",
-            layout === "list" && index === 0 && "rounded-t-card pt-1",
-            layout === "list" && index === items.length - 1 && "rounded-b-card pb-1",
-          )}
+          className="active:opacity-80"
         >
           {layout === "grid" ? (
-            <CollectionCard item={item} coverWidth={cardWidth - 32} />
+            <CollectionCard item={item} width={(width - 44) / 2} />
           ) : (
             <CollectionRow item={item} />
           )}

@@ -8,7 +8,7 @@ export { CollectionList } from "./collection-list/collection-list";
 
 export type { CollectionItem } from "./collection-list/collection-item";
 
-export { listLayoutAction } from "./collection-list/list-layout-menu";
+export { listLayoutMenu } from "./collection-list/list-layout-menu";
 
 export { useListLayout } from "./collection-list/use-list-layout";
 

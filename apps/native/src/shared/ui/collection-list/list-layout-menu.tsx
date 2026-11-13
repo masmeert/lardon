@@ -1,6 +1,6 @@
 import { Stack } from "expo-router";
 
-export function listLayoutAction({
+export function listLayoutMenu({
   layout,
   onChange,
 }: {
@@ -8,11 +8,21 @@ export function listLayoutAction({
   onChange: (layout: "list" | "grid") => void;
 }) {
   return (
-    <Stack.Toolbar.MenuAction
-      icon={layout === "grid" ? "list.bullet" : "square.grid.2x2"}
-      onPress={() => onChange(layout === "grid" ? "list" : "grid")}
-    >
-      {layout === "grid" ? "Show as list" : "Show as grid"}
-    </Stack.Toolbar.MenuAction>
+    <Stack.Toolbar.Menu inline palette title="Layout">
+      <Stack.Toolbar.MenuAction
+        icon="list.bullet"
+        isOn={layout === "list"}
+        onPress={() => onChange("list")}
+      >
+        List
+      </Stack.Toolbar.MenuAction>
+      <Stack.Toolbar.MenuAction
+        icon="square.grid.2x2"
+        isOn={layout === "grid"}
+        onPress={() => onChange("grid")}
+      >
+        Grid
+      </Stack.Toolbar.MenuAction>
+    </Stack.Toolbar.Menu>
   );
 }

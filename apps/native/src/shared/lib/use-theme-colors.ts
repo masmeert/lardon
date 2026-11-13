@@ -8,7 +8,8 @@ type ThemeColor =
   | "accent"
   | "danger"
   | "bacon"
-  | "splash";
+  | "splash"
+  | "placeholder";
 
 export function useThemeColors<Name extends ThemeColor>(...names: Name[]) {
   const values = useCSSVariable(names.map((name) => `--color-${name}`));

@@ -29,7 +29,9 @@ export {
 
 export { RecipeFan } from "./ui/recipe-fan";
 
-export { RecipeFacts } from "./ui/recipe-facts";
+export { recipeFacts } from "./model/recipe-facts";
+
+export { RecipeCover } from "./ui/recipe-cover";
 
 export { RecipeThumbnail } from "./ui/recipe-thumbnail";
 

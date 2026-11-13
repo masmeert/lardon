@@ -9,13 +9,13 @@ import { familiesQuery } from "#/entities/family";
 import {
   type LibraryRecipe,
   type RecipeFilters,
-  RecipeFacts,
   type RecipeScopeParams,
-  RecipeThumbnail,
+  RecipeCover,
   filterRecipes,
   libraryFolders,
   libraryTags,
   noFilters,
+  recipeFacts,
   scopeFromParams,
   scopedRecipes,
   sortRecipes,
@@ -24,15 +24,9 @@ import {
 import { useOrganizeRecipes } from "#/features/organize-recipes";
 import { useThemeColors } from "#/shared/lib";
 import { usePreference } from "#/shared/preferences";
-import {
-  CollectionList,
-  EmptyState,
-  InlineError,
-  listLayoutAction,
-  useListLayout,
-} from "#/shared/ui";
+import { CollectionList, EmptyState, InlineError, useListLayout } from "#/shared/ui";
 
-import { filterMenu } from "./filter-menu";
+import { collectionMenu } from "./collection-menu";
 import { selectionMenu } from "./selection-menu";
 
 function recipeKey(recipe: LibraryRecipe) {
@@ -156,7 +150,7 @@ export function CollectionScreen() {
         </>
       ) : (
         <Stack.Toolbar placement="right">
-          {filterMenu({
+          {collectionMenu({
             filters,
             onFiltersChange: setFilters,
             tagNames: scope.kind === "tag" ? [] : tagNames,
@@ -166,17 +160,12 @@ export function CollectionScreen() {
               setSortField(field);
               setSortDirection(direction);
             },
+            layout,
+            onLayoutChange: setLayout,
+            canSelect: recipes.length > 0,
+            onSelect: () => setSelectedKeys(new Set()),
+            filteredTint: accent,
           })}
-          <Stack.Toolbar.Menu icon="ellipsis" accessibilityLabel="More">
-            <Stack.Toolbar.MenuAction
-              icon="checkmark.circle"
-              disabled={recipes.length === 0}
-              onPress={() => setSelectedKeys(new Set())}
-            >
-              Select
-            </Stack.Toolbar.MenuAction>
-            {listLayoutAction({ layout, onChange: setLayout })}
-          </Stack.Toolbar.Menu>
         </Stack.Toolbar>
       )}
       {organize.move.isError && (
@@ -190,8 +179,8 @@ export function CollectionScreen() {
         items={recipes.map((recipe) => ({
           key: recipeKey(recipe),
           title: recipe.title,
-          cover: (sizePt) => <RecipeThumbnail recipe={recipe} width={sizePt} />,
-          details: <RecipeFacts recipe={recipe} />,
+          cover: (sizePt) => <RecipeCover recipe={recipe} sizePt={sizePt} />,
+          facts: recipeFacts(recipe),
           isSelected: selectedKeys ? selectedKeys.has(recipeKey(recipe)) : undefined,
           onPress: selectedKeys ? () => toggle(recipeKey(recipe)) : undefined,
           onLongPress: () => {

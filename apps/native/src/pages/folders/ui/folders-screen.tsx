@@ -1,16 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { Stack, router } from "expo-router";
-import { Text } from "react-native";
 
 import { familiesQuery } from "#/entities/family";
 import {
-  RecipeFan,
+  RecipeCover,
   libraryFolders,
   scopeParams,
   scopedRecipes,
   useFamilyTables,
 } from "#/entities/recipe";
-import { CollectionList, listLayoutAction, useListLayout } from "#/shared/ui";
+import { CollectionList, listLayoutMenu, useListLayout } from "#/shared/ui";
 
 function recipeCount(amount: number) {
   return amount === 1 ? "1 recipe" : `${amount} recipes`;
@@ -26,7 +25,7 @@ export function FoldersScreen() {
     <>
       <Stack.Toolbar placement="right">
         <Stack.Toolbar.Menu icon="ellipsis" accessibilityLabel="More">
-          {listLayoutAction({ layout, onChange: setLayout })}
+          {listLayoutMenu({ layout, onChange: setLayout })}
         </Stack.Toolbar.Menu>
       </Stack.Toolbar>
       <CollectionList
@@ -35,11 +34,13 @@ export function FoldersScreen() {
             key: folder.name,
             title: folder.name,
             cover: (sizePt: number) => (
-              <RecipeFan recipes={folder.recipes} icon="folder" sizePt={sizePt} />
+              <RecipeCover
+                recipe={folder.recipes.find((recipe) => recipe.imageKey)}
+                sizePt={sizePt}
+                placeholderIcon="folder"
+              />
             ),
-            details: (
-              <Text className="text-caption text-muted">{recipeCount(folder.recipes.length)}</Text>
-            ),
+            facts: [{ label: recipeCount(folder.recipes.length) }],
             onPress: () =>
               router.push({
                 pathname: "/collection",
@@ -49,10 +50,14 @@ export function FoldersScreen() {
           {
             key: "unsorted",
             title: "Unsorted",
-            cover: (sizePt: number) => <RecipeFan recipes={unsorted} icon="tray" sizePt={sizePt} />,
-            details: (
-              <Text className="text-caption text-muted">{recipeCount(unsorted.length)}</Text>
+            cover: (sizePt: number) => (
+              <RecipeCover
+                recipe={unsorted.find((recipe) => recipe.imageKey)}
+                sizePt={sizePt}
+                placeholderIcon="tray"
+              />
             ),
+            facts: [{ label: recipeCount(unsorted.length) }],
             onPress: () =>
               router.push({ pathname: "/collection", params: scopeParams({ kind: "unsorted" }) }),
           },

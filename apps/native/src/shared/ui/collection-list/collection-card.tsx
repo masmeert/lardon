@@ -1,32 +1,39 @@
 import { Text, View } from "react-native";
 
+import { cn } from "#/shared/lib";
+
 import { SelectionCheck } from "../selection-check";
 
+import { CollectionFacts } from "./collection-facts";
 import type { CollectionItem } from "./collection-item";
 
-export function CollectionCard({ item, coverWidth }: { item: CollectionItem; coverWidth: number }) {
+export function CollectionCard({ item, width }: { item: CollectionItem; width: number }) {
   return (
-    <View className="items-center gap-3 px-4 pt-5 pb-4">
-      <View
-        style={{ width: coverWidth, height: coverWidth }}
-        className="items-center justify-center"
-      >
-        {item.cover(coverWidth)}
-        {item.isSelected !== undefined && (
-          <View
-            style={{ top: Math.round(coverWidth * 0.08), right: Math.round(coverWidth * 0.08) }}
-            className="absolute"
-          >
-            <SelectionCheck isSelected={item.isSelected} isOnPhoto />
-          </View>
+    <View
+      style={{ width, height: Math.round(width * 1.2), borderCurve: "continuous" }}
+      className="overflow-hidden rounded-card"
+    >
+      {item.cover(width)}
+      <View className="absolute inset-x-0 top-0 h-1/2 bg-linear-to-b from-[#00000073] to-[#00000000]" />
+      <Text
+        numberOfLines={3}
+        className={cn(
+          "absolute top-3 left-3 text-title font-semibold text-white",
+          item.isSelected === undefined ? "right-3" : "right-11",
         )}
-      </View>
-      <View className="items-center gap-1.5 self-stretch">
-        <Text numberOfLines={2} className="text-center text-title font-semibold text-foreground">
-          {item.title}
-        </Text>
-        {item.details}
-      </View>
+      >
+        {item.title}
+      </Text>
+      {item.facts && (
+        <View className="absolute bottom-3 left-3">
+          <CollectionFacts facts={item.facts} isOnPhoto />
+        </View>
+      )}
+      {item.isSelected !== undefined && (
+        <View className="absolute top-3 right-3">
+          <SelectionCheck isSelected={item.isSelected} isOnPhoto />
+        </View>
+      )}
     </View>
   );
 }
