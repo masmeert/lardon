@@ -38,4 +38,6 @@ export { PhotoFrame } from "./photo-frame";
 
 export { RollingNumber } from "./rolling-number/rolling-number";
 
+export { SheetContent } from "./sheet-content";
+
 export { TextBox } from "./text-box";
