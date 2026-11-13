@@ -35,7 +35,7 @@ jobs:
         with:
           node-version: "26"
           cache: true
-      - run: vp exec alchemy provider check-env --no-input
+      - run: vp exec alchemy provider check-env --provider Cloudflare --no-input
       - name: Plan
         run: |
           vp exec alchemy plan --stage prod --no-input 2>&1 | tee plan.txt
