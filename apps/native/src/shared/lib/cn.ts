@@ -10,6 +10,7 @@ export const cn = createCn({
             "caption",
             "body",
             "title",
+            "field",
             "headline",
             "headline-wordmark",
             "large-title",

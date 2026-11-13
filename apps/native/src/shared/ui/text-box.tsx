@@ -39,7 +39,7 @@ export function TextBox({
           onBlur?.(event);
         }}
         className={cn(
-          "h-full flex-1 pl-5 text-title font-normal text-foreground",
+          "h-full flex-1 pl-5 text-field font-normal text-foreground",
           canClear ? "pr-2" : "pr-5",
         )}
         {...props}
