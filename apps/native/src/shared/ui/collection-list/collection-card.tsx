@@ -12,10 +12,7 @@ export function CollectionCard({ item, coverWidth }: { item: CollectionItem; cov
         {item.cover(coverWidth)}
       </View>
       <View className="items-center gap-1.5 self-stretch">
-        <Text
-          numberOfLines={2}
-          className="text-center font-heading text-heading-sm text-foreground"
-        >
+        <Text numberOfLines={2} className="text-center text-title font-semibold text-foreground">
           {item.title}
         </Text>
         {item.details}

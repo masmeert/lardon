@@ -5,7 +5,6 @@
 @source "../../";
 
 @theme static {
-  --font-heading: LardonEczar-SemiBold;
   --color-background-clear: #f2f2f700;
   --color-splash: #627224;
   --color-muted: #8a8a8e;
@@ -23,12 +22,6 @@
   --text-large-title--line-height: 36px;
   --text-headline: 22px;
   --text-headline--line-height: 28px;
-  --text-heading-sm: 17px;
-  --text-heading-sm--line-height: 23px;
-  --text-heading: 20px;
-  --text-heading--line-height: 26px;
-  --text-heading-lg: 24px;
-  --text-heading-lg--line-height: 32px;
   --text-display: 38px;
   --text-display--line-height: 44px;
   --radius-card: 18px;

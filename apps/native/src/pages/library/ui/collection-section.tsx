@@ -21,7 +21,7 @@ export function CollectionSection({
     <View className="gap-4 border-t border-hairline pt-7 pb-8">
       <View className="flex-row items-center justify-between gap-3 px-5">
         <View className="gap-0.5">
-          <Text accessibilityRole="header" className="font-heading text-heading text-foreground">
+          <Text accessibilityRole="header" className="text-title font-semibold text-foreground">
             {title}
           </Text>
           <Text className="text-caption text-muted">{subtitle}</Text>

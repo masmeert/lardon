@@ -23,7 +23,7 @@ export function EmptyState({
       <View className="mb-2 size-12 items-center justify-center rounded-full bg-fill">
         <Icon name={icon} size={iconSize.xl} color={muted} />
       </View>
-      <Text className="text-center font-heading text-heading text-foreground">{title}</Text>
+      <Text className="text-center text-headline font-semibold text-foreground">{title}</Text>
       <Text className="max-w-xs text-center text-body text-muted">{description}</Text>
       {children && <View className="mt-4 flex-row justify-center">{children}</View>}
     </View>
