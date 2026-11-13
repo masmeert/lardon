@@ -1,7 +1,6 @@
 import { createAuth } from "@lardon/auth";
 import { createDb } from "@lardon/db";
 import { Effect, Layer, ManagedRuntime } from "effect";
-import { createAxiomDrain } from "evlog/axiom";
 import { routerLayer } from "evlog/effect";
 import { HttpRouter, HttpServer } from "effect/http";
 
@@ -70,7 +69,7 @@ export const webHandler = HttpRouter.toWebHandler(
       allowedHeaders: ["content-type", "authorization", "cookie"],
       credentials: true,
     }),
-    routerLayer({ drain: createAxiomDrain() }),
+    routerLayer(),
   ).pipe(Layer.provide(ServicesLive), Layer.provide(HttpServer.layerServices)),
   { disableLogger: true, memoMap: serverRuntime.memoMap },
 ).handler;

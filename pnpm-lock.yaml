@@ -537,9 +537,6 @@ importers:
         specifier: 2.0.0-beta.85
         version: 2.0.0-beta.85(@effect/platform-bun@4.1.4(effect@4.1.4))(@types/node@26.6.6)(@volar/typescript@2.4.31(typescript@6.0.3))(astro@7.4.5(@types/node@26.6.6)(@volar/typescript@2.4.31(typescript@6.0.3))(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript@6.0.3)(yaml@2.9.1))(effect@4.1.4)(hono@4.13.16)(jiti@2.7.0)(redis@6.3.1)(terser@5.51.2)(typescript@6.0.3)(yaml@2.9.1)
     devDependencies:
-      '@alchemy.run/axiom':
-        specifier: 2.0.0-beta.85
-        version: 2.0.0-beta.85(alchemy@2.0.0-beta.85(@alchemy.run/frontend-frameworks@2.0.0-beta.85(@effect/platform-bun@4.1.4(effect@4.1.4))(@types/node@26.6.6)(@volar/typescript@2.4.31(typescript@6.0.3))(astro@7.4.5(@types/node@26.6.6)(@volar/typescript@2.4.31(typescript@6.0.3))(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript@6.0.3)(yaml@2.9.1))(effect@4.1.4)(hono@4.13.16)(jiti@2.7.0)(redis@6.3.1)(terser@5.51.2)(typescript@6.0.3)(yaml@2.9.1))(@effect/platform-bun@4.1.4(effect@4.1.4))(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@types/node@26.6.6)(@types/react@19.3.0)(@volar/typescript@2.4.31(typescript@6.0.3))(effect@4.1.4)(esbuild@0.28.2)(jiti@2.7.0)(react-devtools-core@6.1.5)(terser@5.51.2)(typescript@6.0.3)(ws@8.22.2))(effect@4.1.4)
       '@alchemy.run/cloudflare':
         specifier: 2.0.0-beta.85
         version: 2.0.0-beta.85(5ec23ce5a65471c812283c4cb3b85fbf)
@@ -600,12 +597,6 @@ packages:
 
   '@alchemy.run/acme@2.0.0-beta.85':
     resolution: {integrity: sha512-hOV18VHG6ivrbPnk35hoqlCQPc6bR8b9soGmHlSkbnPIgVZUg7jpliF9AztSSJbJK4GHcBFc9hWetwCRHzGYAg==}
-    peerDependencies:
-      alchemy: 2.0.0-beta.85
-      effect: 4.1.4
-
-  '@alchemy.run/axiom@2.0.0-beta.85':
-    resolution: {integrity: sha512-dpBBDxZaRlRIiszRYTUB9M3e3yN6hvkyYTpc0E66tJfcESY6rwp2O2fl38Mun5iLEyGJb2Gvv4HqPiURYWzrHw==}
     peerDependencies:
       alchemy: 2.0.0-beta.85
       effect: 4.1.4
@@ -1471,11 +1462,6 @@ packages:
 
   '@distilled.cloud/aws@1.0.0-rc.18':
     resolution: {integrity: sha512-VZDlOGEXvXvTdY/0sTEoTWnPCGde+fjvq1ZIW3wgiZK/X8ChbbonGArg+Sc9OO4E9tr1WBymASrZ906uLnLWFw==}
-    peerDependencies:
-      effect: 4.1.4
-
-  '@distilled.cloud/axiom@1.0.0-rc.18':
-    resolution: {integrity: sha512-8z6PPKm3OlEI9ovuSgqnQBYrGU5Fg8LVrk/Xs85NBDH8kJ69ttdJ8vaSb6hILi9hHluefvYO7SJ1XTOXxH+vCw==}
     peerDependencies:
       effect: 4.1.4
 
@@ -7046,13 +7032,6 @@ snapshots:
       alchemy: 2.0.0-beta.85(@alchemy.run/frontend-frameworks@2.0.0-beta.85(@effect/platform-bun@4.1.4(effect@4.1.4))(@types/node@26.6.6)(@volar/typescript@2.4.31(typescript@6.0.3))(astro@7.4.5(@types/node@26.6.6)(@volar/typescript@2.4.31(typescript@6.0.3))(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript@6.0.3)(yaml@2.9.1))(effect@4.1.4)(hono@4.13.16)(jiti@2.7.0)(redis@6.3.1)(terser@5.51.2)(typescript@6.0.3)(yaml@2.9.1))(@effect/platform-bun@4.1.4(effect@4.1.4))(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@types/node@26.6.6)(@types/react@19.3.0)(@volar/typescript@2.4.31(typescript@6.0.3))(effect@4.1.4)(esbuild@0.28.2)(jiti@2.7.0)(react-devtools-core@6.1.5)(terser@5.51.2)(typescript@6.0.3)(ws@8.22.2)
       effect: 4.1.4
 
-  '@alchemy.run/axiom@2.0.0-beta.85(alchemy@2.0.0-beta.85(@alchemy.run/frontend-frameworks@2.0.0-beta.85(@effect/platform-bun@4.1.4(effect@4.1.4))(@types/node@26.6.6)(@volar/typescript@2.4.31(typescript@6.0.3))(astro@7.4.5(@types/node@26.6.6)(@volar/typescript@2.4.31(typescript@6.0.3))(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript@6.0.3)(yaml@2.9.1))(effect@4.1.4)(hono@4.13.16)(jiti@2.7.0)(redis@6.3.1)(terser@5.51.2)(typescript@6.0.3)(yaml@2.9.1))(@effect/platform-bun@4.1.4(effect@4.1.4))(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@types/node@26.6.6)(@types/react@19.3.0)(@volar/typescript@2.4.31(typescript@6.0.3))(effect@4.1.4)(esbuild@0.28.2)(jiti@2.7.0)(react-devtools-core@6.1.5)(terser@5.51.2)(typescript@6.0.3)(ws@8.22.2))(effect@4.1.4)':
-    dependencies:
-      '@distilled.cloud/axiom': 1.0.0-rc.18(effect@4.1.4)
-      '@distilled.cloud/core': 1.0.0-rc.18(effect@4.1.4)
-      alchemy: 2.0.0-beta.85(@alchemy.run/frontend-frameworks@2.0.0-beta.85(@effect/platform-bun@4.1.4(effect@4.1.4))(@types/node@26.6.6)(@volar/typescript@2.4.31(typescript@6.0.3))(astro@7.4.5(@types/node@26.6.6)(@volar/typescript@2.4.31(typescript@6.0.3))(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(typescript@6.0.3)(yaml@2.9.1))(effect@4.1.4)(hono@4.13.16)(jiti@2.7.0)(redis@6.3.1)(terser@5.51.2)(typescript@6.0.3)(yaml@2.9.1))(@effect/platform-bun@4.1.4(effect@4.1.4))(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@types/node@26.6.6)(@types/react@19.3.0)(@volar/typescript@2.4.31(typescript@6.0.3))(effect@4.1.4)(esbuild@0.28.2)(jiti@2.7.0)(react-devtools-core@6.1.5)(terser@5.51.2)(typescript@6.0.3)(ws@8.22.2)
-      effect: 4.1.4
-
   '@alchemy.run/cloudflare-runtime@2.0.0-beta.85(@distilled.cloud/cloudflare@1.0.0-rc.18(effect@4.1.4))(@effect/platform-bun@4.1.4(effect@4.1.4))(@effect/platform-node@4.1.4(effect@4.1.4)(redis@6.3.1))(@types/node@26.6.6)(@volar/typescript@2.4.31(typescript@6.0.3))(effect@4.1.4)(esbuild@0.28.2)(jiti@2.7.0)(rolldown@1.2.13)(terser@5.51.2)(typescript@6.0.3)(yaml@2.9.1)':
     dependencies:
       '@alchemy.run/node-utils': 2.0.0-beta.85
@@ -8449,11 +8428,6 @@ snapshots:
   '@distilled.cloud/aws@1.0.0-rc.18(effect@4.1.4)':
     dependencies:
       '@distilled.cloud/aws4signer': 1.0.0-rc.18(effect@4.1.4)
-      '@distilled.cloud/core': 1.0.0-rc.18(effect@4.1.4)
-      effect: 4.1.4
-
-  '@distilled.cloud/axiom@1.0.0-rc.18(effect@4.1.4)':
-    dependencies:
       '@distilled.cloud/core': 1.0.0-rc.18(effect@4.1.4)
       effect: 4.1.4
 

@@ -183,7 +183,7 @@ The marketing site stays a static Astro build.
 
 - D1 Time Travel and Durable Object point-in-time recovery cover accidental writes. Their retention on the free plan still needs checking.
 - Rate limits stay on auth, sensitive routes and the API.
-- Logs go to Axiom through evlog.
+- Logs go to Cloudflare Workers Logs: evlog writes one structured JSON event per request.
 
 ## Limits to keep in mind
 
