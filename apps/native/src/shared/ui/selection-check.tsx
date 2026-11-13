@@ -1,21 +1,20 @@
-import { View } from "react-native";
+import { cn, iconSize, useThemeColors } from "#/shared/lib";
 
-import { iconSize, useThemeColors } from "#/shared/lib";
-
+import { Glass } from "./glass";
 import { Icon } from "./icon";
 
 export function SelectionCheck({ isSelected }: { isSelected: boolean }) {
-  const { white } = useThemeColors("white");
+  const { accent, white } = useThemeColors("accent", "white");
 
   return (
-    <View className="size-6 items-center justify-center rounded-full bg-paper shadow-rim">
-      {isSelected ? (
-        <View className="size-5 items-center justify-center rounded-full bg-accent">
-          <Icon name="checkmark" size={iconSize.xs} color={white} />
-        </View>
-      ) : (
-        <View className="size-5 rounded-full border border-hairline" />
+    <Glass
+      tintColor={isSelected ? accent : undefined}
+      className={cn(
+        "size-7 items-center justify-center rounded-full",
+        !isSelected && "border border-hairline",
       )}
-    </View>
+    >
+      {isSelected && <Icon name="checkmark" size={iconSize.sm} color={white} />}
+    </Glass>
   );
 }

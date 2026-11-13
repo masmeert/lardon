@@ -13,7 +13,10 @@ export function CollectionCard({ item, coverWidth }: { item: CollectionItem; cov
       >
         {item.cover(coverWidth)}
         {item.isSelected !== undefined && (
-          <View className="absolute top-2 right-2">
+          <View
+            style={{ top: Math.round(coverWidth * 0.08), right: Math.round(coverWidth * 0.08) }}
+            className="absolute"
+          >
             <SelectionCheck isSelected={item.isSelected} />
           </View>
         )}
