@@ -5,5 +5,7 @@ export type CollectionItem = {
   title: string;
   cover: (sizePt: number) => ReactNode;
   details?: ReactNode;
+  isSelected?: boolean;
   onPress?: () => void;
+  onLongPress?: () => void;
 };

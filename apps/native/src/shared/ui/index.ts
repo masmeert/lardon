@@ -8,7 +8,9 @@ export { CollectionList } from "./collection-list/collection-list";
 
 export type { CollectionItem } from "./collection-list/collection-item";
 
-export { ListLayoutMenu } from "./collection-list/list-layout-menu";
+export { listLayoutAction } from "./collection-list/list-layout-menu";
+
+export { useListLayout } from "./collection-list/use-list-layout";
 
 export { CollectionTile } from "./collection-tile";
 
@@ -37,6 +39,8 @@ export { LardonMark } from "./lardon-mark";
 export { PhotoFrame } from "./photo-frame";
 
 export { RollingNumber } from "./rolling-number/rolling-number";
+
+export { SelectionCheck } from "./selection-check";
 
 export { SheetContent } from "./sheet-content";
 

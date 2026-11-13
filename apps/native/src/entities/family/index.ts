@@ -6,4 +6,4 @@ export { FamilyFaces } from "./ui/family-faces";
 
 export { useSignOut } from "./sign-out";
 
-export { useFamilyStore } from "./use-family-store";
+export { useFamilyStore, useFamilyStores } from "./use-family-store";

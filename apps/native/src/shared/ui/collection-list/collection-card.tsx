@@ -1,5 +1,7 @@
 import { Text, View } from "react-native";
 
+import { SelectionCheck } from "../selection-check";
+
 import type { CollectionItem } from "./collection-item";
 
 export function CollectionCard({ item, coverWidth }: { item: CollectionItem; coverWidth: number }) {
@@ -10,6 +12,11 @@ export function CollectionCard({ item, coverWidth }: { item: CollectionItem; cov
         className="items-center justify-center"
       >
         {item.cover(coverWidth)}
+        {item.isSelected !== undefined && (
+          <View className="absolute top-2 right-2">
+            <SelectionCheck isSelected={item.isSelected} />
+          </View>
+        )}
       </View>
       <View className="items-center gap-1.5 self-stretch">
         <Text numberOfLines={2} className="text-center text-title font-semibold text-foreground">

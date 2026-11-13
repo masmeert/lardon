@@ -7,6 +7,20 @@ export {
 } from "./model/library";
 
 export {
+  type RecipeFilters,
+  type ServingsRange,
+  type SortDirection,
+  type SortField,
+  activeFilterCount,
+  filterRecipes,
+  noFilters,
+  servingsOptions,
+  sortOptions,
+  sortRecipes,
+  timeOptions,
+} from "./model/recipe-filters";
+
+export {
   type RecipeScope,
   type RecipeScopeParams,
   scopeFromParams,

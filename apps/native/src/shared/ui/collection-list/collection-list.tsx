@@ -35,7 +35,7 @@ export function CollectionList({
       ItemSeparatorComponent={
         layout === "list"
           ? () => (
-              <View className="bg-paper pl-21.5">
+              <View className="bg-paper pl-23">
                 <View style={{ height: StyleSheet.hairlineWidth }} className="bg-hairline" />
               </View>
             )
@@ -44,8 +44,12 @@ export function CollectionList({
       renderItem={({ item, index }) => (
         <Pressable
           accessibilityRole={item.onPress ? "button" : undefined}
-          disabled={!item.onPress}
+          accessibilityState={
+            item.isSelected === undefined ? undefined : { selected: item.isSelected }
+          }
+          disabled={!item.onPress && !item.onLongPress}
           onPress={item.onPress}
+          onLongPress={item.onLongPress}
           style={{ borderCurve: "continuous", width: layout === "grid" ? cardWidth : undefined }}
           className={cn(
             "bg-paper active:opacity-80",

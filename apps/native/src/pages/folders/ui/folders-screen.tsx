@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { router } from "expo-router";
+import { Stack, router } from "expo-router";
 import { Text } from "react-native";
 
 import { familiesQuery } from "#/entities/family";
@@ -10,7 +10,7 @@ import {
   scopedRecipes,
   useFamilyTables,
 } from "#/entities/recipe";
-import { CollectionList, ListLayoutMenu } from "#/shared/ui";
+import { CollectionList, listLayoutAction, useListLayout } from "#/shared/ui";
 
 function recipeCount(amount: number) {
   return amount === 1 ? "1 recipe" : `${amount} recipes`;
@@ -20,10 +20,15 @@ export function FoldersScreen() {
   const { data: families = [] } = useQuery(familiesQuery);
   const familyTables = useFamilyTables(families.map((family) => family.id));
   const unsorted = scopedRecipes(familyTables, { kind: "unsorted" }, "");
+  const [layout, setLayout] = useListLayout();
 
   return (
     <>
-      <ListLayoutMenu />
+      <Stack.Toolbar placement="right">
+        <Stack.Toolbar.Menu icon="ellipsis" accessibilityLabel="More">
+          {listLayoutAction({ layout, onChange: setLayout })}
+        </Stack.Toolbar.Menu>
+      </Stack.Toolbar>
       <CollectionList
         items={[
           ...libraryFolders(familyTables).map((folder) => ({
