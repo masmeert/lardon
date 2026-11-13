@@ -12,7 +12,6 @@ export const cn = createCn({
             "title",
             "field",
             "headline",
-            "headline-wordmark",
             "large-title",
             "display",
           ],

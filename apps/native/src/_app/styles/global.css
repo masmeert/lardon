@@ -5,7 +5,6 @@
 @source "../../";
 
 @theme static {
-  --font-wordmark: Eczar_600SemiBold;
   --color-background-clear: #f2f2f700;
   --color-splash: #627224;
   --color-background: #f2f2f7;
@@ -27,8 +26,6 @@
   --text-large-title--line-height: 36px;
   --text-headline: 22px;
   --text-headline--line-height: 28px;
-  --text-headline-wordmark: 22px;
-  --text-headline-wordmark--line-height: 39px;
   --text-display: 38px;
   --text-display--line-height: 44px;
   --radius-card: 18px;

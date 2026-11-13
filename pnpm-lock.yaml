@@ -232,9 +232,6 @@ importers:
       '@better-auth/expo':
         specifier: 'catalog:'
         version: 1.7.12(@better-auth/core@1.7.12(@better-auth/utils@0.5.0)(@better-fetch/fetch@1.3.2)(better-call@1.4.4(zod@4.6.7))(jose@6.2.17)(kysely@0.29.8)(nanostores@1.5.5))(better-auth@1.7.12(drizzle-kit@1.0.0-rc.5(drizzle-orm@1.0.0-rc.5(@cloudflare/workers-types@5.20261112.1)(@effect/sql-d1@4.1.4(effect@4.1.4))(@libsql/client@0.18.0)(effect@4.1.4)(zod@4.6.7)))(drizzle-orm@1.0.0-rc.5(@cloudflare/workers-types@5.20261112.1)(@effect/sql-d1@4.1.4(effect@4.1.4))(@libsql/client@0.18.0)(effect@4.1.4)(zod@4.6.7))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(vitest@5.0.5))(expo-constants@58.0.16)(expo-linking@58.0.17)(expo-network@58.0.5(expo@58.0.24)(react@19.3.0))(expo-secure-store@58.0.3(expo@58.0.24))(expo-web-browser@58.0.8(expo@58.0.24)(react-native@0.88.1(@babel/core@7.29.13(supports-color@8.1.1))(@react-native/metro-config@0.88.1(@babel/core@7.29.13(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1)))
-      '@expo-google-fonts/eczar':
-        specifier: 0.4.1
-        version: 0.4.1
       '@expo/metro-runtime':
         specifier: ~58.0.14
         version: 58.0.17(@expo/log-box@58.0.15)(expo@58.0.24)(react-dom@19.3.0(react@19.3.0))(react-native@0.88.1(@babel/core@7.29.13(supports-color@8.1.1))(@react-native/metro-config@0.88.1(@babel/core@7.29.13(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
@@ -271,9 +268,6 @@ importers:
       expo-dev-client:
         specifier: ~58.0.13
         version: 58.0.19(expo@58.0.24)(react-native@0.88.1(@babel/core@7.29.13(supports-color@8.1.1))(@react-native/metro-config@0.88.1(@babel/core@7.29.13(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))
-      expo-font:
-        specifier: ~58.0.12
-        version: 58.0.12(expo@58.0.24)(react-native@0.88.1(@babel/core@7.29.13(supports-color@8.1.1))(@react-native/metro-config@0.88.1(@babel/core@7.29.13(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
       expo-glass-effect:
         specifier: ~58.0.5
         version: 58.0.5(expo@58.0.24)(react-native@0.88.1(@babel/core@7.29.13(supports-color@8.1.1))(@react-native/metro-config@0.88.1(@babel/core@7.29.13(supports-color@8.1.1))(supports-color@8.1.1))(@types/react@19.3.0)(react@19.3.0)(supports-color@8.1.1))(react@19.3.0)
@@ -1696,9 +1690,6 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
-
-  '@expo-google-fonts/eczar@0.4.1':
-    resolution: {integrity: sha512-xwTiBLycLkSDpE5rszukP8UyxHKPmpcLw4PrY/krqjQT+D07n+sFDUQExejOOBSISrzxPjhw0qbBrtAfC+Ru1A==}
 
   '@expo/cli@58.1.20':
     resolution: {integrity: sha512-VXXcqGuXBngzItcP97ERWON3aHJOeAwDxuRlkxgbYfW9m9DpGHM6umGgjOPWWy14xSArUvwGZpg+D5Ms+hnnkg==}
@@ -8621,8 +8612,6 @@ snapshots:
 
   '@esbuild/win32-x64@0.28.2':
     optional: true
-
-  '@expo-google-fonts/eczar@0.4.1': {}
 
   '@expo/cli@58.1.20(@expo/dom-webview@58.0.2)(@expo/metro-runtime@58.0.17)(expo-constants@58.0.16)(expo-font@58.0.12(expo@58.0.24)(react-native@0.88.1(@babel/core@7.29.13(supports-color@10.2.2))(@react-native/metro-config@0.88.1(@babel/core@7.29.13(supports-color@10.2.2))(supports-color@10.2.2))(@types/react@19.3.0)(react@19.3.0)(supports-color@10.2.2))(react@19.3.0))(expo@58.0.24)(react-dom@19.3.0(react@19.3.0))(react-native@0.88.1(@babel/core@7.29.13(supports-color@10.2.2))(@react-native/metro-config@0.88.1(@babel/core@7.29.13(supports-color@10.2.2))(supports-color@10.2.2))(@types/react@19.3.0)(react@19.3.0)(supports-color@10.2.2))(react@19.3.0)(supports-color@10.2.2)(typescript@6.0.3)':
     dependencies:
