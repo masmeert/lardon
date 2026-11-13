@@ -1,5 +1,6 @@
 import { Stack } from "expo-router";
 import type { ReactNode } from "react";
+import { useCSSVariable } from "uniwind";
 
 import { useThemeColors } from "#/shared/lib";
 
@@ -7,7 +8,12 @@ export function TabStack({ title, children }: { title: string; children?: ReactN
   const { background, foreground } = useThemeColors("background", "foreground");
 
   return (
-    <Stack screenOptions={{ contentStyle: { backgroundColor: background } }}>
+    <Stack
+      screenOptions={{
+        contentStyle: { backgroundColor: background },
+        headerLargeTitleStyle: { fontFamily: String(useCSSVariable("--font-heading")) },
+      }}
+    >
       <Stack.Screen
         name="index"
         options={{

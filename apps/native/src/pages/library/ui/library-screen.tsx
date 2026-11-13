@@ -53,7 +53,7 @@ export function LibraryScreen() {
       <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerClassName="pb-16">
         <View className="items-center gap-5 px-5 pt-2 pb-8">
           <View className="items-center">
-            <Text className="text-display font-bold text-foreground">{recipes.length}</Text>
+            <Text className="text-large-title font-semibold text-foreground">{recipes.length}</Text>
             <Text className="text-caption font-semibold text-muted">
               {recipes.length === 1 ? "Saved recipe" : "Saved recipes"}
             </Text>
