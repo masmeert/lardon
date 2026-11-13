@@ -43,6 +43,15 @@
             "deploymentTarget": "26.0"
           }
         }
+      ],
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/LardonEczar-Medium.ttf",
+            "./assets/fonts/LardonEczar-SemiBold.ttf"
+          ]
+        }
       ]
     ],
     "experiments": {

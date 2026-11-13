@@ -9,7 +9,7 @@ export function RecipeRow({ recipe }: { recipe: LibraryRecipe }) {
     <View className="flex-row items-center gap-3.5 px-4 py-2.5">
       <RecipeThumbnail recipe={recipe} width={56} />
       <View className="flex-1 gap-1">
-        <Text numberOfLines={1} className="text-title text-foreground">
+        <Text numberOfLines={1} className="font-heading text-heading-sm text-foreground">
           {recipe.title}
         </Text>
         <RecipeFacts recipe={recipe} />

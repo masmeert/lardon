@@ -9,7 +9,10 @@ export function RecipeCard({ recipe, width }: { recipe: LibraryRecipe; width: nu
     <View className="items-center gap-3 px-4 pt-5 pb-4">
       <RecipeThumbnail recipe={recipe} width={width} />
       <View className="items-center gap-1.5 self-stretch">
-        <Text numberOfLines={2} className="text-center text-title font-semibold text-foreground">
+        <Text
+          numberOfLines={2}
+          className="text-center font-heading text-heading-sm text-foreground"
+        >
           {recipe.title}
         </Text>
         <RecipeFacts recipe={recipe} />
