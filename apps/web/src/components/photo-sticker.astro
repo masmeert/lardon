@@ -1,14 +1,12 @@
 ---
 import type { ImageMetadata } from "astro";
-import { Image } from "astro:assets";
 
 interface Props {
   src: ImageMetadata;
-  widthPx: number;
   class: string;
 }
 
-const { src, widthPx, class: className } = Astro.props;
+const { src, class: className } = Astro.props;
 ---
 
 <div
@@ -18,11 +16,12 @@ const { src, widthPx, class: className } = Astro.props;
     className,
   ]}
 >
-  <Image
-    src={src}
+  <img
+    src={src.src}
     alt=""
-    widths={[widthPx, widthPx * 2]}
-    sizes={`${widthPx}px`}
+    width={src.width}
+    height={src.height}
+    decoding="async"
     class="size-full rounded-[22%] object-cover"
   />
 </div>
