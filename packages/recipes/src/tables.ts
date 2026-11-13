@@ -1,0 +1,164 @@
+import { Option, Record, Schema } from "effect";
+import { type Cell, type MergeableStore, createMergeableStore } from "tinybase";
+import { createEffectSchematizer } from "tinybase/schematizers/schematizer-effect";
+
+import { unitCodes } from "./units";
+
+function text(maxLength: number) {
+  return Schema.String.check(
+    Schema.isTrimmed(),
+    Schema.isMinLength(1),
+    Schema.isMaxLength(maxLength),
+  );
+}
+
+const idPattern = /^[A-Za-z0-9_-]{1,64}$/;
+const Id = Schema.String.check(Schema.isPattern(idPattern));
+const Position = Schema.String.check(Schema.isMinLength(1), Schema.isMaxLength(200));
+const Millis = Schema.Int.check(Schema.isGreaterThanOrEqualTo(0));
+
+const Minutes = Schema.Int.check(
+  Schema.isGreaterThanOrEqualTo(0),
+  Schema.isLessThanOrEqualTo(100_000),
+);
+
+const Servings = Schema.Finite.check(Schema.isGreaterThan(0), Schema.isLessThanOrEqualTo(10_000));
+
+const Quantity = Schema.Finite.check(
+  Schema.isGreaterThan(0),
+  Schema.isLessThanOrEqualTo(1_000_000),
+);
+
+export const ImageKey = Schema.String.check(Schema.isPattern(/^[0-9a-f-]{36}\.(?:jpg|png|webp)$/));
+
+export const Visibility = Schema.Literals(["private", "followers"]);
+
+export type Visibility = typeof Visibility.Type;
+
+export const Unit = Schema.Literals(unitCodes);
+
+export const TagName = text(40);
+
+export const FolderName = text(60);
+
+export const tables = {
+  recipes: Schema.Struct({
+    title: text(200),
+    servings: Schema.optionalKey(Servings),
+    prepMinutes: Schema.optionalKey(Minutes),
+    cookMinutes: Schema.optionalKey(Minutes),
+    notes: Schema.optionalKey(text(20_000)),
+    imageKey: Schema.optionalKey(ImageKey),
+    visibility: Visibility,
+    createdById: Id,
+    createdAt: Millis,
+    updatedAt: Millis,
+  }),
+  ingredients: Schema.Struct({
+    recipeId: Id,
+    position: Position,
+    quantity: Schema.optionalKey(Quantity),
+    unit: Schema.optionalKey(Unit),
+    name: text(200),
+  }),
+  steps: Schema.Struct({ recipeId: Id, position: Position, text: text(5000) }),
+  tags: Schema.Struct({ name: TagName }),
+  recipeTags: Schema.Struct({ recipeId: Id, tagId: Id }),
+  folders: Schema.Struct({ name: FolderName }),
+  recipeFolders: Schema.Struct({ recipeId: Id, folderId: Id }),
+  meals: Schema.Struct({ recipeId: Id, servings: Schema.NullOr(Servings) }),
+};
+
+export type TableId = keyof typeof tables;
+
+export type Row<Table extends TableId> = (typeof tables)[Table]["Type"];
+
+export type Stored<Table extends TableId> = Row<Table> & { id: string };
+
+export function createRecipeStore() {
+  return createMergeableStore().setTablesSchema(createEffectSchematizer().toTablesSchema(tables));
+}
+
+export function linkId(ownerId: string, recipeId: string) {
+  return `${ownerId}:${recipeId}`;
+}
+
+const datePattern = /^\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])$/;
+
+export function isMealDate(date: string) {
+  return datePattern.test(date) && new Date(`${date}T00:00:00Z`).toISOString().startsWith(date);
+}
+
+const linkOwners = { recipeTags: "tagId", recipeFolders: "folderId" } as const;
+
+function isTableId(tableId: string): tableId is TableId {
+  return Object.hasOwn(tables, tableId);
+}
+
+export function isValidRowId(tableId: string, rowId: string) {
+  if (tableId === "meals") return isMealDate(rowId);
+
+  if (tableId === "recipeTags" || tableId === "recipeFolders") {
+    const [ownerId = "", recipeId = "", ...rest] = rowId.split(":");
+
+    return rest.length === 0 && idPattern.test(ownerId) && idPattern.test(recipeId);
+  }
+
+  return isTableId(tableId) && idPattern.test(rowId);
+}
+
+function cellDecoder(field: Schema.Codec<unknown, unknown>) {
+  return Schema.decodeUnknownOption(Schema.Struct({ cell: field }));
+}
+
+const cellDecoders: Record.ReadonlyRecord<
+  string,
+  Record.ReadonlyRecord<string, ReturnType<typeof cellDecoder>>
+> = Record.map(tables, (table) => {
+  const fields: Record.ReadonlyRecord<string, Schema.Codec<unknown, unknown>> = table.fields;
+
+  return Record.map(fields, cellDecoder);
+});
+
+export function isValidCell(
+  tableId: string,
+  rowId: string,
+  cellId: string,
+  cell: Cell | undefined,
+) {
+  const decode = cellDecoders[tableId]?.[cellId];
+
+  if (!decode || !isValidRowId(tableId, rowId)) return false;
+
+  if (cell === undefined) return true;
+
+  if (tableId in linkOwners) {
+    const [ownerId, recipeId] = rowId.split(":");
+    const expected = cellId === "recipeId" ? recipeId : ownerId;
+
+    if (cell !== expected) return false;
+  }
+
+  return Option.isSome(decode({ cell }));
+}
+
+export function readRow<Table extends TableId>(
+  store: MergeableStore,
+  tableId: Table,
+  rowId: string,
+): Stored<Table> | undefined {
+  return Option.getOrUndefined(
+    Option.map(
+      Schema.decodeUnknownOption(tables[tableId])(store.getRow(tableId, rowId)),
+      (row) => ({ ...row, id: rowId }),
+    ),
+  );
+}
+
+export function readRows<Table extends TableId>(store: MergeableStore, tableId: Table) {
+  return store.getRowIds(tableId).flatMap((rowId) => {
+    const row = readRow(store, tableId, rowId);
+
+    return row ? [row] : [];
+  });
+}

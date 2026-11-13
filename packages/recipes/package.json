@@ -1,0 +1,22 @@
+{
+  "name": "@lardon/recipes",
+  "license": "PolyForm-Strict-1.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "test": "vp test run"
+  },
+  "dependencies": {
+    "effect": "catalog:",
+    "fractional-indexing": "4.0.0",
+    "tinybase": "10.1.0"
+  },
+  "devDependencies": {
+    "@lardon/config": "workspace:*",
+    "typescript": "^6.0.3",
+    "vite-plus": "catalog:"
+  }
+}
