@@ -2,13 +2,14 @@ import { Stack } from "expo-router";
 import { useState } from "react";
 import { Provider } from "tinybase/ui-react";
 
-import { sheetOptions } from "#/_app/nav/sheet-options";
+import { useSheetOptions } from "#/_app/nav/use-sheet-options";
 import { FamilyStores } from "#/entities/family";
 import { SessionCookieContext, authClient } from "#/shared/auth";
 import { PreferencesStore } from "#/shared/preferences";
 
 export default function AppLayout() {
   const [sessionCookie] = useState(() => authClient.getCookie());
+  const sheetOptions = useSheetOptions();
 
   return (
     <SessionCookieContext value={sessionCookie}>
