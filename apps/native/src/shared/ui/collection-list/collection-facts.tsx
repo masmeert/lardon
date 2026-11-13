@@ -25,7 +25,9 @@ export function CollectionFacts({
         !isOnCover && "bg-fill",
       )}
     >
-      {isOnCover && <Glass className="absolute inset-0 rounded-full" />}
+      {isOnCover && (
+        <Glass tintColor="rgba(255, 255, 255, 0.7)" className="absolute inset-0 rounded-full" />
+      )}
       {facts.map((fact) => (
         <View key={fact.label} className="flex-row items-center gap-1">
           {fact.icon && (
