@@ -4,6 +4,12 @@ export { ButtonLabel } from "./button/button-label";
 
 export { CodeInput } from "./code-input";
 
+export { CollectionList } from "./collection-list/collection-list";
+
+export type { CollectionItem } from "./collection-list/collection-item";
+
+export { ListLayoutMenu } from "./collection-list/list-layout-menu";
+
 export { CollectionTile } from "./collection-tile";
 
 export { EmptyState } from "./empty-state";

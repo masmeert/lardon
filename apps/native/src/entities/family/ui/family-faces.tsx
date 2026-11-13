@@ -1,22 +1,22 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { iconSize, useThemeColors } from "#/shared/lib";
+import { useThemeColors } from "#/shared/lib";
 import { Fan, Icon } from "#/shared/ui";
 
 import { familyQuery } from "../family-query";
 
 import { MemberAvatar } from "./member-avatar";
 
-export function FamilyFaces({ familyId }: { familyId: string }) {
+export function FamilyFaces({ familyId, sizePt }: { familyId: string; sizePt: number }) {
   const { muted } = useThemeColors("muted");
   const { data: family } = useQuery(familyQuery(familyId));
 
-  if (!family) return <Icon name="person.2" size={iconSize.xl} color={muted} />;
+  if (!family) return <Icon name="person.2" size={Math.round(sizePt * 0.24)} color={muted} />;
 
   return (
-    <Fan spreadPt={24}>
+    <Fan spreadPt={Math.round(sizePt * 0.25)}>
       {family.members.slice(0, 3).map((member) => (
-        <MemberAvatar key={member.userId} member={member} sizePt={50} />
+        <MemberAvatar key={member.userId} member={member} sizePt={Math.round(sizePt * 0.52)} />
       ))}
     </Fan>
   );

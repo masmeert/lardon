@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { ScrollView, View } from "react-native";
+import { Text } from "react-native";
 
 import { familiesQuery } from "#/entities/family";
 import {
@@ -10,7 +10,11 @@ import {
   scopedRecipes,
   useFamilyTables,
 } from "#/entities/recipe";
-import { CollectionTile } from "#/shared/ui";
+import { CollectionList, ListLayoutMenu } from "#/shared/ui";
+
+function recipeCount(amount: number) {
+  return amount === 1 ? "1 recipe" : `${amount} recipes`;
+}
 
 export function FoldersScreen() {
   const { data: families = [] } = useQuery(familiesQuery);
@@ -18,15 +22,29 @@ export function FoldersScreen() {
   const unsorted = scopedRecipes(familyTables, { kind: "unsorted" }, "");
 
   return (
-    <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerClassName="pb-16">
-      <View className="flex-row flex-wrap gap-x-3 gap-y-5 px-5 pt-4">
-        {libraryFolders(familyTables).map((folder) => (
-          <CollectionTile
-            key={`${folder.familyId}:${folder.id}`}
-            name={folder.name}
-            recipeCount={folder.recipeCount}
-            cover={<RecipeFan recipes={folder.recipes} icon="folder" />}
-            onPress={() =>
+    <>
+      <ListLayoutMenu />
+      <CollectionList
+        items={[
+          ...libraryFolders(familyTables).map((folder) => ({
+            key: `${folder.familyId}:${folder.id}`,
+            title: folder.name,
+            cover: (sizePt: number) => (
+              <RecipeFan recipes={folder.recipes} icon="folder" sizePt={sizePt} />
+            ),
+            details: (
+              <Text className="text-caption text-muted">
+                {[
+                  recipeCount(folder.recipeCount),
+                  families.length > 1
+                    ? families.find((family) => family.id === folder.familyId)?.name
+                    : undefined,
+                ]
+                  .filter((detail) => detail !== undefined)
+                  .join(", ")}
+              </Text>
+            ),
+            onPress: () =>
               router.push({
                 pathname: "/collection",
                 params: scopeParams({
@@ -34,19 +52,20 @@ export function FoldersScreen() {
                   familyId: folder.familyId,
                   folderId: folder.id,
                 }),
-              })
-            }
-          />
-        ))}
-        <CollectionTile
-          name="Unsorted"
-          recipeCount={unsorted.length}
-          cover={<RecipeFan recipes={unsorted} icon="tray" />}
-          onPress={() =>
-            router.push({ pathname: "/collection", params: scopeParams({ kind: "unsorted" }) })
-          }
-        />
-      </View>
-    </ScrollView>
+              }),
+          })),
+          {
+            key: "unsorted",
+            title: "Unsorted",
+            cover: (sizePt: number) => <RecipeFan recipes={unsorted} icon="tray" sizePt={sizePt} />,
+            details: (
+              <Text className="text-caption text-muted">{recipeCount(unsorted.length)}</Text>
+            ),
+            onPress: () =>
+              router.push({ pathname: "/collection", params: scopeParams({ kind: "unsorted" }) }),
+          },
+        ]}
+      />
+    </>
   );
 }

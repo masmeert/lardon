@@ -1,35 +1,44 @@
 import { useQuery } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { ScrollView, View } from "react-native";
+import { Text } from "react-native";
 
 import { FamilyFaces, familiesQuery } from "#/entities/family";
 import { scopeParams, scopedRecipes, useFamilyTables } from "#/entities/recipe";
-import { CollectionTile } from "#/shared/ui";
+import { CollectionList, ListLayoutMenu } from "#/shared/ui";
+
+function count(amount: number, singular: string, plural: string) {
+  return `${amount} ${amount === 1 ? singular : plural}`;
+}
 
 export function FamiliesScreen() {
   const { data: families = [] } = useQuery(familiesQuery);
   const familyTables = useFamilyTables(families.map((family) => family.id));
 
   return (
-    <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerClassName="pb-16">
-      <View className="flex-row flex-wrap gap-x-3 gap-y-5 px-5 pt-4">
-        {families.map((family) => (
-          <CollectionTile
-            key={family.id}
-            name={family.name}
-            recipeCount={
-              scopedRecipes(familyTables, { kind: "family", familyId: family.id }, "").length
-            }
-            cover={<FamilyFaces familyId={family.id} />}
-            onPress={() =>
-              router.push({
-                pathname: "/collection",
-                params: scopeParams({ kind: "family", familyId: family.id }),
-              })
-            }
-          />
-        ))}
-      </View>
-    </ScrollView>
+    <>
+      <ListLayoutMenu />
+      <CollectionList
+        items={families.map((family) => ({
+          key: family.id,
+          title: family.name,
+          cover: (sizePt) => <FamilyFaces familyId={family.id} sizePt={sizePt} />,
+          details: (
+            <Text className="text-caption text-muted">
+              {count(family.memberCount, "member", "members")},{" "}
+              {count(
+                scopedRecipes(familyTables, { kind: "family", familyId: family.id }, "").length,
+                "recipe",
+                "recipes",
+              )}
+            </Text>
+          ),
+          onPress: () =>
+            router.push({
+              pathname: "/collection",
+              params: scopeParams({ kind: "family", familyId: family.id }),
+            }),
+        }))}
+      />
+    </>
   );
 }

@@ -80,7 +80,7 @@ export function LibraryScreen() {
                   key={family.id}
                   name={family.name}
                   recipeCount={familyRecipes.length}
-                  cover={<FamilyFaces familyId={family.id} />}
+                  cover={<FamilyFaces familyId={family.id} sizePt={96} />}
                   onPress={() => openCollection({ kind: "family", familyId: family.id })}
                 />
               );
@@ -106,7 +106,7 @@ export function LibraryScreen() {
                 key={`${folder.familyId}:${folder.id}`}
                 name={folder.name}
                 recipeCount={folder.recipeCount}
-                cover={<RecipeFan recipes={folder.recipes} icon="folder" />}
+                cover={<RecipeFan recipes={folder.recipes} icon="folder" sizePt={96} />}
                 onPress={() =>
                   openCollection({ kind: "folder", familyId: folder.familyId, folderId: folder.id })
                 }
@@ -115,7 +115,7 @@ export function LibraryScreen() {
             <CollectionTile
               name="Unsorted"
               recipeCount={unsorted.length}
-              cover={<RecipeFan recipes={unsorted} icon="tray" />}
+              cover={<RecipeFan recipes={unsorted} icon="tray" sizePt={96} />}
               onPress={() => openCollection({ kind: "unsorted" })}
             />
           </ScrollView>
