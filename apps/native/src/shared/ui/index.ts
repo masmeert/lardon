@@ -4,6 +4,8 @@ export { ButtonLabel } from "./button/button-label";
 
 export { CodeInput } from "./code-input";
 
+export { GoogleLogo } from "./google-logo";
+
 export { Icon } from "./icon";
 
 export { InlineError } from "./inline-error";

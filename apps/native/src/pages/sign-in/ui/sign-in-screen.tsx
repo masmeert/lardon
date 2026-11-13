@@ -6,7 +6,7 @@ import { Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { authClient } from "#/shared/auth";
-import { Button, ButtonLabel, Icon, InlineError, LardonLogo } from "#/shared/ui";
+import { Button, ButtonLabel, GoogleLogo, Icon, InlineError, LardonLogo } from "#/shared/ui";
 import { iconSize, useThemeColor } from "#/shared/lib";
 
 import { Hero } from "./hero";
@@ -138,7 +138,7 @@ export function SignInScreen() {
             className="flex-1"
             isLoading={pendingProvider === "google"}
           >
-            <Icon name="g.circle.fill" size={iconSize.md} color={foregroundColor} />
+            <GoogleLogo size={iconSize.md} />
           </Button>
         </View>
       </View>
