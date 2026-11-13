@@ -1,0 +1,65 @@
+import type { ReactNode } from "react";
+import { ActivityIndicator, View } from "react-native";
+
+import { cn, useThemeColor } from "#/shared/lib";
+
+import { PressableScale } from "../pressable-scale";
+
+import { type ButtonVariant, ButtonVariantContext } from "./button-variant";
+
+export function Button({
+  variant = "primary",
+  size = "lg",
+  isIconOnly = false,
+  isDisabled = false,
+  isLoading = false,
+  accessibilityLabel,
+  onPress,
+  className,
+  children,
+}: {
+  variant?: ButtonVariant;
+  size?: "md" | "lg";
+  isIconOnly?: boolean;
+  isDisabled?: boolean;
+  isLoading?: boolean;
+  accessibilityLabel?: string;
+  onPress: () => void;
+  className?: string;
+  children: ReactNode;
+}) {
+  const whiteColor = useThemeColor("white");
+  const foregroundColor = useThemeColor("foreground");
+
+  return (
+    <PressableScale
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      accessibilityState={{ disabled: isDisabled, busy: isLoading }}
+      disabled={isDisabled || isLoading}
+      onPress={onPress}
+      className={cn(
+        "flex-row items-center justify-center rounded-full",
+        size === "lg" && (isIconOnly ? "size-control-lg" : "h-control-lg px-5"),
+        size === "md" && (isIconOnly ? "size-control" : "h-control px-4"),
+        variant === "primary" && "accent-raised",
+        variant === "secondary" && "surface-raised",
+        variant === "danger" && "bg-danger",
+        isDisabled && "opacity-50",
+        className,
+      )}
+    >
+      <ButtonVariantContext value={variant}>
+        <View className={cn("flex-row items-center gap-1.5", isLoading && "opacity-0")}>
+          {children}
+        </View>
+      </ButtonVariantContext>
+      {isLoading && (
+        <ActivityIndicator
+          color={variant === "secondary" ? foregroundColor : whiteColor}
+          className="absolute"
+        />
+      )}
+    </PressableScale>
+  );
+}

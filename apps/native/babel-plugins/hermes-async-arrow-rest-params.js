@@ -1,6 +1,6 @@
 // Hermes 260318099.0.4 (react-native 0.88) cannot compile async arrow functions
-// with a rest parameter, such as `async (...[input, options = {}]) => {}` in
-// @orpc/client. babel-preset-expo 58.0.18 dropped the transform that rewrote them.
+// with a rest parameter, such as `async (...actions) => {}` in TinyBase's
+// persisters. babel-preset-expo 58.0.18 dropped the transform that rewrote them.
 // Remove this plugin once Hermes compiles the syntax again:
 // https://github.com/expo/expo/issues/51842
 module.exports = function hermesAsyncArrowRestParams({ types: t }) {

@@ -1,23 +1,29 @@
+const { createHash } = require("node:crypto");
+const { readFileSync } = require("node:fs");
+const path = require("node:path");
 const { withVarlockMetroConfig } = require("@varlock/expo-integration/metro-config");
 const { getDefaultConfig } = require("expo/metro-config");
-const { withUniwindConfig } = require("uniwind/metro");
 const { wrapWithReanimatedMetroConfig } = require("react-native-reanimated/metro-config");
+const { withUniwindConfig } = require("uniwind/metro");
 
 /** @type {import('expo/metro-config').MetroConfig} */
 const config = getDefaultConfig(__dirname);
 
-// Alchemy writes runtime state here; block it to avoid Metro refresh loops.
+config.cacheVersion = createHash("sha256")
+  .update(process.env.APP_ENV ?? "development")
+  .update(readFileSync(path.join(__dirname, ".env.schema"), "utf8"))
+  .digest("hex");
+
 const blockList = config.resolver.blockList ?? [];
-const blockListPatterns = Array.isArray(blockList) ? blockList : [blockList];
 
 config.resolver.blockList = [
-  ...blockListPatterns,
+  ...(Array.isArray(blockList) ? blockList : [blockList]),
   /[/\\]packages[/\\]infra[/\\]\.alchemy(?:[/\\]|$)/,
 ];
 
-const uniwindConfig = withUniwindConfig(wrapWithReanimatedMetroConfig(config), {
-  cssEntryFile: "./global.css",
-  dtsFile: "./uniwind-types.d.ts",
-});
-
-module.exports = withVarlockMetroConfig(uniwindConfig);
+module.exports = withVarlockMetroConfig(
+  withUniwindConfig(wrapWithReanimatedMetroConfig(config), {
+    cssEntryFile: "./src/_app/styles/global.css",
+    dtsFile: "./uniwind-types.d.ts",
+  }),
+);
