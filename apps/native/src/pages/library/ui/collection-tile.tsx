@@ -1,19 +1,19 @@
 import { Pressable, Text, View } from "react-native";
 
-import { RecipeThumbnail } from "#/entities/recipe";
+import { type LibraryRecipe, RecipeThumbnail } from "#/entities/recipe";
 import { iconSize, useThemeColors } from "#/shared/lib";
 import { Icon, type IconName } from "#/shared/ui";
 
 export function CollectionTile({
   name,
   recipeCount,
-  hasPreview,
+  preview,
   icon,
   onPress,
 }: {
   name: string;
   recipeCount: number;
-  hasPreview: boolean;
+  preview: LibraryRecipe | undefined;
   icon: IconName;
   onPress: () => void;
 }) {
@@ -31,8 +31,8 @@ export function CollectionTile({
         style={{ borderCurve: "continuous" }}
         className="size-24 items-center justify-center rounded-card bg-paper"
       >
-        {hasPreview ? (
-          <RecipeThumbnail width={58} />
+        {preview ? (
+          <RecipeThumbnail recipe={preview} width={58} />
         ) : (
           <Icon name={icon} size={iconSize.xl} color={muted} />
         )}

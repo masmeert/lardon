@@ -63,7 +63,7 @@ export function libraryFolders(familyTables: readonly FamilyTables[]) {
         tables,
         { kind: "folder", familyId, folderId: folder.id },
         "",
-      )[0],
+      ).find((recipe) => recipe.imageKey),
     })),
   );
 }

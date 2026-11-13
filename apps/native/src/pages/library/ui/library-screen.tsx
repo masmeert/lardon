@@ -49,7 +49,7 @@ export function LibraryScreen() {
             <Button onPress={() => openCollection({ kind: "all" })}>
               <ButtonLabel>All recipes</ButtonLabel>
             </Button>
-            <RecipeStickers recipeIds={recipes.slice(0, 9).map((recipe) => recipe.id)} />
+            <RecipeStickers recipes={recipes.filter((recipe) => recipe.imageKey).slice(0, 12)} />
           </>
         ) : (
           <Text className="max-w-xs text-center text-body text-muted">
@@ -76,7 +76,7 @@ export function LibraryScreen() {
                   key={family.id}
                   name={family.name}
                   recipeCount={familyRecipes.length}
-                  hasPreview={familyRecipes.length > 0}
+                  preview={familyRecipes.find((recipe) => recipe.imageKey)}
                   icon="person.2"
                   onPress={() => openCollection({ kind: "family", familyId: family.id })}
                 />
@@ -102,7 +102,7 @@ export function LibraryScreen() {
                 key={`${folder.familyId}:${folder.id}`}
                 name={folder.name}
                 recipeCount={folder.recipeCount}
-                hasPreview={folder.preview !== undefined}
+                preview={folder.preview}
                 icon="folder"
                 onPress={() =>
                   openCollection({ kind: "folder", familyId: folder.familyId, folderId: folder.id })
@@ -112,7 +112,7 @@ export function LibraryScreen() {
             <CollectionTile
               name="Unsorted"
               recipeCount={unsorted.length}
-              hasPreview={unsorted.length > 0}
+              preview={unsorted.find((recipe) => recipe.imageKey)}
               icon="tray"
               onPress={() => openCollection({ kind: "unsorted" })}
             />
