@@ -7,7 +7,7 @@ import {
   InvalidRequest,
   NotFound,
 } from "@lardon/api";
-import { and, asc, eq, gt, ne, sql } from "@lardon/db/orm";
+import { and, asc, eq, gt, isNull, ne, sql } from "@lardon/db/orm";
 import { user } from "@lardon/db/schema/auth";
 import { family, familyInvite, familyMember } from "@lardon/db/schema/families";
 import { Clock, Context, Effect, Layer } from "effect";
@@ -33,7 +33,7 @@ export class Families extends Context.Service<
   {
     list(userId: string): Effect.Effect<FamilySummary[]>;
     get(userId: string, familyId: string): Effect.Effect<FamilyDetails, NotFound>;
-    create(userId: string, name: string): Effect.Effect<FamilyDetails>;
+    create(userId: string, name: string): Effect.Effect<FamilyDetails, InvalidRequest>;
     rename(
       userId: string,
       familyId: string,
@@ -48,7 +48,7 @@ export class Families extends Context.Service<
       familyId: string,
     ): Effect.Effect<FamilyInvite, NotFound | InvalidRequest>;
     revokeInvite(userId: string, code: string): Effect.Effect<void, NotFound | Forbidden>;
-    join(userId: string, code: string): Effect.Effect<FamilyDetails, NotFound>;
+    join(userId: string, code: string): Effect.Effect<FamilyDetails, NotFound | InvalidRequest>;
     leave(userId: string, familyId: string): Effect.Effect<void, NotFound | InvalidRequest>;
     removeMember(
       userId: string,
@@ -109,6 +109,25 @@ export class Families extends Context.Service<
         if ((yield* requireMember(familyId, userId)).role !== "owner") {
           return yield* new Forbidden({
             message: "Only family owners can do this. Ask an owner of the family.",
+          });
+        }
+      });
+
+      const requireNoOtherFamily = Effect.fn("Families.requireNoOtherFamily")(function* (
+        userId: string,
+        allowedFamilyId?: string,
+      ) {
+        const shared = yield* database.use((client) =>
+          client
+            .select({ familyId: familyMember.familyId })
+            .from(familyMember)
+            .innerJoin(family, eq(family.id, familyMember.familyId))
+            .where(and(eq(familyMember.userId, userId), isNull(family.personalForUserId))),
+        );
+
+        if (shared.some((membership) => membership.familyId !== allowedFamilyId)) {
+          return yield* new InvalidRequest({
+            message: "You're already in a family. Leave it before you create or join another one.",
           });
         }
       });
@@ -246,6 +265,8 @@ export class Families extends Context.Service<
         get,
 
         create: Effect.fn("Families.create")(function* (userId: string, name: string) {
+          yield* requireNoOtherFamily(userId);
+
           return yield* get(userId, yield* insert(userId, { name })).pipe(Effect.orDie);
         }),
 
@@ -335,6 +356,8 @@ export class Families extends Context.Service<
               message: "This invite code is invalid or has expired. Ask for a new one.",
             });
           }
+
+          yield* requireNoOtherFamily(userId, invite.familyId);
 
           yield* database.use((client) =>
             client

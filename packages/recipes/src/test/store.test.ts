@@ -264,11 +264,15 @@ describe("recipes", () => {
     expect(store.getTables()).toEqual({});
   });
 
-  it("moves a recipe to another family under the same id, without its links", () => {
+  it("moves a recipe to another store under the same id, keeping its tags and folders by name", () => {
     const personal = createRecipeStore();
     const family = createRecipeStore();
     const recipeId = createRecipe(personal, draft(), "alice");
     addToCollection(personal, "tags", createCollection(personal, "tags", "Soup"), [recipeId]);
+    addToCollection(personal, "folders", createCollection(personal, "folders", "Winter"), [
+      recipeId,
+    ]);
+    const winterId = createCollection(family, "folders", "winter");
 
     expect(moveRecipe(personal, family, recipeId, null)).toBe(true);
 
@@ -276,7 +280,8 @@ describe("recipes", () => {
     expect(recipeDetail(family.getTables(), recipeId)).toMatchObject({
       title: "Tomato soup",
       createdById: "alice",
-      tags: [],
+      tags: [expect.objectContaining({ name: "Soup" })],
+      folders: [{ id: winterId, name: "winter" }],
     });
     expect(names(family, recipeId)).toEqual(["tomatoes", "onion", "salt"]);
   });

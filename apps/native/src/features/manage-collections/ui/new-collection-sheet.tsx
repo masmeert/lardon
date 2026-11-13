@@ -1,5 +1,3 @@
-import { Host, Picker, Text as SwiftText } from "@expo/ui/swift-ui";
-import { pickerStyle, tag } from "@expo/ui/swift-ui/modifiers";
 import { type Collection, FolderName, TagName, createCollection, readRows } from "@lardon/recipes";
 import { useQuery } from "@tanstack/react-query";
 import { Schema } from "effect";
@@ -20,10 +18,11 @@ const names = {
 export function NewCollectionSheet({ collection }: { collection: Collection }) {
   const { noun, schema, maxLength, placeholder } = names[collection];
   const { data: families = [] } = useQuery(familiesQuery);
-  const [chosenFamilyId, setChosenFamilyId] = useState<string>();
 
   const familyId =
-    chosenFamilyId ?? families.find((family) => family.personal)?.id ?? families[0]?.id ?? "";
+    families.find((family) => !family.personal)?.id ??
+    families.find((family) => family.personal)?.id ??
+    "";
 
   const store = useFamilyStore(familyId);
   const existing = readRows({ [collection]: useTable(collection, familyId) }, collection);
@@ -39,14 +38,14 @@ export function NewCollectionSheet({ collection }: { collection: Collection }) {
   function create() {
     if (!store || !canCreate) return;
 
-    const id = createCollection(store, collection, trimmedName);
+    createCollection(store, collection, trimmedName);
 
     router.dismiss();
 
     if (collection === "folders") {
       router.push({
         pathname: "/collection",
-        params: scopeParams({ kind: "folder", familyId, folderId: id }),
+        params: scopeParams({ kind: "folder", name: trimmedName }),
       });
     }
   }
@@ -69,24 +68,9 @@ export function NewCollectionSheet({ collection }: { collection: Collection }) {
             onSubmitEditing={create}
           />
           {isTaken && (
-            <InlineError>{`There's already a ${noun} called “${trimmedName}” in this family`}</InlineError>
+            <InlineError>{`There's already a ${noun} called “${trimmedName}”`}</InlineError>
           )}
         </View>
-        {families.length > 1 && (
-          <Host matchContents={{ vertical: true }}>
-            <Picker
-              selection={familyId}
-              onSelectionChange={(selection: string) => setChosenFamilyId(selection)}
-              modifiers={[pickerStyle("segmented")]}
-            >
-              {families.map((family) => (
-                <SwiftText key={family.id} modifiers={[tag(family.id)]}>
-                  {family.name}
-                </SwiftText>
-              ))}
-            </Picker>
-          </Host>
-        )}
         <Button isDisabled={!canCreate} onPress={create}>
           <ButtonLabel>{`Create ${noun}`}</ButtonLabel>
         </Button>

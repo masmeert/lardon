@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Stack, router } from "expo-router";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 
-import { FamilyFaces, familiesQuery } from "#/entities/family";
+import { familiesQuery } from "#/entities/family";
 import {
   RecipeFan,
   type RecipeScope,
@@ -71,37 +71,6 @@ export function LibraryScreen() {
             </Text>
           )}
         </View>
-        {families.length > 1 && (
-          <CollectionSection
-            title="Families"
-            subtitle={count(families.length, "family", "families")}
-            onShowAll={() => router.push("/families")}
-          >
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerClassName="gap-3 px-5"
-            >
-              {families.map((family) => {
-                const familyRecipes = scopedRecipes(
-                  familyTables,
-                  { kind: "family", familyId: family.id },
-                  "",
-                );
-
-                return (
-                  <CollectionTile
-                    key={family.id}
-                    name={family.name}
-                    recipeCount={familyRecipes.length}
-                    cover={<FamilyFaces familyId={family.id} sizePt={96} />}
-                    onPress={() => openCollection({ kind: "family", familyId: family.id })}
-                  />
-                );
-              })}
-            </ScrollView>
-          </CollectionSection>
-        )}
         <CollectionSection
           title="Folders"
           subtitle={
@@ -117,17 +86,11 @@ export function LibraryScreen() {
             >
               {folders.map((folder) => (
                 <CollectionTile
-                  key={`${folder.familyId}:${folder.id}`}
+                  key={folder.name}
                   name={folder.name}
-                  recipeCount={folder.recipeCount}
+                  recipeCount={folder.recipes.length}
                   cover={<RecipeFan recipes={folder.recipes} icon="folder" sizePt={96} />}
-                  onPress={() =>
-                    openCollection({
-                      kind: "folder",
-                      familyId: folder.familyId,
-                      folderId: folder.id,
-                    })
-                  }
+                  onPress={() => openCollection({ kind: "folder", name: folder.name })}
                 />
               ))}
               <CollectionTile

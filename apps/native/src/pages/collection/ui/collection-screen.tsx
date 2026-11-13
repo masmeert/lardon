@@ -9,7 +9,6 @@ import {
   RecipeFacts,
   type RecipeScopeParams,
   RecipeThumbnail,
-  libraryFolders,
   scopeFromParams,
   scopedRecipes,
   useFamilyTables,
@@ -28,11 +27,7 @@ export function CollectionScreen() {
   const title = Match.value(scope).pipe(
     Match.discriminatorsExhaustive("kind")({
       all: () => "All recipes",
-      family: ({ familyId }) => families.find((family) => family.id === familyId)?.name,
-      folder: ({ familyId, folderId }) =>
-        libraryFolders(familyTables).find(
-          (folder) => folder.familyId === familyId && folder.id === folderId,
-        )?.name,
+      folder: ({ name }) => name,
       tag: ({ name }) => name,
       unsorted: () => "Unsorted",
     }),

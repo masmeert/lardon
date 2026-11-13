@@ -85,15 +85,16 @@ describe("pictures", () => {
         const calls = yield* FamilyStoreCalls;
         const alice = yield* createUser("Alice");
         const bob = yield* createUser("Bob");
+        const carol = yield* createUser("Carol");
         const family = yield* alice.api.families.create({ payload: { name: "Meerts" } });
-        const kept = yield* alice.api.families.create({ payload: { name: "Kept" } });
+        const kept = yield* carol.api.families.create({ payload: { name: "Kept" } });
         yield* alice.api.images.upload({ params: { familyId: family.id }, payload: TINY_PNG });
-        yield* alice.api.images.upload({ params: { familyId: kept.id }, payload: TINY_PNG });
-        const invite = yield* alice.api.families.createInvite({ params: { familyId: kept.id } });
+        yield* carol.api.images.upload({ params: { familyId: kept.id }, payload: TINY_PNG });
+        const invite = yield* carol.api.families.createInvite({ params: { familyId: kept.id } });
         yield* bob.api.families.join({ payload: { code: invite.code } });
 
         yield* alice.api.families.delete({ params: { familyId: family.id } });
-        yield* alice.api.families.removeMember({ params: { familyId: kept.id, userId: bob.id } });
+        yield* carol.api.families.removeMember({ params: { familyId: kept.id, userId: bob.id } });
 
         expect(calls.deleted).toEqual([family.id]);
         expect(calls.disconnected).toEqual([`${kept.id}/${bob.id}`]);

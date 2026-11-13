@@ -12,14 +12,16 @@ Lardon is a local-first recipe app for families. Every device holds a full copy 
 
 ## Families
 
-A family is the unit of data: its recipes, tags, folders and meal plan live together, and every member sees and edits all of it. An account can belong to several families.
+Everyone has their own recipes and can be in at most one family on top. The app always shows both together as one library; nothing is ever split by family. Each is a separate store, because a store syncs in full to everyone who can open it.
 
-- **Personal family.** Signing up creates a family of one, shown as your own recipes. It's a family like any other in the data, except that nobody can be invited to it and you can't leave it. A solo user never sees the word "family".
-- **Joining** a family through an invite code gives you access to its store, next to your others. Nothing is merged.
-- **Moving a recipe** to another family is an action on the recipe screen. The device writes the recipe and its rows into the target store first, copies its photo into the target family, then deletes it from the source. If it's interrupted, you end up with a duplicate, never a loss. A move doesn't carry tags, folders or planned meals, which belong to the source family.
-- **Leaving** a family takes nothing with you. Move the recipes you want to keep first.
+- **Your own store.** Signing up creates it (in the data, a family of one that nobody can join or leave). Without a family, everything lives here. In a family, it holds what you marked "Only me".
+- **The family store.** Creating or joining a family gives you its store. Creating or joining a second one is refused until you leave the first. New recipes go to the family by default, and so do new folders and tags.
+- **"Only me" and "Share with family"** move a recipe between the two stores under the same id. The device writes the recipe into the target store first, copies its photo, then deletes it from the source, so an interruption leaves a duplicate, never a loss. Tags and folders come along by name.
+- **Folders and tags are matched by name** across the two stores, so the family shares one set. Putting a private recipe in a family folder creates a folder of the same name in your own store, which only you see. Each store stays self-contained, and its cleanup never sees a link to another store.
+- **Joining** keeps the recipes you already have private. Share them one by one.
+- **Leaving** takes nothing with you: shared recipes stay with the family, and your private ones stay yours.
 - **Removing a member** closes their open sync connections to that family immediately, and their device drops its copy.
-- **Deleting an account** deletes the personal family and leaves every other family. A family whose last member leaves is deleted with its store and images. Ownership passes to the longest-standing member when the last owner leaves.
+- **Deleting an account** deletes your own store and leaves your family. A family whose last member leaves is deleted with its store and images. Ownership passes to the longest-standing member when the last owner leaves.
 
 ## Where data lives
 
@@ -34,7 +36,7 @@ A family is the unit of data: its recipes, tags, folders and meal plan live toge
 
 TinyBase `MergeableStore` on both sides. Each cell carries a hybrid logical clock timestamp, and the latest write to a cell wins on every peer.
 
-**On the device**: one `MergeableStore` per family, created with TinyBase's React hooks (`useCreateMergeableStore`, `useCreatePersister`, `useCreateSynchronizer`) in a component per family that stays mounted while the user is signed in, whichever family is on screen. Each store is saved with `createExpoSqlitePersister` in its own database file (`family-<id>.db`, as one JSON row, the only mode a `MergeableStore` supports) and synced with `createWsSynchronizer` over a `reconnecting-websocket`, which reconnects with backoff and sends a fresh session cookie each time. Screens read plain table data (TinyBase's reactive hooks, or `useRecipes`, which subscribes to several family stores at once for the library's merged list) and pass it to the shared queries, which keeps them correct under the React Compiler. The library shows every family's recipes in one list, newest first, with a filter to narrow it to one family. The family list comes from TanStack Query, persisted on the device so the library opens offline. Signing out erases every family database; leaving a family erases its own.
+**On the device**: one `MergeableStore` per family, created with TinyBase's React hooks (`useCreateMergeableStore`, `useCreatePersister`, `useCreateSynchronizer`) in a component per family that stays mounted while the user is signed in, whichever family is on screen. Each store is saved with `createExpoSqlitePersister` in its own database file (`family-<id>.db`, as one JSON row, the only mode a `MergeableStore` supports) and synced with `createWsSynchronizer` over a `reconnecting-websocket`, which reconnects with backoff and sends a fresh session cookie each time. Screens read plain table data (TinyBase's reactive hooks, or `useRecipes`, which subscribes to several family stores at once for the library's merged list) and pass it to the shared queries, which keeps them correct under the React Compiler. The library always shows your own recipes and your family's together. The family list comes from TanStack Query, persisted on the device so the library opens offline. Signing out erases every family database; leaving a family erases its own.
 
 **On the server**: `FamilyStore extends WsServerDurableObject`, persisted with `createDurableObjectSqlStoragePersister` in `fragmented` mode, so a change rewrites one SQL row per changed TinyBase row instead of the whole store. WebSockets hibernate, so idle families cost no duration.
 

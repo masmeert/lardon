@@ -1,4 +1,5 @@
 import {
+  type Collection,
   type Stored,
   collectionList,
   everyRecipe,
@@ -9,15 +10,15 @@ import {
 import { Match } from "effect";
 import type { Tables } from "tinybase";
 
-import { type RecipeScope, isInScope } from "./recipe-scope";
+import type { RecipeScope } from "./recipe-scope";
 
 export type FamilyTables = { familyId: string; tables: Tables };
 
 export type LibraryRecipe = Stored<"recipes"> & { familyId: string };
 
-function tagIdsNamed(tables: Tables, name: string) {
-  return readRows(tables, "tags").flatMap((tag) =>
-    tag.name.toLocaleLowerCase() === name.toLocaleLowerCase() ? [tag.id] : [],
+function idsNamed(tables: Tables, collection: Collection, name: string) {
+  return readRows(tables, collection).flatMap((owner) =>
+    owner.name.toLocaleLowerCase() === name.toLocaleLowerCase() ? [owner.id] : [],
   );
 }
 
@@ -26,9 +27,12 @@ function familyRecipes(familyId: string, tables: Tables, scope: RecipeScope, sea
 
   const recipes = Match.value(scope).pipe(
     Match.discriminators("kind")({
-      folder: ({ folderId }) => recipeList(tables, { ...query, folderId }),
+      folder: ({ name }) =>
+        idsNamed(tables, "folders", name).flatMap((folderId) =>
+          recipeList(tables, { ...query, folderId }),
+        ),
       tag: ({ name }) =>
-        tagIdsNamed(tables, name).flatMap((tagId) =>
+        idsNamed(tables, "tags", name).flatMap((tagId) =>
           recipeList(tables, { ...query, tagIds: [tagId] }),
         ),
     }),
@@ -48,24 +52,25 @@ export function scopedRecipes(
   search: string,
 ): LibraryRecipe[] {
   return familyTables
-    .filter(({ familyId }) => isInScope(scope, familyId))
     .flatMap(({ familyId, tables }) => familyRecipes(familyId, tables, scope, search))
     .sort((first, second) => second.updatedAt - first.updatedAt);
 }
 
 export function libraryFolders(familyTables: readonly FamilyTables[]) {
-  return familyTables.flatMap(({ familyId, tables }) =>
-    collectionList(tables, "folders").map((folder) => ({
-      ...folder,
-      familyId,
-      recipes: familyRecipes(
-        familyId,
-        tables,
-        { kind: "folder", familyId, folderId: folder.id },
-        "",
-      ),
-    })),
-  );
+  const names = new Map<string, string>();
+
+  for (const { tables } of familyTables) {
+    for (const folder of readRows(tables, "folders")) {
+      names.set(
+        folder.name.toLocaleLowerCase(),
+        names.get(folder.name.toLocaleLowerCase()) ?? folder.name,
+      );
+    }
+  }
+
+  return [...names.values()]
+    .sort((first, second) => first.localeCompare(second))
+    .map((name) => ({ name, recipes: scopedRecipes(familyTables, { kind: "folder", name }, "") }));
 }
 
 export function libraryTags(familyTables: readonly FamilyTables[]) {

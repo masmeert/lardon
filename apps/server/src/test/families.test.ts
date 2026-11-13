@@ -94,6 +94,35 @@ describe("families", () => {
       }),
     ));
 
+  it("keeps everyone in at most one family besides their own recipes", () =>
+    runTest(
+      Effect.gen(function* () {
+        const { users, family, invite } = yield* createFamilyWith(["Alice", "Bob"]);
+        const [alice, bob] = users;
+        const other = yield* createFamilyWith(["Carol"]);
+
+        const created = yield* alice!.api.families
+          .create({ payload: { name: "Second" } })
+          .pipe(Effect.flip);
+
+        const joined = yield* bob!.api.families
+          .join({ payload: { code: other.invite.code } })
+          .pipe(Effect.flip);
+
+        expect([created._tag, joined._tag]).toEqual(["InvalidRequest", "InvalidRequest"]);
+
+        const again = yield* bob!.api.families.join({ payload: { code: invite.code } });
+
+        expect(again.id).toBe(family.id);
+
+        yield* bob!.api.families.leave({ params: { familyId: family.id } });
+
+        const moved = yield* bob!.api.families.join({ payload: { code: other.invite.code } });
+
+        expect(moved.id).toBe(other.family.id);
+      }),
+    ));
+
   it("rejects unknown or revoked invite codes", () =>
     runTest(
       Effect.gen(function* () {
@@ -222,7 +251,6 @@ describe("forgetting an account", () => {
       Effect.gen(function* () {
         const { users, family } = yield* createFamilyWith(["Alice", "Bob"]);
         const [alice, bob] = users;
-        const solo = yield* alice!.api.families.create({ payload: { name: "Solo" } });
         const [personal] = yield* alice!.api.families.list();
         const families = yield* Families;
 
@@ -236,12 +264,11 @@ describe("forgetting an account", () => {
           ["Bob", "owner"],
         ]);
 
-        const gone = yield* Effect.all([
-          bob!.api.families.get({ params: { familyId: solo.id } }).pipe(Effect.flip),
-          bob!.api.families.get({ params: { familyId: personal!.id } }).pipe(Effect.flip),
-        ]);
+        const gone = yield* bob!.api.families
+          .get({ params: { familyId: personal!.id } })
+          .pipe(Effect.flip);
 
-        expect(gone.map((error) => error._tag)).toEqual(["NotFound", "NotFound"]);
+        expect(gone._tag).toBe("NotFound");
       }),
     ));
 });

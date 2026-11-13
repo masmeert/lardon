@@ -483,8 +483,28 @@ export function moveRecipe(
 
   if (!recipe || !draft || source === target) return false;
 
+  const sourceContent = source.getTables();
+
+  function sameNameIn(collection: Collection, ids: readonly string[]) {
+    return ids.flatMap((id) => {
+      const owner = readRow(sourceContent, collection, id);
+
+      return owner ? [createCollection(target, collection, owner.name)] : [];
+    });
+  }
+
   target.transaction(() =>
-    writeRecipe(target, recipeId, { ...draft, imageKey, tagIds: [], folderIds: [] }, recipe),
+    writeRecipe(
+      target,
+      recipeId,
+      {
+        ...draft,
+        imageKey,
+        tagIds: sameNameIn("tags", draft.tagIds),
+        folderIds: sameNameIn("folders", draft.folderIds),
+      },
+      recipe,
+    ),
   );
   deleteRecipes(source, [recipeId]);
 

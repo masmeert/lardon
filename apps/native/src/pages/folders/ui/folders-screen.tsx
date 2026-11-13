@@ -27,31 +27,18 @@ export function FoldersScreen() {
       <CollectionList
         items={[
           ...libraryFolders(familyTables).map((folder) => ({
-            key: `${folder.familyId}:${folder.id}`,
+            key: folder.name,
             title: folder.name,
             cover: (sizePt: number) => (
               <RecipeFan recipes={folder.recipes} icon="folder" sizePt={sizePt} />
             ),
             details: (
-              <Text className="text-caption text-muted">
-                {[
-                  recipeCount(folder.recipeCount),
-                  families.length > 1
-                    ? families.find((family) => family.id === folder.familyId)?.name
-                    : undefined,
-                ]
-                  .filter((detail) => detail !== undefined)
-                  .join(", ")}
-              </Text>
+              <Text className="text-caption text-muted">{recipeCount(folder.recipes.length)}</Text>
             ),
             onPress: () =>
               router.push({
                 pathname: "/collection",
-                params: scopeParams({
-                  kind: "folder",
-                  familyId: folder.familyId,
-                  folderId: folder.id,
-                }),
+                params: scopeParams({ kind: "folder", name: folder.name }),
               }),
           })),
           {

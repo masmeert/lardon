@@ -63,11 +63,12 @@ export class FamiliesApi extends HttpApiGroup.make("families")
     HttpApiEndpoint.post("create", "/", {
       payload: Schema.Struct({ name: FamilyName }),
       success: FamilyDetails,
+      error: InvalidRequest,
     }),
     HttpApiEndpoint.post("join", "/join", {
       payload: Schema.Struct({ code: Schema.String.check(Schema.isMaxLength(32)) }),
       success: FamilyDetails,
-      error: NotFound,
+      error: [NotFound, InvalidRequest],
     }),
     HttpApiEndpoint.delete("revokeInvite", "/invites/:code", {
       params: { code: Schema.String },
