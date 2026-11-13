@@ -58,6 +58,14 @@ export const server = Cloudflare.Worker("server", {
     CORS_ORIGIN: Config.String("CORS_ORIGIN"),
     BETTER_AUTH_SECRET: Config.Redacted("BETTER_AUTH_SECRET"),
     BETTER_AUTH_URL: Cloudflare.Worker.URL,
+    AUTH_RATE_LIMIT: Cloudflare.RateLimit("AUTH_RATE_LIMIT", {
+      namespaceId: 1001,
+      simple: { limit: 20, period: 60 },
+    }),
+    API_RATE_LIMIT: Cloudflare.RateLimit("API_RATE_LIMIT", {
+      namespaceId: 1003,
+      simple: { limit: 600, period: 60 },
+    }),
     ...observabilityBindings,
   },
   domain: process.env.APP_ENV === "production" ? "api.lardon.app" : undefined,

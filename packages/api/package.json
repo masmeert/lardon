@@ -1,0 +1,16 @@
+{
+  "name": "@lardon/api",
+  "license": "PolyForm-Strict-1.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
+  },
+  "dependencies": {
+    "effect": "catalog:"
+  },
+  "devDependencies": {
+    "@lardon/config": "workspace:*",
+    "typescript": "^6.0.3"
+  }
+}
