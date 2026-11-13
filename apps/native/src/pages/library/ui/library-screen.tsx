@@ -54,7 +54,11 @@ export function LibraryScreen() {
         <EmptyState
           icon="book"
           title="No recipes yet"
-          description="Recipes you and your family add show up here."
+          description={
+            families.some((family) => !family.personal)
+              ? "Recipes you and your family add show up here."
+              : "Recipes you add show up here."
+          }
         />
       ) : (
         <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerClassName="pb-16">
