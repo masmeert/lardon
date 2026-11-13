@@ -13,11 +13,13 @@
     "@lardon/auth": "workspace:*",
     "@lardon/brand": "workspace:*",
     "@lardon/db": "workspace:*",
+    "@lardon/recipes": "workspace:*",
     "@varlock/infisical-plugin": "2.1.3",
     "better-auth": "catalog:",
     "effect": "catalog:",
     "evlog": "catalog:",
     "hono": "4.13.16",
+    "tinybase": "10.1.0",
     "varlock": "catalog:"
   },
   "devDependencies": {

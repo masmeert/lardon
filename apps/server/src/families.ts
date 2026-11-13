@@ -13,6 +13,8 @@ import { family, familyInvite, familyMember } from "@lardon/db/schema/families";
 import { Clock, Context, Effect, Layer } from "effect";
 
 import { Database } from "./database";
+import { FamilyStores } from "./family-stores";
+import { ImageStorage, familyImagePrefix } from "./image-storage";
 import { formatInviteCode, generateInviteCode, normalizeInviteCode } from "./invite-code";
 
 const INVITE_LIFETIME_MS = 7 * 24 * 60 * 60 * 1000;
@@ -60,6 +62,8 @@ export class Families extends Context.Service<
     Families,
     Effect.gen(function* () {
       const database = yield* Database;
+      const familyStores = yield* FamilyStores;
+      const images = yield* ImageStorage;
 
       const requireMember = Effect.fn("Families.requireMember")(function* (
         familyId: string,
@@ -148,6 +152,10 @@ export class Families extends Context.Service<
 
       const destroy = Effect.fn("Families.destroy")(function* (familyId: string) {
         yield* database.use((client) => client.delete(family).where(eq(family.id, familyId)));
+        yield* familyStores.delete(familyId);
+        yield* images.deleteMany(
+          (yield* images.list(familyImagePrefix(familyId))).map((image) => image.key),
+        );
       });
 
       const depart = Effect.fn("Families.depart")(function* (userId: string, familyId: string) {
@@ -185,6 +193,8 @@ export class Families extends Context.Service<
         } else {
           yield* database.use((client) => client.delete(familyMember).where(departing));
         }
+
+        yield* familyStores.disconnect(familyId, userId);
       });
 
       return Families.of({
@@ -354,6 +364,8 @@ export class Families extends Context.Service<
           if (!removed) {
             return yield* new NotFound({ message: "This person isn't a member of the family." });
           }
+
+          yield* familyStores.disconnect(familyId, memberId);
 
           return yield* get(userId, familyId);
         }),

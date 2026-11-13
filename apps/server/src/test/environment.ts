@@ -9,13 +9,86 @@ import { HttpApiMiddleware, HttpApiTest } from "effect/http-api";
 import { Authentication } from "../authentication";
 import { Database } from "../database";
 import { Families } from "../families";
+import { FamilyStores } from "../family-stores";
 import { ApiHandlers } from "../http/api";
+import { ImageStorage } from "../image-storage";
 import { AppRoutes } from "../http/app";
 import { RateLimits } from "../rate-limits";
 
 export class RateLimitCounts extends Context.Service<RateLimitCounts, Map<string, number>>()(
   "lardon/server/test/RateLimitCounts",
 ) {}
+
+export class FamilyStoreCalls extends Context.Service<
+  FamilyStoreCalls,
+  {
+    connected: Array<{ familyId: string; userId: string; request: Request }>;
+    disconnected: string[];
+    deleted: string[];
+  }
+>()("lardon/server/test/FamilyStoreCalls") {}
+
+export class StoredImages extends Context.Service<
+  StoredImages,
+  Map<string, { bytes: Uint8Array; contentType: string; uploadedMs: number }>
+>()("lardon/server/test/StoredImages") {}
+
+const FamilyStoresTest = Layer.effect(
+  FamilyStores,
+  Effect.gen(function* () {
+    const calls = yield* FamilyStoreCalls;
+
+    return FamilyStores.of({
+      connect: (familyId, userId, request) =>
+        Effect.sync(() => {
+          calls.connected.push({ familyId, userId, request });
+
+          return new Response(null, { status: 204 });
+        }),
+      disconnect: (familyId, userId) =>
+        Effect.sync(() => void calls.disconnected.push(`${familyId}/${userId}`)),
+      delete: (familyId) => Effect.sync(() => void calls.deleted.push(familyId)),
+    });
+  }),
+);
+
+const ImageStorageTest = Layer.effect(
+  ImageStorage,
+  Effect.gen(function* () {
+    const images = yield* StoredImages;
+
+    return ImageStorage.of({
+      put: (key, bytes, contentType) =>
+        Effect.sync(() => void images.set(key, { bytes, contentType, uploadedMs: Date.now() })),
+      get: (key) =>
+        Effect.sync(() => {
+          const image = images.get(key);
+
+          return image
+            ? { body: new Blob([image.bytes.slice()]).stream(), contentType: image.contentType }
+            : null;
+        }),
+      copy: (sourceKey, targetKey) =>
+        Effect.sync(() => {
+          const source = images.get(sourceKey);
+
+          if (source) images.set(targetKey, source);
+
+          return source !== undefined;
+        }),
+      list: (prefix) =>
+        Effect.sync(() =>
+          [...images].flatMap(([key, image]) =>
+            key.startsWith(prefix) ? [{ key, uploadedMs: image.uploadedMs }] : [],
+          ),
+        ),
+      deleteMany: (keys) =>
+        Effect.sync(() => {
+          for (const key of keys) images.delete(key);
+        }),
+    });
+  }),
+);
 
 export const TEST_RATE_LIMITS = { auth: 3, sensitive: 3, api: 1000 } as const;
 
@@ -70,9 +143,15 @@ const RateLimitsTest = Layer.effect(
 );
 
 export const TestServices = Families.layer.pipe(
-  Layer.provideMerge(Layer.mergeAll(AuthenticationTest, RateLimitsTest)),
+  Layer.provideMerge(
+    Layer.mergeAll(AuthenticationTest, RateLimitsTest, FamilyStoresTest, ImageStorageTest),
+  ),
   Layer.provideMerge(DatabaseTest),
   Layer.provideMerge(Layer.sync(RateLimitCounts, () => new Map())),
+  Layer.provideMerge(
+    Layer.sync(FamilyStoreCalls, () => ({ connected: [], disconnected: [], deleted: [] })),
+  ),
+  Layer.provideMerge(Layer.sync(StoredImages, () => new Map())),
 );
 
 export const TestServer = Layer.mergeAll(ApiHandlers, HttpServer.layerServices).pipe(
@@ -93,7 +172,7 @@ export function signedInAs(userId: string | null) {
 }
 
 export const clientFor = Effect.fn("clientFor")(function* (userId: string | null) {
-  return yield* HttpApiTest.groups(Api, ["system", "account", "families"]).pipe(
+  return yield* HttpApiTest.groups(Api, ["system", "account", "families", "images"]).pipe(
     Effect.provide(signedInAs(userId)),
   );
 });

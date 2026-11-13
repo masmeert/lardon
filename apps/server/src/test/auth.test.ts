@@ -8,6 +8,8 @@ import { describe, expect, it } from "vite-plus/test";
 
 import { Database } from "../database";
 import { Families } from "../families";
+import { FamilyStores } from "../family-stores";
+import { ImageStorage } from "../image-storage";
 
 const config = {
   BETTER_AUTH_URL: "http://localhost:3000",
@@ -26,7 +28,31 @@ async function testAuth() {
       return yield* Families;
     }).pipe(
       Effect.provide(
-        Families.layer.pipe(Layer.provide(Layer.succeed(Database, Database.make(client)))),
+        Families.layer.pipe(
+          Layer.provide(
+            Layer.mergeAll(
+              Layer.succeed(Database, Database.make(client)),
+              Layer.succeed(
+                FamilyStores,
+                FamilyStores.of({
+                  connect: () => Effect.die("not used"),
+                  disconnect: () => Effect.void,
+                  delete: () => Effect.void,
+                }),
+              ),
+              Layer.succeed(
+                ImageStorage,
+                ImageStorage.of({
+                  put: () => Effect.void,
+                  get: () => Effect.succeed(null),
+                  copy: () => Effect.succeed(false),
+                  list: () => Effect.succeed([]),
+                  deleteMany: () => Effect.void,
+                }),
+              ),
+            ),
+          ),
+        ),
       ),
     ),
   );

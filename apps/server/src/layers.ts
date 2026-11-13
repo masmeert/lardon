@@ -1,6 +1,6 @@
 import { createAuth } from "@lardon/auth";
 import { createDb } from "@lardon/db";
-import { Effect, Layer } from "effect";
+import { Effect, Layer, ManagedRuntime } from "effect";
 import { createAxiomDrain } from "evlog/axiom";
 import { routerLayer } from "evlog/effect";
 import { HttpRouter, HttpServer } from "effect/http";
@@ -9,13 +9,19 @@ import { Authentication } from "./authentication";
 import { Database } from "./database";
 import { ENV } from "./env.server";
 import { Families } from "./families";
+import { FamilyStores, inEuropeanUnion } from "./family-stores";
 import { AppRoutes } from "./http/app";
+import { ImageStorage } from "./image-storage";
 import { Mailer, signInCodeEmail } from "./mailer";
 import { RateLimits } from "./rate-limits";
 
 const InfrastructureLive = Layer.mergeAll(
   Layer.sync(Database, () => Database.make(createDb(ENV))),
   Layer.sync(Mailer, () => Mailer.fromCloudflare(ENV.EMAIL, ENV.EMAIL_FROM)),
+  Layer.sync(ImageStorage, () => ImageStorage.fromR2(ENV.IMAGES)),
+  Layer.sync(FamilyStores, () =>
+    FamilyStores.fromDurableObjects(inEuropeanUnion(ENV.FAMILY_STORES)),
+  ),
 );
 
 const ServicesLive = Layer.mergeAll(
@@ -55,6 +61,8 @@ const ServicesLive = Layer.mergeAll(
   ),
 );
 
+export const serverRuntime = ManagedRuntime.make(ServicesLive);
+
 export const webHandler = HttpRouter.toWebHandler(
   Layer.mergeAll(
     AppRoutes,
@@ -66,5 +74,5 @@ export const webHandler = HttpRouter.toWebHandler(
     }),
     routerLayer({ drain: createAxiomDrain() }),
   ).pipe(Layer.provide(ServicesLive), Layer.provide(HttpServer.layerServices)),
-  { disableLogger: true },
+  { disableLogger: true, memoMap: serverRuntime.memoMap },
 ).handler;

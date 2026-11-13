@@ -1,9 +1,9 @@
-import { Option, Schema } from "effect";
+import { Option, Record, Schema } from "effect";
 import { generateKeyBetween, generateNKeysBetween } from "fractional-indexing";
 import { type Cell, type MergeableStore, getUniqueId } from "tinybase";
 
 import { ingredientsOf, linkedIds, stepsOf } from "./queries";
-import { type TableId, type Visibility, linkId, readRow, readRows } from "./tables";
+import { type TableId, type Visibility, linkId, readRow, readRows, tables } from "./tables";
 import type { UnitCode } from "./units";
 
 export type DraftIngredient = {
@@ -581,10 +581,19 @@ export function clearMeal(store: MergeableStore, date: string) {
   store.delRow("meals", date);
 }
 
-export function removeOrphans(store: MergeableStore) {
+export function cleanUp(store: MergeableStore) {
   let removed = 0;
 
   store.transaction(() => {
+    for (const tableId of Record.keys(tables)) {
+      for (const rowId of store.getRowIds(tableId)) {
+        if (!readRow(store, tableId, rowId)) {
+          store.delRow(tableId, rowId);
+          removed += 1;
+        }
+      }
+    }
+
     for (const tableId of childTables) {
       for (const rowId of store.getRowIds(tableId)) {
         const isOrphan = Option.match(decodeChild(store.getRow(tableId, rowId)), {

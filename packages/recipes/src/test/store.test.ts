@@ -15,7 +15,7 @@ import {
   moveRecipe,
   planMeal,
   recipeDraft,
-  removeOrphans,
+  cleanUp,
   saveRecipe,
   setVisibility,
 } from "../commands";
@@ -248,8 +248,17 @@ describe("recipes", () => {
 
     expect(recipeList(phone, everyRecipe)).toEqual([]);
     expect(readRows(phone, "ingredients").map((ingredient) => ingredient.id)).toEqual(["cream"]);
-    expect(removeOrphans(phone)).toBe(1);
-    expect(readRows(phone, "ingredients")).toEqual([]);
+    expect(cleanUp(phone)).toBeGreaterThanOrEqual(1);
+    expect(phone.getTables()).toEqual({});
+  });
+
+  it("cleans up rows that never became valid, with their lines", () => {
+    const store = createRecipeStore();
+    const recipeId = createRecipe(store, draft(), "alice");
+    store.delCell("recipes", recipeId, "createdById");
+
+    expect(cleanUp(store)).toBe(6);
+    expect(store.getTables()).toEqual({});
   });
 
   it("moves a recipe to another family under the same id, without its links", () => {
@@ -333,7 +342,7 @@ describe("tags and folders", () => {
 });
 
 describe("meal plan", () => {
-  it("keeps one meal per day, the later choice winning across devices", () => {
+  it("keeps one meal per day, the later choice winning across devices", async () => {
     const phone = createRecipeStore();
     const soup = createRecipe(phone, draft(), "alice");
     const stew = createRecipe(phone, draft({ title: "Stew" }), "alice");
@@ -341,6 +350,7 @@ describe("meal plan", () => {
     tablet.merge(phone);
 
     planMeal(phone, "2026-11-13", { recipeId: soup, servings: 2 });
+    await new Promise((resolve) => setTimeout(resolve, 5));
     planMeal(tablet, "2026-11-13", { recipeId: stew, servings: null });
     planMeal(tablet, "2026-11-14", { recipeId: soup, servings: null });
     phone.merge(tablet);

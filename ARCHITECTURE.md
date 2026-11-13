@@ -49,7 +49,7 @@ TinyBase `MergeableStore` on both sides. Each cell carries a hybrid logical cloc
 
 **Cells merge independently**, so a row whose cells only make sense together writes all of them every time, with `null` for "none". A meal does this, so a later choice replaces the whole meal.
 
-**Deleting a recipe** deletes its ingredients, steps, tag links, folder links and planned meals in the same transaction. A child row orphaned by a concurrent edit on another device is hidden by queries and removed by the next cleanup.
+**Deleting a recipe** deletes its ingredients, steps, tag links, folder links and planned meals in the same transaction. A row left behind by a concurrent edit on another device (an orphaned line, or a deleted recipe's `updatedAt` written after the delete) is hidden by queries and removed by the next cleanup.
 
 **Ordering** uses fractional index strings (`position`), so moving a line writes one cell.
 
@@ -103,11 +103,11 @@ Never synced: library layout and sort order, and the unit system (original, metr
 ## Images
 
 1. The device resizes and compresses a photo before upload.
-2. `PUT /families/:familyId/images` checks membership, the type by its bytes and the size, then stores it in R2 under that family and returns its key.
+2. `PUT /api/families/:familyId/images` checks membership, the type by its bytes and the size, then stores it in R2 under that family and returns its key.
 3. The recipe's `imageKey` cell holds its file name.
-4. Reading goes through `GET /families/:familyId/images/:file` with the session. Removed members lose access, and the device caches the files.
-5. Moving a recipe copies its photo with `POST /families/:familyId/images/copy`, which checks membership of both families. The source copy is left to the cleanup below.
-6. A daily alarm in each `FamilyStore` deletes R2 objects in its prefix that no recipe references and that are older than a day. The grace period covers uploads whose `imageKey` hasn't synced yet. This replaces tracking deletes event by event.
+4. Reading goes through `GET /api/families/:familyId/images/:imageKey` with the session. Removed members lose access, and the device caches the files.
+5. Moving a recipe copies its photo with `POST /api/families/:familyId/images/copy`, which checks membership of both families. The source copy is left to the cleanup below.
+6. A daily alarm in each `FamilyStore` first deletes rows that still don't decode and lines whose recipe, tag or folder is gone, then deletes R2 objects in the family's prefix that no recipe references and that are older than a day. The grace period covers uploads whose `imageKey` hasn't synced yet. If the store has no recipes at all, it skips the photos, so a store that failed to load can never wipe them.
 
 ## Sharing
 

@@ -4,11 +4,15 @@ import { HttpApiBuilder } from "effect/http-api";
 
 import { AuthorizationLive } from "./authorization";
 import { FamiliesHandlers } from "./families";
+import { ImagesHandlers } from "./images";
 import { AccountHandlers, SystemHandlers } from "./system";
 
-export const ApiHandlers = Layer.mergeAll(SystemHandlers, AccountHandlers, FamiliesHandlers).pipe(
-  Layer.provideMerge(AuthorizationLive),
-);
+export const ApiHandlers = Layer.mergeAll(
+  SystemHandlers,
+  AccountHandlers,
+  FamiliesHandlers,
+  ImagesHandlers,
+).pipe(Layer.provideMerge(AuthorizationLive));
 
 export const ApiRoutes = HttpApiBuilder.layer(Api, { openapiPath: "/api/openapi.json" }).pipe(
   Layer.provide(ApiHandlers),

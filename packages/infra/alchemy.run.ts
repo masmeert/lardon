@@ -49,6 +49,8 @@ export const observabilityBindings = {
   AXIOM_EDGE_URL: observabilityEnv.pipe(Effect.map(({ AXIOM_EDGE_URL }) => AXIOM_EDGE_URL)),
 };
 
+export const images = Cloudflare.R2.Bucket("images", { jurisdiction: "eu" });
+
 export const server = Cloudflare.Worker("server", {
   main: "../../apps/server/src/index.ts",
   compatibility: {
@@ -56,6 +58,8 @@ export const server = Cloudflare.Worker("server", {
   },
   env: {
     DB: db,
+    IMAGES: images,
+    FAMILY_STORES: Cloudflare.DurableObject("FamilyStore"),
     CORS_ORIGIN: Config.String("CORS_ORIGIN"),
     BETTER_AUTH_SECRET: Config.Redacted("BETTER_AUTH_SECRET"),
     BETTER_AUTH_URL: Cloudflare.Worker.URL,
