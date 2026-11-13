@@ -7,9 +7,15 @@ allowBuilds:
   msgpackr-extract: true
   workerd: true
 overrides:
+  effect: 4.1.4
+  "@effect/platform-node": 4.1.4
+  "@effect/platform-bun": 4.1.4
   vite@*: npm:@voidzero-dev/vite-plus-core@1.4.0
 catalog:
   vite-plus: 1.4.0
+  effect: 4.1.4
+  "@effect/platform-node": 4.1.4
+  "@effect/platform-bun": 4.1.4
   zod: ^4.5.4
   "@types/node": ^26.4.1
   varlock: 1.23.0

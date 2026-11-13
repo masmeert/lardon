@@ -7,6 +7,7 @@ import * as Layer from "effect/Layer";
 import "varlock/auto-load";
 
 export const db = Cloudflare.D1.Database("database", {
+  jurisdiction: "eu",
   migrations: "../../packages/db/src/migrations",
 });
 
@@ -19,6 +20,7 @@ export const observability = Effect.gen(function* () {
     kind: "axiom:events:v1",
     description: "lardon application logs",
   });
+
   const ingest = yield* Axiom.ApiToken("logs-ingest", {
     name: `lardon-${stage}-logs-ingest`,
     datasetCapabilities: {
@@ -58,12 +60,20 @@ export const server = Cloudflare.Worker("server", {
     BETTER_AUTH_URL: Cloudflare.Worker.URL,
     ...observabilityBindings,
   },
+  domain: process.env.APP_ENV === "production" ? "api.lardon.app" : undefined,
   dev: {
     port: 3000,
   },
 });
 
 export type ServerEnv = Cloudflare.InferEnv<typeof server>;
+
+export const website = Cloudflare.Website.Astro("website", {
+  rootDir: "../../apps/web",
+  astro: { output: "static" },
+  assets: { notFoundHandling: "404-page" },
+  domain: process.env.APP_ENV === "production" ? "lardon.app" : undefined,
+});
 
 export default Alchemy.Stack(
   "lardon",
@@ -74,21 +84,10 @@ export default Alchemy.Stack(
   Effect.gen(function* () {
     const observabilityResources = yield* observability;
     const serverWorker = yield* server;
-    const webWorker = yield* Cloudflare.Website.Astro("web", {
-      rootDir: "../../apps/web",
-      env: {
-        ...observabilityBindings,
-        SESSION: Cloudflare.KV.Namespace("session"),
-        IMAGES: Cloudflare.Images.Images(),
-        PUBLIC_SERVER_URL: serverWorker.url.as<string>(),
-      },
-      dev: {
-        port: 4321,
-      },
-    });
+    const websiteWorker = yield* website;
 
     return {
-      web: webWorker.url,
+      website: websiteWorker.url,
       server: serverWorker.url,
       axiomDataset: observabilityResources.dataset.name,
     };
