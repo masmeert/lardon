@@ -17,7 +17,6 @@ export const cn = createCn({
             "heading-sm",
             "heading",
             "heading-lg",
-            "heading-display",
           ],
         },
       ],
