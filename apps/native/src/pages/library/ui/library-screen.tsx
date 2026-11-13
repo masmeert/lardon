@@ -1,8 +1,11 @@
+import { useQuery } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { useState } from "react";
 import { ActivityIndicator, Alert, FlatList, StyleSheet, View } from "react-native";
+import { useStore } from "tinybase/ui-react";
 
-import { refreshLibrary, signOut, useLibrary, useRecipes } from "#/shared/library";
+import { familiesQuery, useSignOut } from "#/entities/family";
+import { useRecipes } from "#/entities/recipe";
 import { useThemeColors } from "#/shared/lib";
 import { Button, ButtonLabel, InlineError } from "#/shared/ui";
 
@@ -10,36 +13,30 @@ import { LibraryMessage } from "./library-message";
 import { RecipeRow } from "./recipe-row";
 
 export function LibraryScreen() {
-  const { families, status } = useLibrary();
   const { accent } = useThemeColors("accent");
+  const familyList = useQuery(familiesQuery);
+  const families = familyList.data ?? [];
+  const [chosenFamilyId, setChosenFamilyId] = useState<string>();
+
+  const family =
+    families.find((candidate) => candidate.id === chosenFamilyId) ??
+    families.find((candidate) => candidate.personal) ??
+    families[0];
+
   const [search, setSearch] = useState("");
-  const recipes = useRecipes(search);
-  const [isSigningOut, setIsSigningOut] = useState(false);
-  const [signOutError, setSignOutError] = useState<string>();
-  const [isRetrying, setIsRetrying] = useState(false);
+  const recipes = useRecipes(family?.id ?? "", search);
+  const isStoreOpen = useStore(family?.id ?? "") !== undefined;
+  const signOut = useSignOut();
 
   function confirmSignOut() {
     Alert.alert("Sign out?", "Your recipes stay in your account, ready when you sign back in.", [
       { text: "Cancel", style: "cancel" },
-      {
-        text: "Sign out",
-        style: "destructive",
-        onPress: () => {
-          setIsSigningOut(true);
-          setSignOutError(undefined);
-          signOut().catch(() => {
-            setIsSigningOut(false);
-            setSignOutError("Couldn't sign out. Check your connection and try again");
-          });
-        },
-      },
+      { text: "Sign out", style: "destructive", onPress: () => signOut.mutate() },
     ]);
   }
 
   function emptyState() {
-    if (status === "loading") return <ActivityIndicator className="flex-1 pb-24" />;
-
-    if (status === "unreachable") {
+    if (familyList.isError && !familyList.data) {
       return (
         <LibraryMessage
           title="Couldn't reach Lardon"
@@ -47,17 +44,16 @@ export function LibraryScreen() {
         >
           <Button
             variant="secondary"
-            isLoading={isRetrying}
-            onPress={() => {
-              setIsRetrying(true);
-              void refreshLibrary().finally(() => setIsRetrying(false));
-            }}
+            isLoading={familyList.isFetching}
+            onPress={() => void familyList.refetch()}
           >
             <ButtonLabel>Try again</ButtonLabel>
           </Button>
         </LibraryMessage>
       );
     }
+
+    if (!isStoreOpen) return <ActivityIndicator className="flex-1 pb-24" />;
 
     if (search.trim() !== "") {
       return (
@@ -95,7 +91,23 @@ export function LibraryScreen() {
         }}
       />
       <Stack.Toolbar placement="right">
-        {isSigningOut ? (
+        {families.length > 1 && (
+          <Stack.Toolbar.Menu
+            icon="line.3.horizontal.decrease.circle"
+            accessibilityLabel="Choose a family"
+          >
+            {families.map((candidate) => (
+              <Stack.Toolbar.MenuAction
+                key={candidate.id}
+                isOn={candidate.id === family?.id}
+                onPress={() => setChosenFamilyId(candidate.id)}
+              >
+                {candidate.name}
+              </Stack.Toolbar.MenuAction>
+            ))}
+          </Stack.Toolbar.Menu>
+        )}
+        {signOut.isPending ? (
           <Stack.Toolbar.View>
             <ActivityIndicator />
           </Stack.Toolbar.View>
@@ -113,15 +125,15 @@ export function LibraryScreen() {
       </Stack.Toolbar>
       <FlatList
         data={recipes}
-        keyExtractor={(recipe) => `${recipe.family.id}:${recipe.id}`}
+        keyExtractor={(recipe) => recipe.id}
         contentInsetAdjustmentBehavior="automatic"
         keyboardDismissMode="on-drag"
         className="flex-1 bg-background"
         contentContainerClassName="grow pt-2 pb-12"
         ListHeaderComponent={
-          signOutError ? (
+          signOut.isError ? (
             <View className="items-start px-4 pb-3">
-              <InlineError>{signOutError}</InlineError>
+              <InlineError>Couldn't sign out. Check your connection and try again</InlineError>
             </View>
           ) : undefined
         }
@@ -132,13 +144,7 @@ export function LibraryScreen() {
           </View>
         )}
         renderItem={({ item, index }) => (
-          <RecipeRow
-            recipe={item}
-            family={item.family}
-            isFamilyShown={families.length > 1}
-            isFirst={index === 0}
-            isLast={index === recipes.length - 1}
-          />
+          <RecipeRow recipe={item} isFirst={index === 0} isLast={index === recipes.length - 1} />
         )}
       />
     </>

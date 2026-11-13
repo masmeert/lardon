@@ -1,7 +1,6 @@
 import type { Stored } from "@lardon/recipes";
 import { Text, View } from "react-native";
 
-import type { LibraryFamily } from "#/shared/library";
 import { cn, iconSize, useThemeColors } from "#/shared/lib";
 import { Icon } from "#/shared/ui";
 
@@ -14,13 +13,12 @@ function formatMinutes(totalMinutes: number) {
   return minutes === 0 ? `${hours} h` : `${hours} h ${minutes} min`;
 }
 
-function recipeDetails(recipe: Stored<"recipes">, family: LibraryFamily, isFamilyShown: boolean) {
+function recipeDetails(recipe: Stored<"recipes">) {
   const totalMinutes = (recipe.prepMinutes ?? 0) + (recipe.cookMinutes ?? 0);
 
   return [
     recipe.servings === undefined ? undefined : `Serves ${recipe.servings}`,
     totalMinutes > 0 ? formatMinutes(totalMinutes) : undefined,
-    isFamilyShown && !family.personal ? family.name : undefined,
   ]
     .filter((detail) => detail !== undefined)
     .join(", ");
@@ -28,19 +26,15 @@ function recipeDetails(recipe: Stored<"recipes">, family: LibraryFamily, isFamil
 
 export function RecipeRow({
   recipe,
-  family,
-  isFamilyShown,
   isFirst,
   isLast,
 }: {
   recipe: Stored<"recipes">;
-  family: LibraryFamily;
-  isFamilyShown: boolean;
   isFirst: boolean;
   isLast: boolean;
 }) {
   const { accent } = useThemeColors("accent");
-  const details = recipeDetails(recipe, family, isFamilyShown);
+  const details = recipeDetails(recipe);
 
   return (
     <View

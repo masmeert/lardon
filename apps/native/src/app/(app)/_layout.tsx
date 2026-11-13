@@ -1,17 +1,16 @@
 import { Stack } from "expo-router";
-import { useEffect } from "react";
+import { Provider } from "tinybase/ui-react";
 
-import { startLibrary, stopLibrary } from "#/shared/library";
+import { FamilyStores } from "#/entities/family";
 import { useThemeColors } from "#/shared/lib";
 
 export default function AppLayout() {
   const { background } = useThemeColors("background");
 
-  useEffect(() => {
-    startLibrary();
-
-    return () => void stopLibrary({ isErasing: false });
-  }, []);
-
-  return <Stack screenOptions={{ contentStyle: { backgroundColor: background } }} />;
+  return (
+    <Provider>
+      <FamilyStores />
+      <Stack screenOptions={{ contentStyle: { backgroundColor: background } }} />
+    </Provider>
+  );
 }
