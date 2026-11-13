@@ -6,6 +6,14 @@ export default function RecipesLayout() {
   return (
     <TabStack title="Recipes">
       <Stack.Screen name="collection" options={{ headerBackButtonDisplayMode: "minimal" }} />
+      <Stack.Screen
+        name="families"
+        options={{ title: "Families", headerBackButtonDisplayMode: "minimal" }}
+      />
+      <Stack.Screen
+        name="folders"
+        options={{ title: "Folders", headerBackButtonDisplayMode: "minimal" }}
+      />
     </TabStack>
   );
 }

@@ -4,6 +4,7 @@ import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 
 import { FamilyFaces, familiesQuery } from "#/entities/family";
 import {
+  RecipeFan,
   type RecipeScope,
   libraryFolders,
   libraryTags,
@@ -11,11 +12,9 @@ import {
   scopedRecipes,
   useFamilyTables,
 } from "#/entities/recipe";
-import { Button, ButtonLabel, FilterPill } from "#/shared/ui";
+import { Button, ButtonLabel, CollectionTile, FilterPill } from "#/shared/ui";
 
 import { CollectionSection } from "./collection-section";
-import { CollectionTile } from "./collection-tile";
-import { FolderCover } from "./folder-cover";
 import { RecipeStickers } from "./recipe-stickers";
 
 function count(amount: number, singular: string, plural: string) {
@@ -59,7 +58,11 @@ export function LibraryScreen() {
         )}
       </View>
       {families.length > 1 && (
-        <CollectionSection title="Families" subtitle={count(families.length, "family", "families")}>
+        <CollectionSection
+          title="Families"
+          subtitle={count(families.length, "family", "families")}
+          onShowAll={() => router.push("/families")}
+        >
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -90,6 +93,7 @@ export function LibraryScreen() {
         subtitle={
           folders.length > 0 ? count(folders.length, "folder", "folders") : "No folders yet"
         }
+        onShowAll={folders.length > 0 ? () => router.push("/folders") : undefined}
       >
         {folders.length > 0 ? (
           <ScrollView
@@ -102,7 +106,7 @@ export function LibraryScreen() {
                 key={`${folder.familyId}:${folder.id}`}
                 name={folder.name}
                 recipeCount={folder.recipeCount}
-                cover={<FolderCover preview={folder.preview} icon="folder" />}
+                cover={<RecipeFan recipes={folder.recipes} icon="folder" />}
                 onPress={() =>
                   openCollection({ kind: "folder", familyId: folder.familyId, folderId: folder.id })
                 }
@@ -111,9 +115,7 @@ export function LibraryScreen() {
             <CollectionTile
               name="Unsorted"
               recipeCount={unsorted.length}
-              cover={
-                <FolderCover preview={unsorted.find((recipe) => recipe.imageKey)} icon="tray" />
-              }
+              cover={<RecipeFan recipes={unsorted} icon="tray" />}
               onPress={() => openCollection({ kind: "unsorted" })}
             />
           </ScrollView>

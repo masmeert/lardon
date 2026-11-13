@@ -15,6 +15,8 @@ export {
 
 export { RecipeCard } from "./ui/recipe-card";
 
+export { RecipeFan } from "./ui/recipe-fan";
+
 export { RecipeRow } from "./ui/recipe-row";
 
 export { RecipeThumbnail } from "./ui/recipe-thumbnail";

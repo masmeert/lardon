@@ -18,7 +18,7 @@ export function MemberAvatar({
   return (
     <View
       style={{ width: sizePt, height: sizePt }}
-      className="items-center justify-center overflow-hidden rounded-full border-2 border-paper bg-accent"
+      className="items-center justify-center overflow-hidden rounded-full border-2 border-paper bg-accent shadow-rim"
     >
       {member.image ? (
         <Image source={{ uri: member.image }} className="size-full" />

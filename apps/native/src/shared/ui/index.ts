@@ -4,7 +4,11 @@ export { ButtonLabel } from "./button/button-label";
 
 export { CodeInput } from "./code-input";
 
+export { CollectionTile } from "./collection-tile";
+
 export { EmptyState } from "./empty-state";
+
+export { Fan } from "./fan";
 
 export { FilterPill } from "./filter-pill";
 

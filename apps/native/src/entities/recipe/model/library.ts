@@ -58,12 +58,12 @@ export function libraryFolders(familyTables: readonly FamilyTables[]) {
     collectionList(tables, "folders").map((folder) => ({
       ...folder,
       familyId,
-      preview: familyRecipes(
+      recipes: familyRecipes(
         familyId,
         tables,
         { kind: "folder", familyId, folderId: folder.id },
         "",
-      ).find((recipe) => recipe.imageKey),
+      ),
     })),
   );
 }
