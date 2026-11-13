@@ -18,14 +18,12 @@ export function RecipeThumbnail({
 
   if (!recipe.imageKey) {
     return (
-      <PhotoFrame style={{ width, height: width, borderRadius }}>
-        <View
-          style={{ borderRadius: borderRadius - 2, borderCurve: "continuous" }}
-          className="size-full items-center justify-center bg-placeholder"
-        >
-          <LardonMark width={Math.round(width * 0.5)} color={white} />
-        </View>
-      </PhotoFrame>
+      <View
+        style={{ width, height: width, borderRadius, borderCurve: "continuous" }}
+        className="items-center justify-center bg-placeholder"
+      >
+        <LardonMark width={Math.round(width * 0.5)} color={white} />
+      </View>
     );
   }
 

@@ -14,16 +14,15 @@ export function RecipeFan({
 }) {
   const { muted } = useThemeColors("muted");
 
-  if (recipes.length === 0) return <Icon name={icon} size={iconSize.xl} color={muted} />;
+  const photoRecipes = recipes.filter((recipe) => recipe.imageKey);
+
+  if (photoRecipes.length === 0) return <Icon name={icon} size={iconSize.xl} color={muted} />;
 
   return (
     <Fan spreadPt={24}>
-      {[...recipes]
-        .sort((first, second) => Number(Boolean(second.imageKey)) - Number(Boolean(first.imageKey)))
-        .slice(0, 3)
-        .map((recipe) => (
-          <RecipeThumbnail key={`${recipe.familyId}:${recipe.id}`} recipe={recipe} width={52} />
-        ))}
+      {photoRecipes.slice(0, 3).map((recipe) => (
+        <RecipeThumbnail key={`${recipe.familyId}:${recipe.id}`} recipe={recipe} width={52} />
+      ))}
     </Fan>
   );
 }
