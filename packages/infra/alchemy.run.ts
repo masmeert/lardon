@@ -71,6 +71,10 @@ export const server = Cloudflare.Worker("server", {
       namespaceId: 1001,
       simple: { limit: 20, period: 60 },
     }),
+    SENSITIVE_RATE_LIMIT: Cloudflare.RateLimit("SENSITIVE_RATE_LIMIT", {
+      namespaceId: 1002,
+      simple: { limit: 30, period: 60 },
+    }),
     API_RATE_LIMIT: Cloudflare.RateLimit("API_RATE_LIMIT", {
       namespaceId: 1003,
       simple: { limit: 600, period: 60 },

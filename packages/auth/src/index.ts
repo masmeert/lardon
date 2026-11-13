@@ -16,7 +16,11 @@ export type AuthConfig = {
 
 export type SignInCode = { to: string; code: string };
 
-export type AuthHooks = { sendSignInCode(email: SignInCode): Promise<void> };
+export type AuthHooks = {
+  sendSignInCode(email: SignInCode): Promise<void>;
+  afterCreateUser(userId: string): Promise<void>;
+  beforeDeleteUser(userId: string): Promise<void>;
+};
 
 const withoutProviderTokens = <Account extends object>(account: Account) =>
   Promise.resolve({
@@ -41,8 +45,11 @@ export function createAuth(env: AuthConfig, database: Database, hooks: AuthHooks
         appBundleIdentifier: env.APPLE_BUNDLE_ID,
       },
     },
-    user: { deleteUser: { enabled: true } },
+    user: {
+      deleteUser: { enabled: true, beforeDelete: (user) => hooks.beforeDeleteUser(user.id) },
+    },
     databaseHooks: {
+      user: { create: { after: (user) => hooks.afterCreateUser(user.id) } },
       account: {
         create: { before: withoutProviderTokens },
         update: { before: withoutProviderTokens },

@@ -41,4 +41,29 @@ describe("router", () => {
       await dispose();
     }
   });
+
+  it("rate limits joining families separately from the rest of the API", async () => {
+    const { handler, dispose } = testWebHandler();
+
+    try {
+      const statuses = [];
+
+      for (let index = 0; index <= TEST_RATE_LIMITS.sensitive; index++) {
+        const response = await handler(
+          request("/api/families/join", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ code: "AAAA-BBBB-CCCC" }),
+          }),
+        );
+
+        statuses.push(response.status);
+      }
+
+      expect(statuses).toEqual([401, 401, 401, 429]);
+      expect((await handler(request("/api/families"))).status).toBe(401);
+    } finally {
+      await dispose();
+    }
+  });
 });

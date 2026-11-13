@@ -8,6 +8,7 @@ import { HttpRouter, HttpServer } from "effect/http";
 import { Authentication } from "./authentication";
 import { Database } from "./database";
 import { ENV } from "./env.server";
+import { Families } from "./families";
 import { AppRoutes } from "./http/app";
 import { Mailer, signInCodeEmail } from "./mailer";
 import { RateLimits } from "./rate-limits";
@@ -23,6 +24,7 @@ const ServicesLive = Layer.mergeAll(
     Effect.gen(function* () {
       const database = yield* Database;
       const mailer = yield* Mailer;
+      const families = yield* Families;
 
       return Authentication.fromBetterAuth(
         createAuth(ENV, database.client, {
@@ -38,12 +40,18 @@ const ServicesLive = Layer.mergeAll(
                   ),
                 ),
             ),
+          afterCreateUser: (userId) => Effect.runPromise(families.createPersonal(userId)),
+          beforeDeleteUser: (userId) => Effect.runPromise(families.forgetUser(userId)),
         }),
       );
     }),
-  ).pipe(Layer.provideMerge(InfrastructureLive)),
+  ).pipe(Layer.provideMerge(Families.layer), Layer.provideMerge(InfrastructureLive)),
   Layer.sync(RateLimits, () =>
-    RateLimits.fromCloudflare({ auth: ENV.AUTH_RATE_LIMIT, api: ENV.API_RATE_LIMIT }),
+    RateLimits.fromCloudflare({
+      auth: ENV.AUTH_RATE_LIMIT,
+      sensitive: ENV.SENSITIVE_RATE_LIMIT,
+      api: ENV.API_RATE_LIMIT,
+    }),
   ),
 );
 

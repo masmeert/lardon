@@ -1,7 +1,7 @@
 import { TooManyRequests } from "@lardon/api";
 import { Context, Effect } from "effect";
 
-export type RateLimitRule = "auth" | "api";
+export type RateLimitRule = "auth" | "sensitive" | "api";
 
 export class RateLimits extends Context.Service<
   RateLimits,
@@ -31,6 +31,8 @@ const AUTH_PATHS = [
 
 export function rateLimitRuleFor(path: string): RateLimitRule | null {
   if (AUTH_PATHS.some((prefix) => path.startsWith(prefix))) return "auth";
+
+  if (path === "/api/families/join") return "sensitive";
 
   if (path.startsWith("/api/")) return "api";
 

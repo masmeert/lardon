@@ -3,9 +3,10 @@ import { Layer } from "effect";
 import { HttpApiBuilder } from "effect/http-api";
 
 import { AuthorizationLive } from "./authorization";
+import { FamiliesHandlers } from "./families";
 import { AccountHandlers, SystemHandlers } from "./system";
 
-export const ApiHandlers = Layer.mergeAll(SystemHandlers, AccountHandlers).pipe(
+export const ApiHandlers = Layer.mergeAll(SystemHandlers, AccountHandlers, FamiliesHandlers).pipe(
   Layer.provideMerge(AuthorizationLive),
 );
 

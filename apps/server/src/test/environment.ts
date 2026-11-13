@@ -8,6 +8,7 @@ import { HttpApiMiddleware, HttpApiTest } from "effect/http-api";
 
 import { Authentication } from "../authentication";
 import { Database } from "../database";
+import { Families } from "../families";
 import { ApiHandlers } from "../http/api";
 import { AppRoutes } from "../http/app";
 import { RateLimits } from "../rate-limits";
@@ -16,7 +17,7 @@ export class RateLimitCounts extends Context.Service<RateLimitCounts, Map<string
   "lardon/server/test/RateLimitCounts",
 ) {}
 
-export const TEST_RATE_LIMITS = { auth: 3, api: 1000 } as const;
+export const TEST_RATE_LIMITS = { auth: 3, sensitive: 3, api: 1000 } as const;
 
 const DatabaseTest = Layer.effect(
   Database,
@@ -68,7 +69,8 @@ const RateLimitsTest = Layer.effect(
   }),
 );
 
-export const TestServices = Layer.mergeAll(AuthenticationTest, RateLimitsTest).pipe(
+export const TestServices = Families.layer.pipe(
+  Layer.provideMerge(Layer.mergeAll(AuthenticationTest, RateLimitsTest)),
   Layer.provideMerge(DatabaseTest),
   Layer.provideMerge(Layer.sync(RateLimitCounts, () => new Map())),
 );
@@ -91,7 +93,7 @@ export function signedInAs(userId: string | null) {
 }
 
 export const clientFor = Effect.fn("clientFor")(function* (userId: string | null) {
-  return yield* HttpApiTest.groups(Api, ["system", "account"]).pipe(
+  return yield* HttpApiTest.groups(Api, ["system", "account", "families"]).pipe(
     Effect.provide(signedInAs(userId)),
   );
 });
@@ -107,6 +109,7 @@ export const createUser = Effect.fn("createUser")(function* (name: string) {
   };
 
   yield* database.use((client) => client.insert(user).values(created));
+  yield* (yield* Families).createPersonal(created.id);
 
   return { ...created, api: yield* clientFor(created.id) };
 });
