@@ -43,7 +43,8 @@
             "deploymentTarget": "26.0"
           }
         }
-      ]
+      ],
+      "expo-image"
     ],
     "experiments": {
       "typedRoutes": true,

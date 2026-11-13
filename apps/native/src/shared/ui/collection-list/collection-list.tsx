@@ -1,5 +1,8 @@
+import { FlashList } from "@shopify/flash-list";
 import type { ReactElement } from "react";
-import { FlatList, Pressable, StyleSheet, View, useWindowDimensions } from "react-native";
+import { Pressable, StyleSheet, View, useWindowDimensions } from "react-native";
+
+import { cn } from "#/shared/lib";
 
 import { CollectionCard } from "./collection-card";
 import type { CollectionItem } from "./collection-item";
@@ -19,18 +22,15 @@ export function CollectionList({
   if (items.length === 0 && emptyState) return emptyState;
 
   return (
-    <FlatList
+    <FlashList
       key={layout}
       data={items}
       keyExtractor={(item) => item.key}
       numColumns={layout === "grid" ? 2 : 1}
-      columnWrapperStyle={layout === "grid" ? { gap: 12 } : undefined}
+      maintainVisibleContentPosition={{ disabled: true }}
       contentInsetAdjustmentBehavior="automatic"
       keyboardDismissMode="on-drag"
-      className="flex-1"
-      contentContainerClassName={
-        layout === "grid" ? "grow gap-3 px-4 pt-2 pb-16" : "grow px-4 pb-16"
-      }
+      contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 64 }}
       ItemSeparatorComponent={
         layout === "list"
           ? () => (
@@ -38,23 +38,30 @@ export function CollectionList({
             )
           : undefined
       }
-      renderItem={({ item }) => (
-        <Pressable
-          accessibilityRole={item.onPress ? "button" : undefined}
-          accessibilityState={
-            item.isSelected === undefined ? undefined : { selected: item.isSelected }
-          }
-          disabled={!item.onPress && !item.onLongPress}
-          onPress={item.onPress}
-          onLongPress={item.onLongPress}
-          className="active:opacity-80"
-        >
-          {layout === "grid" ? (
-            <CollectionCard item={item} width={(width - 44) / 2} />
-          ) : (
-            <CollectionRow item={item} />
+      renderItem={({ item, index }) => (
+        <View
+          className={cn(
+            layout === "grid" && "pb-3",
+            layout === "grid" && (index % 2 === 0 ? "items-start" : "items-end"),
           )}
-        </Pressable>
+        >
+          <Pressable
+            accessibilityRole={item.onPress ? "button" : undefined}
+            accessibilityState={
+              item.isSelected === undefined ? undefined : { selected: item.isSelected }
+            }
+            disabled={!item.onPress && !item.onLongPress}
+            onPress={item.onPress}
+            onLongPress={item.onLongPress}
+            className="active:opacity-80"
+          >
+            {layout === "grid" ? (
+              <CollectionCard item={item} width={(width - 44) / 2} />
+            ) : (
+              <CollectionRow item={item} />
+            )}
+          </Pressable>
+        </View>
       )}
     />
   );
