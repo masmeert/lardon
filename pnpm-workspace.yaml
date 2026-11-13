@@ -9,6 +9,7 @@ allowBuilds:
 overrides:
   vite@*: npm:@voidzero-dev/vite-plus-core@1.4.0
 catalog:
+  vite-plus: 1.4.0
   zod: ^4.5.4
   "@types/node": ^26.4.1
   varlock: 1.23.0

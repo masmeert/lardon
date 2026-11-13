@@ -1,0 +1,45 @@
+---
+import DadMessages from "./dad-messages.astro";
+import RecipeBox from "./recipe-box.astro";
+import GrandpaQuote from "./grandpa-quote.astro";
+---
+
+<section class="mx-auto max-w-5xl px-6 py-24">
+  <div class="grid gap-6 lg:grid-cols-[1.2fr_1fr] lg:items-end lg:gap-16">
+    <h2
+      class="text-4xl leading-[1.1] font-medium tracking-tight text-balance text-foreground sm:text-5xl"
+    >
+      The best recipes aren't in cookbooks
+    </h2>
+    <p class="text-base leading-relaxed text-pretty sm:text-lg">
+      They're in places that get lost, thrown out or forgotten. Lardon gives them one place your
+      whole family can reach.
+    </p>
+  </div>
+  <div class="mt-14 grid gap-x-4 gap-y-10 md:grid-cols-3">
+    <figure>
+      <div
+        class="flex h-72 items-center justify-center overflow-hidden rounded-2xl border border-hairline bg-white"
+      >
+        <RecipeBox />
+      </div>
+      <figcaption class="mt-4 text-base font-medium text-foreground">In grandma's recipe box</figcaption>
+    </figure>
+    <figure>
+      <div
+        class="flex h-72 items-center justify-center overflow-hidden rounded-2xl border border-hairline bg-white"
+      >
+        <DadMessages />
+      </div>
+      <figcaption class="mt-4 text-base font-medium text-foreground">In a text from dad</figcaption>
+    </figure>
+    <figure>
+      <div
+        class="flex h-72 items-center justify-center overflow-hidden rounded-2xl border border-hairline bg-white"
+      >
+        <GrandpaQuote />
+      </div>
+      <figcaption class="mt-4 text-base font-medium text-foreground">Nowhere, because nobody wrote it down</figcaption>
+    </figure>
+  </div>
+</section>

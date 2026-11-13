@@ -1,6 +1,7 @@
 {
   "name": "@lardon/infra",
   "private": true,
+  "license": "PolyForm-Strict-1.0.0",
   "type": "module",
   "scripts": {
     "check-types": "tsc --noEmit",

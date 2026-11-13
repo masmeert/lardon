@@ -1,0 +1,385 @@
+---
+import Logo from "@lardon/brand/assets/logo.svg";
+import LogoStacked from "@lardon/brand/assets/logo-stacked.svg";
+import Mark from "@lardon/brand/assets/mark.svg";
+import Wordmark from "@lardon/brand/assets/wordmark.svg";
+import { colors } from "@lardon/brand";
+import SiteFooter from "../components/site-footer.astro";
+import SiteHeader from "../components/site-header.astro";
+import Base from "../layouts/base.astro";
+---
+
+<Base title="Brand" description="The Lardon logo, colors, type and the rules we design by.">
+  <div class="bg-linear-to-b from-accent-light to-accent text-card">
+    <SiteHeader class="max-w-5xl" />
+    <div class="mx-auto max-w-5xl px-6 pt-16 pb-16 sm:pt-24 sm:pb-20">
+      <h1 class="text-5xl leading-[1.05] font-medium sm:text-7xl">Brand</h1>
+      <p class="mt-5 text-base text-card">Our logo, colors, type and the rules we design by.</p>
+      <a
+        href="/brand/lardon-brand-assets.zip"
+        download
+        class="mt-8 inline-flex min-h-11 items-center gap-2 rounded-full bg-paper px-5 text-sm font-semibold text-foreground shadow-[0_1px_2px_rgb(34_28_24/0.14),0_3px_10px_rgb(34_28_24/0.08)] hover:bg-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-card"
+      >
+        Download all files
+        <span class="font-normal text-muted">ZIP, 0.6 MB</span>
+      </a>
+    </div>
+  </div>
+  <main class="mx-auto max-w-5xl px-6 pt-4 pb-24">
+    <section class="mt-20" aria-labelledby="logo">
+      <h2 id="logo" class="text-2xl font-medium text-foreground">Logo</h2>
+      <div class="mt-6 grid gap-3 sm:grid-cols-3">
+        {
+          [
+            "bg-paper ring-1 ring-hairline ring-inset text-foreground",
+            "bg-accent text-bacon",
+            "bg-foreground text-background",
+          ].map((tile) => (
+            <div class:list={["flex h-40 items-center justify-center rounded-[18px] px-8", tile]}>
+              <Logo class="h-9 w-auto max-w-full" />
+            </div>
+          ))
+        }
+        <div
+          class="flex h-40 items-center justify-center rounded-[18px] bg-paper text-foreground ring-1 ring-hairline ring-inset"
+        >
+          <LogoStacked class="h-24 w-auto" />
+        </div>
+        <div
+          class="flex h-40 items-center justify-center rounded-[18px] bg-paper text-accent ring-1 ring-hairline ring-inset"
+        >
+          <Mark class="h-20 w-auto" />
+        </div>
+        <div class="flex h-40 items-center justify-center rounded-[18px] bg-fill">
+          <img
+            src="/brand/lardon-app-icon-rounded.svg"
+            alt=""
+            width="96"
+            height="96"
+            class="size-24 drop-shadow-[0_1px_2px_rgb(34_28_24/0.12)]"
+          />
+        </div>
+      </div>
+      <p class="mt-4 max-w-xl text-sm leading-relaxed">
+        Use the full logo when it fits and the bacon strip when it doesn't. Keep it at least 20 px
+        tall, with room around it.
+      </p>
+    </section>
+
+    <section class="mt-20" aria-labelledby="principles">
+      <h2 id="principles" class="text-2xl font-medium text-foreground">Principles</h2>
+      <div class="mt-6 grid gap-3 sm:grid-cols-2">
+        {
+          [
+            ["Calm", "Small type, wide margins, few colors. The recipe photos bring the color."],
+            ["One accent", "Olive is for the main action, selection and focus. One olive button per screen."],
+            ["Raised means pressable", "Pages are flat. Only things you can press look raised."],
+            ["Native first", "Headers, sheets and menus come from the system. We style what's inside them."],
+          ].map(([title, text]) => (
+            <div class="rounded-[18px] bg-fill p-5">
+              <p class="text-base font-semibold text-foreground">{title}</p>
+              <p class="mt-1 text-sm leading-relaxed">{text}</p>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="mt-20" aria-labelledby="color">
+      <h2 id="color" class="text-2xl font-medium text-foreground">Colors</h2>
+      <p class="mt-4 max-w-xl text-sm leading-relaxed">
+        Warm neutrals and one olive. All text on these colors meets WCAG AA contrast.
+      </p>
+      <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {
+          [
+            ["Flour", "Page", colors.background, "bg-background ring-1 ring-hairline ring-inset", "text-foreground", "text-muted"],
+            ["Paper", "Raised surfaces", colors.paper, "bg-paper ring-1 ring-hairline ring-inset", "text-foreground", "text-muted"],
+            ["Oat", "Fields and tiles", colors.fill, "bg-fill", "text-foreground", "text-muted"],
+            ["Linen", "Dividers", colors.hairline, "bg-hairline", "text-foreground", "text-foreground"],
+            ["Stone", "Secondary text", colors.muted, "bg-muted", "text-white", "text-white"],
+            ["Espresso", "Text", colors.foreground, "bg-foreground", "text-white", "text-white"],
+            ["Olive", "Main action", colors.accent, "bg-accent", "text-white", "text-white"],
+            ["Paprika", "Errors", colors.danger, "bg-danger", "text-white", "text-white"],
+          ].map(([name, role, hex, swatch, ink, detail]) => (
+            <div class:list={["flex h-32 flex-col justify-between rounded-[18px] p-4", swatch]}>
+              <span class:list={["font-mono text-xs", detail]}>{hex.toUpperCase()}</span>
+              <span>
+                <span class:list={["block text-sm font-semibold", ink]}>{name}</span>
+                <span class:list={["block text-xs", detail]}>{role}</span>
+              </span>
+            </div>
+          ))
+        }
+      </div>
+      <h3 class="mt-10 text-base font-semibold text-foreground">Supporting</h3>
+      <ul class="mt-4 grid grid-cols-2 gap-x-3 gap-y-4 sm:grid-cols-4">
+        {
+          [
+            ["Olive tint", "Selected backgrounds", `background-color: ${colors.accentSoft}`, colors.accentSoft.toUpperCase()],
+            ["Paprika tint", "Error backgrounds", `background-color: ${colors.dangerSoft}`, colors.dangerSoft.toUpperCase()],
+            [
+              "Olive gradient",
+              "Raised buttons",
+              `background-image: linear-gradient(170deg, ${colors.accentLight}, ${colors.accent} 35%, ${colors.accentDeep})`,
+              `${colors.accentLight.toUpperCase()} to ${colors.accentDeep.toUpperCase()}`,
+            ],
+          ].map(([name, role, style, value]) => (
+            <li class="flex items-center gap-3">
+              <span class="size-10 shrink-0 rounded-full ring-1 ring-hairline ring-inset" style={style} />
+              <span class="min-w-0">
+                <span class="block text-sm font-semibold text-foreground">{name}</span>
+                <span class="block text-xs">{role}</span>
+                <span class="block font-mono text-xs">{value}</span>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+      <h3 class="mt-10 text-base font-semibold text-foreground">Illustration</h3>
+      <p class="mt-1 text-sm">For the logo, drawings and recipe cards. Not for buttons or text.</p>
+      <ul class="mt-4 grid grid-cols-2 gap-x-3 gap-y-4 sm:grid-cols-4">
+        {
+          [
+            ["Sage", colors.placeholder],
+            ["Sage mark", colors.placeholderMark],
+            ["Bacon", colors.bacon],
+            ["Butter", colors.butter],
+            ["Card", colors.card],
+            ["Card margin", colors.cardMargin],
+            ["Card rule", colors.cardRule],
+          ].map(([name, hex]) => (
+            <li class="flex items-center gap-3">
+              <span
+                class="size-10 shrink-0 rounded-full ring-1 ring-hairline ring-inset"
+                style={`background-color: ${hex}`}
+              />
+              <span>
+                <span class="block text-sm font-semibold text-foreground">{name}</span>
+                <span class="block font-mono text-xs">{hex.toUpperCase()}</span>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="mt-20" aria-labelledby="type">
+      <h2 id="type" class="text-2xl font-medium text-foreground">Type</h2>
+      <p class="mt-4 max-w-xl text-sm leading-relaxed">
+        Six sizes of Hanken Grotesk, each with its own line height. Hierarchy comes from size and
+        weight, not capitals or letter-spacing.
+      </p>
+      <ul class="mt-6 divide-y divide-hairline border-y border-hairline">
+        {
+          [
+            ["Display", "38/44, bold", "8 recipes", "text-[38px] leading-[44px] font-bold"],
+            ["Headline", "22/28, semibold", "What's your email?", "text-[22px] leading-[28px] font-semibold"],
+            ["Title", "17/22, semibold", "Sunday dinners", "text-[17px] leading-[22px] font-semibold"],
+            ["Body", "16/21, regular", "Pâtes à la moutarde", "text-[16px] leading-[21px]"],
+            ["Caption", "14/18, regular", "4 people, 35 min", "text-[14px] leading-[18px]"],
+            ["Label", "13/16, semibold", "Under 30 min", "text-[13px] leading-[16px] font-semibold"],
+          ].map(([role, size, sample, style]) => (
+            <li class="grid grid-cols-[8rem_1fr] items-center gap-4 py-4">
+              <span>
+                <span class="block text-sm font-semibold text-foreground">{role}</span>
+                <span class="block text-xs">{size}</span>
+              </span>
+              <span class:list={["text-foreground", style]}>{sample}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="mt-6 grid gap-3 sm:grid-cols-3">
+        <div class="rounded-[18px] bg-fill p-5">
+          <div class="flex h-14 items-center text-foreground">
+            <Wordmark class="h-9 w-auto" />
+          </div>
+          <p class="mt-4 text-sm font-semibold text-foreground">Eczar SemiBold</p>
+          <p class="text-sm">The wordmark only.</p>
+        </div>
+        <div class="rounded-[18px] bg-fill p-5">
+          <p class="flex h-14 items-center text-3xl font-medium text-foreground">Pot-au-feu</p>
+          <p class="mt-4 text-sm font-semibold text-foreground">Hanken Grotesk</p>
+          <p class="text-sm">Everything else.</p>
+        </div>
+        <div class="rounded-[18px] bg-fill p-5">
+          <p class="flex h-14 items-center font-handwritten text-5xl leading-none text-foreground">
+            À table !
+          </p>
+          <p class="mt-4 text-sm font-semibold text-foreground">Reenie Beanie</p>
+          <p class="text-sm">Handwriting on recipe cards.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-20" aria-labelledby="depth">
+      <h2 id="depth" class="text-2xl font-medium text-foreground">Shape and depth</h2>
+      <p class="mt-4 max-w-xl text-sm leading-relaxed">
+        Controls are capsules and cards have 18 px corners. Shadows are soft and warm, never
+        colored.
+      </p>
+      <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div
+          class="flex h-44 flex-col justify-between rounded-[18px] bg-background p-4 ring-1 ring-hairline ring-inset"
+        >
+          <span />
+          <span>
+            <span class="block text-sm font-semibold text-foreground">Page</span>
+            <span class="block text-xs">Flour, no shadow.</span>
+          </span>
+        </div>
+        <div
+          class="flex h-44 flex-col justify-between rounded-[18px] bg-background p-4 ring-1 ring-hairline ring-inset"
+        >
+          <span
+            class="inline-flex h-9 items-center self-start rounded-full bg-fill px-4 text-sm text-muted"
+          >
+            Search
+          </span>
+          <span>
+            <span class="block text-sm font-semibold text-foreground">Recessed</span>
+            <span class="block text-xs">Fields, tiles and chips.</span>
+          </span>
+        </div>
+        <div class="flex h-44 flex-col justify-between rounded-[18px] bg-fill p-4">
+          <span
+            class="size-12 rounded-[12px] bg-paper p-0.5 shadow-[0_0_1px_rgb(34_28_24/0.16),0_1px_2px_rgb(34_28_24/0.08)]"
+          >
+            <span class="block size-full rounded-[10px] bg-placeholder" />
+          </span>
+          <span>
+            <span class="block text-sm font-semibold text-foreground">Paper</span>
+            <span class="block text-xs">Photo frames and bubbles.</span>
+          </span>
+        </div>
+        <div class="flex h-44 flex-col justify-between rounded-[18px] bg-fill p-4">
+          <span class="flex flex-wrap gap-2">
+            <span
+              class="inline-flex h-7 items-center rounded-full border border-hairline bg-linear-to-b from-paper from-45% to-fill px-3.5 text-[13px] font-semibold text-foreground shadow-[0_1px_1px_rgb(34_28_24/0.16),0_2px_6px_rgb(34_28_24/0.06)]"
+            >
+              Tags
+            </span>
+            <span
+              class="inline-flex h-7 items-center rounded-full border-[0.5px] border-accent-rim bg-linear-170 from-accent-light via-accent via-35% to-accent-deep px-3.5 text-[13px] font-semibold text-white shadow-[inset_0_0_0_1px_rgb(255_255_255/0.16),0_1px_2px_rgb(34_28_24/0.24)]"
+            >
+              Baking
+            </span>
+          </span>
+          <span>
+            <span class="block text-sm font-semibold text-foreground">Raised</span>
+            <span class="block text-xs">Only what you can press.</span>
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-20" aria-labelledby="voice">
+      <h2 id="voice" class="text-2xl font-medium text-foreground">Writing</h2>
+      <p class="mt-4 max-w-xl text-sm leading-relaxed">
+        Plain and friendly. When something breaks, say what happened and how to fix it.
+      </p>
+      <div class="mt-6 grid gap-3 sm:grid-cols-2">
+        <div class="rounded-[18px] bg-paper p-5 ring-1 ring-hairline ring-inset">
+          <p class="text-xs font-semibold text-accent">Yes</p>
+          <p class="mt-1 text-foreground">Couldn't reach Lardon. Check your connection.</p>
+        </div>
+        <div class="rounded-[18px] bg-paper p-5 ring-1 ring-hairline ring-inset">
+          <p class="text-xs font-semibold text-danger">No</p>
+          <p class="mt-1 text-foreground">Error 503: network request failed.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-20" aria-labelledby="misuse">
+      <h2 id="misuse" class="text-2xl font-medium text-foreground">Please don't</h2>
+      <div class="mt-6 grid gap-3 sm:grid-cols-3">
+        {
+          [
+            ["Stretch it", "text-foreground", "scale-x-150"],
+            ["Recolor it", "text-danger", ""],
+            ["Add effects", "text-accent", "drop-shadow-[0_0_10px_rgb(122_140_48/0.9)]"],
+          ].map(([caption, color, effect]) => (
+            <figure>
+              <div
+                class:list={[
+                  "flex h-32 items-center justify-center overflow-hidden rounded-[18px] bg-paper ring-1 ring-hairline ring-inset",
+                  color,
+                ]}
+              >
+                <Logo class:list={["h-7 w-auto", effect]} />
+              </div>
+              <figcaption class="mt-2 flex items-center gap-2 text-sm text-foreground">
+                <span aria-hidden="true" class="text-danger">✕</span>
+                {caption}
+              </figcaption>
+            </figure>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="mt-20" aria-labelledby="files">
+      <h2 id="files" class="text-2xl font-medium text-foreground">Files</h2>
+      <ul class="mt-6 divide-y divide-hairline border-y border-hairline">
+        {
+          [
+            [
+              "Logo",
+              [
+                ["Ink", "/brand/lardon-logo-ink.svg"],
+                ["White", "/brand/lardon-logo-white.svg"],
+                ["Olive", "/brand/lardon-logo-olive.svg"],
+              ],
+            ],
+            [
+              "Stacked logo",
+              [
+                ["Ink", "/brand/lardon-logo-stacked-ink.svg"],
+                ["White", "/brand/lardon-logo-stacked-white.svg"],
+              ],
+            ],
+            [
+              "Bacon strip",
+              [
+                ["Ink", "/brand/lardon-mark-ink.svg"],
+                ["White", "/brand/lardon-mark-white.svg"],
+                ["Olive", "/brand/lardon-mark-olive.svg"],
+              ],
+            ],
+            [
+              "Wordmark",
+              [
+                ["Ink", "/brand/lardon-wordmark-ink.svg"],
+                ["White", "/brand/lardon-wordmark-white.svg"],
+              ],
+            ],
+            [
+              "App icon",
+              [
+                ["Square PNG", "/brand/lardon-app-icon.png"],
+                ["Rounded SVG", "/brand/lardon-app-icon-rounded.svg"],
+              ],
+            ],
+          ].map(([name, files]) => (
+            <li class="grid grid-cols-[8rem_1fr] items-center gap-4 py-2">
+              <span class="text-sm text-foreground">{name}</span>
+              <span class="flex flex-wrap gap-x-4">
+                {(files as string[][]).map(([label, href]) => (
+                  <a
+                    href={href}
+                    download
+                    class="-m-2 inline-flex min-h-11 items-center rounded-sm p-2 text-sm text-muted underline underline-offset-2 hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                  >
+                    {label}
+                  </a>
+                ))}
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </main>
+  <SiteFooter class="max-w-5xl" />
+</Base>

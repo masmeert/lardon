@@ -1,0 +1,55 @@
+---
+import Logo from "@lardon/brand/assets/logo.svg";
+import { operator, studioUrl } from "@lardon/brand";
+
+interface Props {
+  class: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<footer class="overflow-hidden bg-accent text-card/80">
+  <div class:list={["mx-auto w-full px-6 pt-10 pb-12", className]}>
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <p class="text-sm">
+        © {new Date().getFullYear()}{" "}
+        <a
+          href={studioUrl}
+          class="underline underline-offset-2 hover:text-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-card/60"
+        >
+          {operator.tradeName}
+        </a>
+      </p>
+      <nav aria-label="Footer" class="flex flex-wrap gap-x-5 gap-y-1 text-sm">
+        <a
+          href={`mailto:${operator.contactEmail}`}
+          class="-m-2 inline-flex min-h-11 items-center rounded-sm p-2 underline underline-offset-2 hover:text-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-card/60"
+        >
+          Contact
+        </a>
+        <a
+          href="/brand"
+          class="-m-2 inline-flex min-h-11 items-center rounded-sm p-2 underline underline-offset-2 hover:text-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-card/60"
+        >
+          Brand
+        </a>
+        <a
+          href="/privacy"
+          class="-m-2 inline-flex min-h-11 items-center rounded-sm p-2 underline underline-offset-2 hover:text-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-card/60"
+        >
+          Privacy Policy
+        </a>
+        <a
+          href="/terms"
+          class="-m-2 inline-flex min-h-11 items-center rounded-sm p-2 underline underline-offset-2 hover:text-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-card/60"
+        >
+          Terms of Use
+        </a>
+      </nav>
+    </div>
+    <div class="mt-8 border-t border-card/15 pt-10">
+      <Logo aria-hidden="true" class="h-auto w-full text-card/15" />
+    </div>
+  </div>
+</footer>

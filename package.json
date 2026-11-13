@@ -1,6 +1,7 @@
 {
   "name": "lardon",
   "private": true,
+  "license": "PolyForm-Strict-1.0.0",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -9,18 +10,14 @@
   "scripts": {
     "dev": "vp run -r dev",
     "build": "vp run -r build",
-    "check-types": "vp run -r check-types",
-    "check": "oxlint && oxfmt --write",
-    "lint": "vp lint",
-    "format": "vp fmt",
-    "staged": "vp staged",
-    "hooks:setup": "vp config",
+    "test": "vp run -r test",
     "dev:native": "vp run --filter native dev",
     "db:generate": "vp run --filter @lardon/db db:generate",
     "deploy": "vp run --filter @lardon/infra deploy",
     "destroy": "vp run --filter @lardon/infra destroy",
-    "env:generate": "varlock codegen --path ./apps/web/ && varlock codegen --path ./apps/server/ && varlock codegen --path ./apps/native/ && varlock codegen --path ./packages/db/",
-    "postinstall": "varlock codegen --path ./apps/web/ && varlock codegen --path ./apps/server/ && varlock codegen --path ./apps/native/ && varlock codegen --path ./packages/db/"
+    "env:generate": "varlock codegen --path ./apps/server/ && varlock codegen --path ./apps/native/ && varlock codegen --path ./packages/db/",
+    "postinstall": "varlock codegen --path ./apps/server/ && varlock codegen --path ./apps/native/ && varlock codegen --path ./packages/db/",
+    "prepare": "vp config --no-agent"
   },
   "dependencies": {
     "zod": "catalog:"
@@ -28,13 +25,12 @@
   "devDependencies": {
     "@cloudflare/workers-types": "catalog:",
     "@lardon/config": "workspace:*",
+    "@oxlint/plugins": "1.89.0",
     "@types/node": "catalog:",
-    "oxfmt": "^0.74.0",
-    "oxlint": "^1.87.0",
     "rolldown": "1.2.15",
     "typescript": "^6.0.3",
     "varlock": "catalog:",
-    "vite-plus": "1.4.0"
+    "vite-plus": "catalog:"
   },
   "packageManager": "pnpm@12.15.0"
 }

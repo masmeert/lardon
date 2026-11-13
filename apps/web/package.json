@@ -1,28 +1,20 @@
 {
   "name": "web",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "private": true,
+  "license": "PolyForm-Strict-1.0.0",
   "type": "module",
   "scripts": {
-    "check-types": "astro check",
-    "astro": "astro",
-    "dev:bare": "astro dev",
-    "env:generate": "varlock codegen"
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
   },
   "dependencies": {
-    "astro": "^7.3.1",
-    "better-auth": "catalog:",
-    "evlog": "catalog:",
-    "varlock": "catalog:",
-    "zod": "catalog:"
-  },
-  "devDependencies": {
-    "@alchemy.run/frontend-frameworks": "2.0.0-beta.84",
-    "@astrojs/check": "^0.9.10",
-    "@cloudflare/workers-types": "catalog:",
-    "@lardon/config": "workspace:*",
-    "@tailwindcss/vite": "^4.3.3",
-    "tailwindcss": "catalog:",
-    "typescript": "^6.0.3"
+    "@alchemy.run/frontend-frameworks": "2.0.0-beta.85",
+    "@lardon/brand": "workspace:*",
+    "@tailwindcss/typography": "0.5.19",
+    "@tailwindcss/vite": "4.3.4",
+    "astro": "7.4.5",
+    "tailwindcss": "4.3.4"
   }
 }

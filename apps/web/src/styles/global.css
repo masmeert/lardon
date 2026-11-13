@@ -1,8 +1,32 @@
 @import "tailwindcss";
-
-/* Add your theme customizations here. */
-/* See the TailwindCSS v4 docs for more info: https://tailwindcss.com/docs/v4-beta */
+@import "@lardon/brand/theme.css";
+@plugin "@tailwindcss/typography";
 
 @theme {
-  --font-sans: "Inter", sans-serif;
+  --font-sans: var(--font-hanken-grotesk);
+  --font-handwritten: var(--font-reenie-beanie);
+  --font-cursive: var(--font-la-belle-aurore);
+  --animate-float: float 6s ease-in-out infinite;
+
+  @keyframes float {
+    0%,
+    100% {
+      translate: 0 -5px;
+    }
+    50% {
+      translate: 0 5px;
+    }
+  }
+}
+
+@utility prose-lardon {
+  --tw-prose-body: var(--color-muted);
+  --tw-prose-headings: var(--color-foreground);
+  --tw-prose-links: var(--color-foreground);
+  --tw-prose-bold: var(--color-foreground);
+  --tw-prose-counters: var(--color-muted);
+  --tw-prose-bullets: var(--color-hairline);
+  --tw-prose-hr: var(--color-hairline);
+  --tw-prose-th-borders: var(--color-hairline);
+  --tw-prose-td-borders: var(--color-hairline);
 }

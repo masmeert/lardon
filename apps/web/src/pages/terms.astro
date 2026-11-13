@@ -1,0 +1,254 @@
+---
+import Contents from "../components/contents.astro";
+import Summary from "../components/summary.astro";
+import Page from "../layouts/page.astro";
+import { operator } from "@lardon/brand";
+import { lastUpdated, sourceCodeUrl } from "../legal";
+---
+
+<Page title="Terms of Use" lastUpdated={lastUpdated} description="The rules for using Lardon, and what you can expect from us.">
+  <p>
+    These terms are the agreement between you and {operator.tradeName}, the trade name of{" "}
+    {operator.name} ("we", "us"), for using Lardon, the family cookbook app, and this website. By
+    creating an account or using Lardon, you agree to them. If you don't agree, please don't use Lardon. Our{" "}
+    <a href="/privacy">Privacy Policy</a> explains how we handle your data.
+  </p>
+
+  <Summary>
+    <ul>
+      <li>Your recipes and photos stay yours. We only use them to run Lardon.</li>
+      <li>Everyone in a family can see, change and delete the family's recipes.</li>
+      <li>Only add content you have the right to share, and be kind to others.</li>
+      <li>Recipes come from people like you: check them for allergies and food safety.</li>
+      <li>You can delete your account at any time. You keep all your rights under consumer law.</li>
+    </ul>
+  </Summary>
+
+  <Contents
+    slot="aside"
+    sections={[
+      { id: "your-account", title: "Your account" },
+      { id: "families", title: "Families" },
+      { id: "your-recipes", title: "Your recipes and photos" },
+      { id: "acceptable-use", title: "Acceptable use" },
+      { id: "reporting", title: "Reporting content" },
+      { id: "cooking", title: "Cooking safely" },
+      { id: "the-app", title: "Lardon and its code" },
+      { id: "changes-to-lardon", title: "Changes to Lardon" },
+      { id: "ending", title: "Ending your account" },
+      { id: "liability", title: "Liability" },
+      { id: "app-store", title: "App Store" },
+      { id: "changes", title: "Changes to these terms" },
+      { id: "disputes", title: "Disputes and law" },
+      { id: "contact", title: "Contact" },
+    ]}
+  />
+
+  <h2 id="your-account">1. Your account</h2>
+  <ul>
+    <li>
+      You must be at least 13 years old to use Lardon. If you're under 18, ask a parent or guardian
+      before you use it.
+    </li>
+    <li>An account is for one person. Use your real name so your family recognises you.</li>
+    <li>
+      You sign in with a code sent to your email, or with Apple or Google. Keep access to them
+      secure, since anyone who can read your email can sign in to Lardon. If you think someone else
+      has used your account, email us straight away.
+    </li>
+    <li>If you sign in with Apple or Google, their own terms also apply to that sign-in.</li>
+  </ul>
+
+  <h2 id="families">2. Families</h2>
+  <p>
+    A family is a shared cookbook. You can create one, or join one with an invite code from a
+    member.
+  </p>
+  <ul>
+    <li>
+      Every member can see the family's name, its members and their roles, can see, add, change and
+      delete the family's recipes, and can invite new members. Only invite people you trust.
+    </li>
+    <li>
+      Owners can also rename the family, remove members, change members' roles and delete the family
+      with all its recipes. If the last owner leaves, another member becomes an owner.
+    </li>
+    <li>
+      When you leave a family or delete your account, the recipes you added to the family stay with
+      it. When the last member leaves, the family and its recipes are deleted.
+    </li>
+  </ul>
+
+  <h2 id="your-recipes">3. Your recipes and photos</h2>
+  <p>
+    You keep ownership of the recipes, photos and other content you add to Lardon. You give us
+    permission to store, copy, process and show that content, only as needed to run Lardon for you
+    and your families. We don't sell it, use it for advertising, publish it or use it to train AI
+    models.
+  </p>
+  <p>
+    When you add a recipe to a family, you also let its members view, cook from, change and keep it
+    in Lardon, even after you leave the family or delete your account. If you don't want a family to
+    keep a recipe, delete it before you leave.
+  </p>
+  <p>
+    Only add content you have the right to share. A family recipe or a recipe written in your own
+    words is fine. Copying photos or the full text of a recipe from a cookbook or website usually
+    isn't, unless you have permission: add a link to the source instead.
+  </p>
+
+  <h2 id="acceptable-use">4. Acceptable use</h2>
+  <p>Don't use Lardon to:</p>
+  <ul>
+    <li>break the law or infringe other people's rights, including copyright and privacy;</li>
+    <li>share content that is abusive, hateful, sexual, violent or otherwise harmful;</li>
+    <li>harass, threaten or impersonate anyone;</li>
+    <li>send spam or advertise to the people in your families;</li>
+    <li>try to access other people's accounts, families or data;</li>
+    <li>
+      upload malware, overload or disrupt Lardon, get around its limits or security, or access it
+      with bots or scrapers;
+    </li>
+    <li>resell Lardon, or use the app or its code in ways its licence doesn't allow.</li>
+  </ul>
+
+  <h2 id="reporting">5. Reporting content</h2>
+  <p>
+    If you find content in Lardon that is illegal or breaks these terms, email{" "}
+    <a href={`mailto:${operator.contactEmail}`}>{operator.contactEmail}</a>. Tell us where it is,
+    why you think it's a problem, your name and email (unless you're reporting child sexual abuse
+    material), and confirm that your report is accurate and complete to the best of your knowledge.
+    We'll confirm we received it, look into it carefully and tell you what we decided.
+  </p>
+  <p>
+    We don't read your recipes, and we don't use automated tools to moderate content: a person
+    reviews every report. If we remove your content or restrict your account, we'll tell you what we
+    did, which law or rule in these terms it's based on and the facts we relied on. You can reply
+    within 6 months to ask us to reconsider, and we'll answer within 14 days. You can also go to
+    court. If we learn of content suggesting a threat to someone's life or safety, we'll tell the
+    authorities.
+  </p>
+  <p>
+    Our single point of contact under the EU Digital Services Act, for users, authorities, the
+    European Commission and the European Board for Digital Services, is{" "}
+    <a href={`mailto:${operator.contactEmail}`}>{operator.contactEmail}</a>. You can write to us in
+    English or French.
+  </p>
+
+  <h2 id="cooking">6. Cooking safely</h2>
+  <p>
+    Recipes in Lardon are written by its users, not by us, and we don't check them. Nutrition
+    information is an estimate. Before you cook, check ingredients for allergies and dietary needs,
+    and follow safe food handling and cooking temperatures. Lardon doesn't give medical or dietary
+    advice.
+  </p>
+
+  <h2 id="the-app">7. Lardon and its code</h2>
+  <p>
+    Lardon is free. We give you a personal, non-transferable right to use the app and our service
+    for yourself and your families. The Lardon name, app and design belong to us. If we ever add
+    paid features, we'll show you the price and the conditions before you pay anything.
+  </p>
+  <p>
+    Lardon's <a href={sourceCodeUrl}>source code is public</a> under the{" "}
+    <a href="https://polyformproject.org/licenses/strict/1.0.0">PolyForm Strict License 1.0.0</a>.
+    That licence, not these terms, sets what you can do with the code: you can read it and use it
+    for noncommercial purposes, but you can't change it, share copies of it or use it commercially.
+  </p>
+  <p>
+    If you send us ideas or feedback, we may use them to improve Lardon without owing you anything.
+  </p>
+
+  <h2 id="changes-to-lardon">8. Changes to Lardon</h2>
+  <p>
+    We work to keep Lardon available and your data safe, but we can't promise it will always be
+    available or free of errors. Keep your own copies of recipes that matter to you.
+  </p>
+  <p>
+    We improve Lardon over time and may change or remove features, for example to fix problems,
+    keep it secure or follow the law. If a change makes Lardon significantly worse for you, we'll
+    tell you by email in advance, and you can delete your account at no cost within 30 days. If we
+    ever stop running Lardon, we'll tell you by email at least 30 days before it closes, so you can
+    ask us for a copy of your recipes.
+  </p>
+
+  <h2 id="ending">9. Ending your account</h2>
+  <p>
+    You can stop using Lardon at any time and delete your account in the app under Settings, then
+    Delete account. If you can't sign in, email{" "}
+    <a href={`mailto:${operator.contactEmail}`}>{operator.contactEmail}</a> instead. See the{" "}
+    <a href="/privacy#how-long-we-keep-it">Privacy Policy</a> for what happens to your data.
+  </p>
+  <p>
+    We may suspend or close your account if you seriously or repeatedly break these terms, or if
+    the law requires it. Unless it would put others at risk or the law forbids it, we'll warn you
+    first and tell you why, and you can reply to contest our decision.
+  </p>
+
+  <h2 id="liability">10. Liability</h2>
+  <p>
+    We're responsible for death or personal injury caused by our fault, for damage we cause
+    intentionally or through gross negligence, and for anything else the law doesn't let us
+    exclude. Otherwise, as far as the law allows, we aren't liable for indirect losses, for content
+    other users add, or for losing content because of force majeure, such as a disaster at our
+    hosting provider. Nothing in these terms limits your rights under consumer protection law.
+  </p>
+
+  <h2 id="app-store">11. If you got Lardon from the App Store</h2>
+  <ul>
+    <li>
+      These terms are between you and us, not Apple. We, not Apple, are responsible for Lardon and
+      for any claims about it, including product liability, consumer protection, legal compliance
+      and intellectual property claims.
+    </li>
+    <li>
+      You may use Lardon on Apple devices you own or control, as allowed by Apple's Media Services
+      Terms and Conditions.
+    </li>
+    <li>
+      We, not Apple, provide maintenance and support for Lardon. Apple has no obligation to provide
+      any.
+    </li>
+    <li>
+      If Lardon doesn't work as promised, you can tell Apple, which will refund any price you paid
+      for it. Apple has no other warranty obligation for Lardon.
+    </li>
+    <li>
+      You confirm that you aren't in a country under a US government embargo and aren't on a US
+      government list of prohibited or restricted parties.
+    </li>
+    <li>
+      You must follow any third-party terms that apply when you use Lardon, such as your mobile
+      data plan.
+    </li>
+    <li>Apple and its subsidiaries can enforce these terms against you.</li>
+  </ul>
+
+  <h2 id="changes">12. Changes to these terms</h2>
+  <p>
+    We may update these terms when Lardon changes or the law requires it. We'll update the date at
+    the top, and for important changes, we'll let you know by email and in the app at least 30 days
+    before they apply. If you don't agree, you can delete your account at no cost before then.
+  </p>
+
+  <h2 id="disputes">13. Disputes and law</h2>
+  <p>
+    If something goes wrong, email us first, and we'll do our best to sort it out with you. If we
+    can't, you can contact the Belgian{" "}
+    <a href="https://mediationconsommateur.be">Consumer Mediation Service</a>.
+  </p>
+  <p>
+    These terms are governed by Belgian law. If you live elsewhere in the European Union, you keep
+    the protection of your own country's consumer laws and can bring a claim in your local courts.
+  </p>
+  <p>
+    If part of these terms turns out to be invalid, the rest still applies.
+  </p>
+
+  <h2 id="contact">14. Contact</h2>
+  <p>
+    {operator.tradeName}, {operator.address}, {operator.country}. Enterprise and VAT number{" "}
+    {operator.enterpriseNumber}. Questions about these terms:{" "}
+    <a href={`mailto:${operator.contactEmail}`}>{operator.contactEmail}</a>.
+  </p>
+</Page>
