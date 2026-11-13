@@ -6,7 +6,7 @@ export function Hero() {
   return (
     <View className="flex-row items-center justify-center">
       <PhotoSticker
-        source={require("../../../../assets/images/sign-in/pancakes.jpg")}
+        source={require("@lardon/brand/assets/photos/pancakes.jpg")}
         sizePt={120}
         className="-mr-4"
         rotationDeg={-7}
@@ -14,7 +14,7 @@ export function Hero() {
         floatPeriodMs={6000}
       />
       <PhotoSticker
-        source={require("../../../../assets/images/sign-in/lasagna.jpg")}
+        source={require("@lardon/brand/assets/photos/lasagna.jpg")}
         sizePt={168}
         className="z-10"
         rotationDeg={2}
@@ -22,7 +22,7 @@ export function Hero() {
         floatPeriodMs={4200}
       />
       <PhotoSticker
-        source={require("../../../../assets/images/sign-in/borscht.jpg")}
+        source={require("@lardon/brand/assets/photos/borscht.jpg")}
         sizePt={120}
         className="-ml-4"
         rotationDeg={6}

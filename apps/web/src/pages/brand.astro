@@ -10,15 +10,15 @@ import Base from "../layouts/base.astro";
 ---
 
 <Base title="Brand" description="The Lardon logo, colors, type and the rules we design by.">
-  <div class="bg-linear-to-b from-accent-light to-accent text-card">
-    <SiteHeader class="max-w-5xl" />
+  <div class="bg-accent text-white">
+    <SiteHeader class="max-w-5xl" surface="accent" />
     <div class="mx-auto max-w-5xl px-6 pt-16 pb-16 sm:pt-24 sm:pb-20">
-      <h1 class="text-5xl leading-[1.05] font-medium sm:text-7xl">Brand</h1>
-      <p class="mt-5 text-base text-card">Our logo, colors, type and the rules we design by.</p>
+      <h1 class="text-[34px] leading-[41px] font-bold tracking-tight">Brand</h1>
+      <p class="mt-4 text-[17px] text-white/80">Our logo, colors, type and the rules we design by.</p>
       <a
         href="/brand/lardon-brand-assets.zip"
         download
-        class="mt-8 inline-flex min-h-11 items-center gap-2 rounded-full bg-paper px-5 text-sm font-semibold text-foreground shadow-[0_1px_2px_rgb(34_28_24/0.14),0_3px_10px_rgb(34_28_24/0.08)] hover:bg-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-card"
+        class="mt-8 inline-flex min-h-11 items-center gap-2 rounded-full bg-paper px-5 text-sm font-semibold text-foreground hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-card"
       >
         Download all files
         <span class="font-normal text-muted">ZIP, 0.6 MB</span>
@@ -167,7 +167,7 @@ import Base from "../layouts/base.astro";
     <section class="mt-20" aria-labelledby="type">
       <h2 id="type" class="text-2xl font-medium text-foreground">Type</h2>
       <p class="mt-4 max-w-xl text-sm leading-relaxed">
-        Six sizes of Hanken Grotesk, each with its own line height. Hierarchy comes from size and
+        Six sizes of Inter, each with its own line height. Hierarchy comes from size and
         weight, not capitals or letter-spacing.
       </p>
       <ul class="mt-6 divide-y divide-hairline border-y border-hairline">
@@ -196,11 +196,11 @@ import Base from "../layouts/base.astro";
             <Wordmark class="h-9 w-auto" />
           </div>
           <p class="mt-4 text-sm font-semibold text-foreground">Eczar SemiBold</p>
-          <p class="text-sm">The wordmark only.</p>
+          <p class="text-sm">The wordmark and the homepage headline.</p>
         </div>
         <div class="rounded-[18px] bg-fill p-5">
-          <p class="flex h-14 items-center text-3xl font-medium text-foreground">Pot-au-feu</p>
-          <p class="mt-4 text-sm font-semibold text-foreground">Hanken Grotesk</p>
+          <p class="flex h-14 items-center text-3xl font-semibold text-foreground">Pot-au-feu</p>
+          <p class="mt-4 text-sm font-semibold text-foreground">Inter</p>
           <p class="text-sm">Everything else.</p>
         </div>
         <div class="rounded-[18px] bg-fill p-5">
@@ -208,7 +208,7 @@ import Base from "../layouts/base.astro";
             À table !
           </p>
           <p class="mt-4 text-sm font-semibold text-foreground">Reenie Beanie</p>
-          <p class="text-sm">Handwriting on recipe cards.</p>
+          <p class="text-sm">One handwritten sign-off per page, at most.</p>
         </div>
       </div>
     </section>

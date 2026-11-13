@@ -1,0 +1,28 @@
+---
+import type { ImageMetadata } from "astro";
+import { Image } from "astro:assets";
+
+interface Props {
+  src: ImageMetadata;
+  widthPx: number;
+  class: string;
+}
+
+const { src, widthPx, class: className } = Astro.props;
+---
+
+<div
+  aria-hidden="true"
+  class:list={[
+    "aspect-square shrink-0 rounded-[23%] bg-paper p-0.5 shadow-[0_0_1px_rgb(0_0_0/0.16),0_1px_2px_rgb(0_0_0/0.08),0_10px_24px_rgb(0_0_0/0.12)]",
+    className,
+  ]}
+>
+  <Image
+    src={src}
+    alt=""
+    widths={[widthPx, widthPx * 2]}
+    sizes={`${widthPx}px`}
+    class="size-full rounded-[22%] object-cover"
+  />
+</div>

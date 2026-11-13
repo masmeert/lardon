@@ -3,9 +3,14 @@
 @plugin "@tailwindcss/typography";
 
 @theme {
-  --font-sans: var(--font-hanken-grotesk);
+  --font-sans: var(--font-inter);
+  --font-wordmark: var(--font-eczar);
   --font-handwritten: var(--font-reenie-beanie);
-  --font-cursive: var(--font-la-belle-aurore);
+  --color-background: #f2f2f7;
+  --color-fill: #e5e5ea;
+  --color-hairline: #e5e5ea;
+  --color-foreground: #000000;
+  --color-muted: #6e6e73;
   --animate-float: float 6s ease-in-out infinite;
 
   @keyframes float {

@@ -1,9 +1,11 @@
 ---
 import { appDownloadUrl } from "../app-download";
-import RecipeCard from "../components/recipe-card.astro";
+import borscht from "@lardon/brand/assets/photos/borscht.jpg";
+import lasagna from "@lardon/brand/assets/photos/lasagna.jpg";
+import pancakes from "@lardon/brand/assets/photos/pancakes.jpg";
+import PhotoSticker from "../components/photo-sticker.astro";
 import SiteFooter from "../components/site-footer.astro";
 import SiteHeader from "../components/site-header.astro";
-import StorySection from "../components/story/story-section.astro";
 import Base from "../layouts/base.astro";
 ---
 
@@ -12,67 +14,50 @@ import Base from "../layouts/base.astro";
   description="A cookbook your family shares. Write down the dishes you grew up with, and everyone has them on their phone."
 >
   <main class="overflow-x-clip">
-    <section class="overflow-hidden bg-linear-to-b from-accent-light to-accent text-card">
-      <SiteHeader class="max-w-5xl" />
-      <div class="mx-auto flex max-w-5xl flex-col items-center px-6 pt-14 text-center sm:pt-20">
-        <h1
-          class="text-5xl leading-[1.05] font-medium tracking-tight sm:text-7xl lg:text-8xl"
-        >
-          Grandma's <span
-            class="inline-block -rotate-3 font-handwritten text-[1.3em] leading-[0.75] font-normal tracking-normal text-butter"
-            >quiche</span
-          >,<br class="max-sm:hidden" /> on everyone's phone.
+    <section class="overflow-hidden bg-accent text-white">
+      <SiteHeader class="max-w-5xl" surface="accent" />
+      <div class="mx-auto flex max-w-5xl flex-col items-center px-6 pt-8 text-center sm:pt-12">
+        <h1 class="font-wordmark text-5xl leading-[1.15] text-balance sm:text-7xl">
+          Grandma's quiche,<br class="max-sm:hidden" /> on everyone's phone.
         </h1>
-        <p class="mt-8 max-w-md text-base leading-relaxed text-card/80 sm:text-lg">
+        <p class="mt-6 max-w-md text-[17px] leading-relaxed text-white/80">
           Lardon is a cookbook your family shares. Write a recipe down once and the whole family
           has it the next time they cook.
         </p>
         <a
           href={appDownloadUrl}
-          class="mt-8 inline-flex min-h-12 items-center rounded-full bg-butter px-7 text-base font-medium text-accent hover:bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-card/60"
+          class="mt-8 inline-flex h-12 items-center rounded-full bg-white px-6 text-[17px] font-semibold text-accent hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60"
         >
           Start your cookbook
         </a>
       </div>
       <div
-        class="mt-16 flex w-full min-w-0 items-start justify-center max-sm:mt-10 max-sm:-mb-44 max-sm:origin-top max-sm:scale-[0.56] sm:mt-20 sm:-mb-28"
+        class="mt-10 flex w-full min-w-0 items-start justify-center pb-12 sm:mt-12 sm:pb-16"
       >
-        <RecipeCard
-          emoji="🍲"
-          title="Pot-au-feu"
-          ingredients={["1 kg beef", "4 carrots", "2 leeks", "1 onion"]}
-          ruledLineCount={6}
-          isFeatured={false}
-          class="mt-10 -mr-4 w-52 -rotate-6 motion-safe:animate-float"
+        <PhotoSticker
+          src={pancakes}
+          widthPx={208}
+          class="mt-8 -mr-4 w-28 -rotate-7 motion-safe:animate-float sm:mt-10 sm:-mr-5 sm:w-52"
         />
-        <RecipeCard
-          emoji="🥧"
-          title="Quiche lorraine"
-          ingredients={["200 g lardons", "3 eggs", "200 ml cream", "1 pie crust"]}
-          ruledLineCount={7}
-          isFeatured
-          class="z-10 w-80 motion-safe:animate-float motion-safe:[animation-duration:4.2s]"
+        <PhotoSticker
+          src={lasagna}
+          widthPx={288}
+          class="z-10 w-40 rotate-2 motion-safe:animate-float motion-safe:[animation-duration:4.2s] sm:w-72"
         />
-        <RecipeCard
-          emoji="🥗"
-          title="Niçoise"
-          ingredients={["tuna", "olives", "2 eggs", "tomatoes"]}
-          ruledLineCount={6}
-          isFeatured={false}
-          class="mt-10 -ml-4 w-52 rotate-6 motion-safe:animate-float motion-safe:[animation-delay:-2s] motion-safe:[animation-duration:5.6s]"
+        <PhotoSticker
+          src={borscht}
+          widthPx={208}
+          class="mt-8 -ml-4 w-28 rotate-6 motion-safe:animate-float motion-safe:[animation-delay:-2s] motion-safe:[animation-duration:5.6s] sm:mt-10 sm:-ml-5 sm:w-52"
         />
       </div>
     </section>
 
-    <StorySection />
-
-
     <section
       id="get-the-app"
-      class="bg-linear-to-b from-accent-light to-accent px-6 py-24 text-center text-card sm:py-32"
+      class="bg-paper px-6 py-20 text-center sm:py-28"
     >
-      <h2 class="font-handwritten text-7xl leading-none sm:text-9xl">À table !</h2>
-      <p class="mt-6 text-base text-card/80 sm:text-lg">
+      <h2 class="font-handwritten text-7xl leading-none text-accent sm:text-9xl">À table !</h2>
+      <p class="mt-3 text-[17px]">
         Lardon is coming soon to iPhone and Android.
       </p>
     </section>
