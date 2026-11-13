@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import { useState } from "react";
 import { ActivityIndicator, Alert, FlatList, StyleSheet, View } from "react-native";
-import { useStore } from "tinybase/ui-react";
+import { useStoreIds } from "tinybase/ui-react";
 
 import { familiesQuery, useSignOut } from "#/entities/family";
 import { useRecipes } from "#/entities/recipe";
@@ -17,15 +17,20 @@ export function LibraryScreen() {
   const familyList = useQuery(familiesQuery);
   const families = familyList.data ?? [];
   const [chosenFamilyId, setChosenFamilyId] = useState<string>();
-
-  const family =
-    families.find((candidate) => candidate.id === chosenFamilyId) ??
-    families.find((candidate) => candidate.personal) ??
-    families[0];
-
+  const chosenFamily = families.find((family) => family.id === chosenFamilyId);
+  const shownFamilies = chosenFamily ? [chosenFamily] : families;
   const [search, setSearch] = useState("");
-  const recipes = useRecipes(family?.id ?? "", search);
-  const isStoreOpen = useStore(family?.id ?? "") !== undefined;
+
+  const recipes = useRecipes(
+    shownFamilies.map((family) => family.id),
+    search,
+  );
+
+  const openStoreIds = useStoreIds();
+
+  const isLoading =
+    familyList.isPending || shownFamilies.some((family) => !openStoreIds.includes(family.id));
+
   const signOut = useSignOut();
 
   function confirmSignOut() {
@@ -53,7 +58,7 @@ export function LibraryScreen() {
       );
     }
 
-    if (!isStoreOpen) return <ActivityIndicator className="flex-1 pb-24" />;
+    if (isLoading) return <ActivityIndicator className="flex-1 pb-24" />;
 
     if (search.trim() !== "") {
       return (
@@ -96,15 +101,23 @@ export function LibraryScreen() {
             icon="line.3.horizontal.decrease.circle"
             accessibilityLabel="Choose a family"
           >
-            {families.map((candidate) => (
-              <Stack.Toolbar.MenuAction
-                key={candidate.id}
-                isOn={candidate.id === family?.id}
-                onPress={() => setChosenFamilyId(candidate.id)}
-              >
-                {candidate.name}
-              </Stack.Toolbar.MenuAction>
-            ))}
+            <Stack.Toolbar.MenuAction
+              isOn={chosenFamily === undefined}
+              onPress={() => setChosenFamilyId(undefined)}
+            >
+              All families
+            </Stack.Toolbar.MenuAction>
+            <Stack.Toolbar.Menu inline>
+              {families.map((family) => (
+                <Stack.Toolbar.MenuAction
+                  key={family.id}
+                  isOn={family.id === chosenFamily?.id}
+                  onPress={() => setChosenFamilyId(family.id)}
+                >
+                  {family.name}
+                </Stack.Toolbar.MenuAction>
+              ))}
+            </Stack.Toolbar.Menu>
           </Stack.Toolbar.Menu>
         )}
         {signOut.isPending ? (
@@ -125,7 +138,7 @@ export function LibraryScreen() {
       </Stack.Toolbar>
       <FlatList
         data={recipes}
-        keyExtractor={(recipe) => recipe.id}
+        keyExtractor={(recipe) => `${recipe.familyId}:${recipe.id}`}
         contentInsetAdjustmentBehavior="automatic"
         keyboardDismissMode="on-drag"
         className="flex-1 bg-background"
