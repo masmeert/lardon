@@ -51,16 +51,11 @@ export function LibraryScreen() {
         </Stack.Toolbar.Menu>
       </Stack.Toolbar>
       {recipes.length === 0 && folders.length === 0 && tags.length === 0 ? (
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          contentContainerClassName="grow justify-center pb-24"
-        >
-          <EmptyState
-            icon="book"
-            title="No recipes yet"
-            description="Recipes you and your family add show up here."
-          />
-        </ScrollView>
+        <EmptyState
+          icon="book"
+          title="No recipes yet"
+          description="Recipes you and your family add show up here."
+        />
       ) : (
         <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerClassName="pb-16">
           {recipes.length > 0 && (

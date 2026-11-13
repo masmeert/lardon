@@ -19,6 +19,8 @@ export function CollectionList({
   const { width } = useWindowDimensions();
   const cardWidth = (width - 44) / 2;
 
+  if (items.length === 0 && emptyState) return emptyState;
+
   return (
     <FlatList
       key={layout}
@@ -59,7 +61,6 @@ export function CollectionList({
           )}
         </Pressable>
       )}
-      ListEmptyComponent={emptyState}
     />
   );
 }
