@@ -73,10 +73,10 @@ import Base from "../layouts/base.astro";
           [
             ["Calm", "Small type, wide margins, few colors. The recipe photos bring the color."],
             ["One accent", "Olive is for the main action, selection and focus. One olive button per screen."],
-            ["Raised means pressable", "Pages are flat. Only things you can press look raised."],
-            ["Native first", "Headers, sheets and menus come from the system. We style what's inside them."],
+            ["Flat", "No gradients, glows or heavy shadows. The food photos are the only thing that floats."],
+            ["Native first", "Headers, sheets, menus and controls come from the system. We style what's inside them."],
           ].map(([title, text]) => (
-            <div class="rounded-[18px] bg-fill p-5">
+            <div class="rounded-[18px] bg-paper p-5">
               <p class="text-base font-semibold text-foreground">{title}</p>
               <p class="mt-1 text-sm leading-relaxed">{text}</p>
             </div>
@@ -88,25 +88,25 @@ import Base from "../layouts/base.astro";
     <section class="mt-20" aria-labelledby="color">
       <h2 id="color" class="text-2xl font-medium text-foreground">Colors</h2>
       <p class="mt-4 max-w-xl text-sm leading-relaxed">
-        Warm neutrals and one olive. All text on these colors meets WCAG AA contrast.
+        The system's greys and one olive. All text on these colors meets WCAG AA contrast.
       </p>
       <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {
           [
-            ["Flour", "Page", colors.background, "bg-background ring-1 ring-hairline ring-inset", "text-foreground", "text-muted"],
-            ["Paper", "Raised surfaces", colors.paper, "bg-paper ring-1 ring-hairline ring-inset", "text-foreground", "text-muted"],
-            ["Oat", "Fields and tiles", colors.fill, "bg-fill", "text-foreground", "text-muted"],
-            ["Linen", "Dividers", colors.hairline, "bg-hairline", "text-foreground", "text-foreground"],
-            ["Stone", "Secondary text", colors.muted, "bg-muted", "text-white", "text-white"],
-            ["Espresso", "Text", colors.foreground, "bg-foreground", "text-white", "text-white"],
-            ["Olive", "Main action", colors.accent, "bg-accent", "text-white", "text-white"],
-            ["Paprika", "Errors", colors.danger, "bg-danger", "text-white", "text-white"],
-          ].map(([name, role, hex, swatch, ink, detail]) => (
-            <div class:list={["flex h-32 flex-col justify-between rounded-[18px] p-4", swatch]}>
-              <span class:list={["font-mono text-xs", detail]}>{hex.toUpperCase()}</span>
+            ["Page", "Behind everything", colors.background, "bg-background ring-1 ring-hairline ring-inset", "text-foreground"],
+            ["Paper", "Cards and fields", colors.paper, "bg-paper", "text-foreground"],
+            ["Fill", "Tiles and dividers", colors.fill, "bg-fill", "text-foreground"],
+            ["Secondary", "Secondary text", colors.muted, "bg-muted", "text-white"],
+            ["Text", "Text", colors.foreground, "bg-foreground", "text-white"],
+            ["Olive", "Main action", colors.accent, "bg-accent", "text-white"],
+            ["Bacon", "The logo on olive", colors.bacon, "bg-bacon ring-1 ring-hairline ring-inset", "text-foreground"],
+            ["Paprika", "Errors", colors.danger, "bg-danger", "text-white"],
+          ].map(([name, role, hex, swatch, ink]) => (
+            <div class:list={["flex h-32 flex-col justify-between rounded-[18px] p-4", swatch, ink]}>
+              <span class="font-mono text-xs">{hex.toUpperCase()}</span>
               <span>
-                <span class:list={["block text-sm font-semibold", ink]}>{name}</span>
-                <span class:list={["block text-xs", detail]}>{role}</span>
+                <span class="block text-sm font-semibold">{name}</span>
+                <span class="block text-xs">{role}</span>
               </span>
             </div>
           ))
@@ -116,46 +116,19 @@ import Base from "../layouts/base.astro";
       <ul class="mt-4 grid grid-cols-2 gap-x-3 gap-y-4 sm:grid-cols-4">
         {
           [
-            ["Olive tint", "Selected backgrounds", `background-color: ${colors.accentSoft}`, colors.accentSoft.toUpperCase()],
-            ["Paprika tint", "Error backgrounds", `background-color: ${colors.dangerSoft}`, colors.dangerSoft.toUpperCase()],
-            [
-              "Olive gradient",
-              "Raised buttons",
-              `background-image: linear-gradient(170deg, ${colors.accentLight}, ${colors.accent} 35%, ${colors.accentDeep})`,
-              `${colors.accentLight.toUpperCase()} to ${colors.accentDeep.toUpperCase()}`,
-            ],
-          ].map(([name, role, style, value]) => (
-            <li class="flex items-center gap-3">
-              <span class="size-10 shrink-0 rounded-full ring-1 ring-hairline ring-inset" style={style} />
-              <span class="min-w-0">
-                <span class="block text-sm font-semibold text-foreground">{name}</span>
-                <span class="block text-xs">{role}</span>
-                <span class="block font-mono text-xs">{value}</span>
-              </span>
-            </li>
-          ))
-        }
-      </ul>
-      <h3 class="mt-10 text-base font-semibold text-foreground">Illustration</h3>
-      <p class="mt-1 text-sm">For the logo, drawings and recipe cards. Not for buttons or text.</p>
-      <ul class="mt-4 grid grid-cols-2 gap-x-3 gap-y-4 sm:grid-cols-4">
-        {
-          [
-            ["Sage", colors.placeholder],
-            ["Sage mark", colors.placeholderMark],
-            ["Bacon", colors.bacon],
-            ["Butter", colors.butter],
-            ["Card", colors.card],
-            ["Card margin", colors.cardMargin],
-            ["Card rule", colors.cardRule],
-          ].map(([name, hex]) => (
+            ["Olive tint", "Selected backgrounds", colors.accentSoft],
+            ["Deep olive", "Pressed olive", colors.accentDeep],
+            ["Paprika tint", "Error backgrounds", colors.dangerSoft],
+            ["Sage", "Photos while they load", colors.placeholder],
+          ].map(([name, role, hex]) => (
             <li class="flex items-center gap-3">
               <span
                 class="size-10 shrink-0 rounded-full ring-1 ring-hairline ring-inset"
                 style={`background-color: ${hex}`}
               />
-              <span>
+              <span class="min-w-0">
                 <span class="block text-sm font-semibold text-foreground">{name}</span>
+                <span class="block text-xs">{role}</span>
                 <span class="block font-mono text-xs">{hex.toUpperCase()}</span>
               </span>
             </li>
@@ -191,19 +164,19 @@ import Base from "../layouts/base.astro";
         }
       </ul>
       <div class="mt-6 grid gap-3 sm:grid-cols-3">
-        <div class="rounded-[18px] bg-fill p-5">
+        <div class="rounded-[18px] bg-paper p-5">
           <div class="flex h-14 items-center text-foreground">
             <Wordmark class="h-9 w-auto" />
           </div>
           <p class="mt-4 text-sm font-semibold text-foreground">Eczar SemiBold</p>
           <p class="text-sm">The wordmark and the homepage headline.</p>
         </div>
-        <div class="rounded-[18px] bg-fill p-5">
+        <div class="rounded-[18px] bg-paper p-5">
           <p class="flex h-14 items-center text-3xl font-semibold text-foreground">Pot-au-feu</p>
           <p class="mt-4 text-sm font-semibold text-foreground">Inter</p>
           <p class="text-sm">Everything else.</p>
         </div>
-        <div class="rounded-[18px] bg-fill p-5">
+        <div class="rounded-[18px] bg-paper p-5">
           <p class="flex h-14 items-center font-handwritten text-5xl leading-none text-foreground">
             À table !
           </p>
@@ -216,8 +189,8 @@ import Base from "../layouts/base.astro";
     <section class="mt-20" aria-labelledby="depth">
       <h2 id="depth" class="text-2xl font-medium text-foreground">Shape and depth</h2>
       <p class="mt-4 max-w-xl text-sm leading-relaxed">
-        Controls are capsules and cards have 18 px corners. Shadows are soft and warm, never
-        colored.
+        Controls are capsules and cards have 18 px corners. Everything is flat, except photos,
+        which sit in a white frame with a soft shadow.
       </p>
       <div class="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div
@@ -226,49 +199,47 @@ import Base from "../layouts/base.astro";
           <span />
           <span>
             <span class="block text-sm font-semibold text-foreground">Page</span>
-            <span class="block text-xs">Flour, no shadow.</span>
+            <span class="block text-xs">Grey, no shadow.</span>
           </span>
         </div>
-        <div
-          class="flex h-44 flex-col justify-between rounded-[18px] bg-background p-4 ring-1 ring-hairline ring-inset"
-        >
+        <div class="flex h-44 flex-col justify-between rounded-[18px] bg-paper p-4">
           <span
-            class="inline-flex h-9 items-center self-start rounded-full bg-fill px-4 text-sm text-muted"
+            class="inline-flex h-9 items-center self-start rounded-full bg-fill px-4 text-sm text-foreground"
           >
             Search
           </span>
           <span>
-            <span class="block text-sm font-semibold text-foreground">Recessed</span>
-            <span class="block text-xs">Fields, tiles and chips.</span>
+            <span class="block text-sm font-semibold text-foreground">Card</span>
+            <span class="block text-xs">White on the page, fields filled.</span>
           </span>
         </div>
-        <div class="flex h-44 flex-col justify-between rounded-[18px] bg-fill p-4">
-          <span
-            class="size-12 rounded-[12px] bg-paper p-0.5 shadow-[0_0_1px_rgb(34_28_24/0.16),0_1px_2px_rgb(34_28_24/0.08)]"
-          >
-            <span class="block size-full rounded-[10px] bg-placeholder" />
-          </span>
-          <span>
-            <span class="block text-sm font-semibold text-foreground">Paper</span>
-            <span class="block text-xs">Photo frames and bubbles.</span>
-          </span>
-        </div>
-        <div class="flex h-44 flex-col justify-between rounded-[18px] bg-fill p-4">
+        <div class="flex h-44 flex-col justify-between rounded-[18px] bg-paper p-4">
           <span class="flex flex-wrap gap-2">
             <span
-              class="inline-flex h-7 items-center rounded-full border border-hairline bg-linear-to-b from-paper from-45% to-fill px-3.5 text-[13px] font-semibold text-foreground shadow-[0_1px_1px_rgb(34_28_24/0.16),0_2px_6px_rgb(34_28_24/0.06)]"
+              class="inline-flex h-8 items-center rounded-full bg-accent px-4 text-[13px] font-semibold text-white"
             >
-              Tags
+              Save
             </span>
             <span
-              class="inline-flex h-7 items-center rounded-full border-[0.5px] border-accent-rim bg-linear-170 from-accent-light via-accent via-35% to-accent-deep px-3.5 text-[13px] font-semibold text-white shadow-[inset_0_0_0_1px_rgb(255_255_255/0.16),0_1px_2px_rgb(34_28_24/0.24)]"
+              class="inline-flex h-8 items-center rounded-full bg-fill px-4 text-[13px] font-semibold text-foreground"
             >
-              Baking
+              Cancel
             </span>
           </span>
           <span>
-            <span class="block text-sm font-semibold text-foreground">Raised</span>
-            <span class="block text-xs">Only what you can press.</span>
+            <span class="block text-sm font-semibold text-foreground">Buttons</span>
+            <span class="block text-xs">Flat capsules.</span>
+          </span>
+        </div>
+        <div class="flex h-44 flex-col justify-between rounded-[18px] bg-paper p-4">
+          <span
+            class="size-12 rounded-[23%] bg-paper p-0.5 shadow-[0_0_1px_rgb(0_0_0/0.16),0_1px_2px_rgb(0_0_0/0.08),0_10px_24px_rgb(0_0_0/0.12)]"
+          >
+            <span class="block size-full rounded-[22%] bg-placeholder" />
+          </span>
+          <span>
+            <span class="block text-sm font-semibold text-foreground">Photo</span>
+            <span class="block text-xs">The only thing that floats.</span>
           </span>
         </div>
       </div>

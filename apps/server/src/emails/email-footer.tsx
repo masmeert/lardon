@@ -12,11 +12,11 @@ export function EmailFooter() {
     >
       <tr>
         <td
-          style={{ padding: "40px 24px 48px", color: colors.card, fontSize: 14, lineHeight: 1.6 }}
+          style={{ padding: "40px 24px 48px", color: colors.bacon, fontSize: 14, lineHeight: 1.6 }}
         >
           <p style={{ margin: 0 }}>
             © {new Date().getFullYear()}{" "}
-            <a href={studioUrl} style={{ color: colors.card, textDecoration: "underline" }}>
+            <a href={studioUrl} style={{ color: colors.bacon, textDecoration: "underline" }}>
               {operator.tradeName}
             </a>
           </p>
@@ -32,7 +32,7 @@ export function EmailFooter() {
                   href={href}
                   style={{
                     marginRight: 16,
-                    color: colors.card,
+                    color: colors.bacon,
                     textDecoration: "underline",
                     whiteSpace: "nowrap",
                   }}

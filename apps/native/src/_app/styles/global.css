@@ -7,10 +7,6 @@
 @theme static {
   --color-background-clear: #f2f2f700;
   --color-splash: #627224;
-  --color-background: #f2f2f7;
-  --color-fill: #e5e5ea;
-  --color-hairline: #e5e5ea;
-  --color-foreground: #000000;
   --color-muted: #8a8a8e;
   --text-*: initial;
   --text-label: 13px;
