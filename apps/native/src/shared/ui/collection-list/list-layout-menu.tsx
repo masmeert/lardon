@@ -8,7 +8,7 @@ export function listLayoutMenu({
   onChange: (layout: "list" | "grid") => void;
 }) {
   return (
-    <Stack.Toolbar.Menu inline palette title="Layout">
+    <Stack.Toolbar.Menu title="Layout" icon={layout === "grid" ? "square.grid.2x2" : "list.bullet"}>
       <Stack.Toolbar.MenuAction
         icon="list.bullet"
         isOn={layout === "list"}
