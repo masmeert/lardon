@@ -10,12 +10,11 @@ import { libraryFolders, libraryTags, scopeParams, useFamilyTables } from "#/ent
 import { useOrganizeRecipes } from "#/features/organize-recipes";
 import { useThemeColors } from "#/shared/lib";
 import { usePreference } from "#/shared/preferences";
-import { EmptyState, FilterPill, InlineError } from "#/shared/ui";
+import { EmptyState, FilterPill } from "#/shared/ui";
 
 import { IngredientControls } from "./ingredient-controls";
 import { IngredientRow } from "./ingredient-row";
 import { KeyboardDoneButton } from "./keyboard-done-button";
-import { RecipeAudience } from "./recipe-audience";
 import { RecipeHero } from "./recipe-hero";
 import { recipeMenu } from "./recipe-menu";
 import { RecipeSection } from "./recipe-section";
@@ -41,7 +40,6 @@ export function RecipeScreen() {
 
   const owner = familyTables.find(({ tables }) => tables.recipes?.[recipeId] !== undefined);
   const recipe = owner && recipeDetail(owner.tables, recipeId);
-  const family = families.find((candidate) => candidate.id === owner?.familyId);
   const ingredientNames = recipe?.ingredients.map((ingredient) => ingredient.name) ?? [];
   const isPicking = isScaleOpen && scaleMode === "ingredient";
 
@@ -70,19 +68,13 @@ export function RecipeScreen() {
             accessibilityLabel="Share"
             onPress={() => void Share.share({ message: recipeText(recipe) })}
           />
-          {organize.move.isPending ? (
-            <Stack.Toolbar.View>
-              <ActivityIndicator />
-            </Stack.Toolbar.View>
-          ) : (
-            recipeMenu({
-              recipe: { ...recipe, familyId: owner.familyId },
-              folderNames: libraryFolders(familyTables).map((folder) => folder.name),
-              tagNames: libraryTags(familyTables).map((tag) => tag.name),
-              organize,
-              onDeleted: () => router.back(),
-            })
-          )}
+          {recipeMenu({
+            recipe: { ...recipe, familyId: owner.familyId },
+            folderNames: libraryFolders(familyTables).map((folder) => folder.name),
+            tagNames: libraryTags(familyTables).map((tag) => tag.name),
+            organize,
+            onDeleted: () => router.back(),
+          })}
         </Stack.Toolbar>
       )}
       {!owner || !recipe ? (
@@ -104,14 +96,6 @@ export function RecipeScreen() {
           >
             <View className="px-4 pt-2">
               <RecipeHero recipe={recipe} familyId={owner.familyId} />
-              {organize.hasFamily && family && <RecipeAudience family={family} />}
-              {organize.move.isError && (
-                <View className="items-center pt-2">
-                  <InlineError>
-                    Couldn't move this recipe. Check your connection and try again
-                  </InlineError>
-                </View>
-              )}
             </View>
             {recipe.ingredients.length > 0 && (
               <RecipeSection
