@@ -1,4 +1,4 @@
-import { Stack } from "expo-router";
+import { Stack, router } from "expo-router";
 import { Alert } from "react-native";
 
 import type { LibraryRecipe } from "#/entities/recipe";
@@ -31,6 +31,14 @@ export function recipeMenu({
 
   return (
     <Stack.Toolbar.Menu icon="ellipsis" accessibilityLabel="More">
+      <Stack.Toolbar.MenuAction
+        icon="pencil"
+        onPress={() =>
+          router.push({ pathname: "/recipe/[recipeId]/edit", params: { recipeId: recipe.id } })
+        }
+      >
+        Edit recipe
+      </Stack.Toolbar.MenuAction>
       <Stack.Toolbar.Menu inline>
         <Stack.Toolbar.Menu title="Folders" icon="folder">
           {folderNames.length === 0 && (

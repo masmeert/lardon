@@ -40,14 +40,22 @@ export function LibraryScreen() {
       <Stack.Toolbar placement="right">
         <Stack.Toolbar.Menu icon="plus" accessibilityLabel="Add">
           <Stack.Toolbar.MenuAction
-            icon="folder.badge.plus"
-            onPress={() => router.push("/folder/new")}
+            icon="square.and.pencil"
+            onPress={() => router.push("/recipe/new")}
           >
-            New folder
+            New recipe
           </Stack.Toolbar.MenuAction>
-          <Stack.Toolbar.MenuAction icon="tag" onPress={() => router.push("/tag/new")}>
-            New tag
-          </Stack.Toolbar.MenuAction>
+          <Stack.Toolbar.Menu inline>
+            <Stack.Toolbar.MenuAction
+              icon="folder.badge.plus"
+              onPress={() => router.push("/folder/new")}
+            >
+              New folder
+            </Stack.Toolbar.MenuAction>
+            <Stack.Toolbar.MenuAction icon="tag" onPress={() => router.push("/tag/new")}>
+              New tag
+            </Stack.Toolbar.MenuAction>
+          </Stack.Toolbar.Menu>
         </Stack.Toolbar.Menu>
       </Stack.Toolbar>
       {recipes.length === 0 && folders.length === 0 && tags.length === 0 ? (
@@ -59,6 +67,11 @@ export function LibraryScreen() {
               ? "Recipes you and your family add show up here."
               : "Recipes you add show up here."
           }
+          action={{
+            label: "New recipe",
+            icon: "square.and.pencil",
+            onPress: () => router.push("/recipe/new"),
+          }}
         />
       ) : (
         <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerClassName="pb-16">

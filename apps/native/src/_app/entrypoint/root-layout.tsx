@@ -1,5 +1,6 @@
 import "#/_app/styles/global.css";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 
 import { RootStack } from "#/_app/entrypoint/root-stack";
@@ -15,9 +16,11 @@ export function RootLayout() {
         dehydrateOptions: { shouldDehydrateQuery: (query) => query.state.data !== undefined },
       }}
     >
-      <KeyboardProvider>
-        <RootStack />
-      </KeyboardProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <KeyboardProvider>
+          <RootStack />
+        </KeyboardProvider>
+      </GestureHandlerRootView>
     </PersistQueryClientProvider>
   );
 }

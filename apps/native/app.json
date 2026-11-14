@@ -45,6 +45,14 @@
         }
       ],
       "expo-image",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Lardon uses your photos so you can add one to a recipe.",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
+      ],
       "expo-sharing"
     ],
     "experiments": {

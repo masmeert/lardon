@@ -19,6 +19,8 @@ export default function AppLayout() {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="folder/new" options={sheetOptions} />
           <Stack.Screen name="tag/new" options={sheetOptions} />
+          <Stack.Screen name="recipe/new" options={{ presentation: "modal" }} />
+          <Stack.Screen name="recipe/[recipeId]/edit" options={{ presentation: "modal" }} />
         </Stack>
       </Provider>
     </SessionCookieContext>
