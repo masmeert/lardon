@@ -15,7 +15,7 @@ export function NewFamilySheet() {
     onSuccess: async (family) => {
       await storeFamily(family);
       router.dismiss();
-      router.push("/settings/family");
+      router.push("/profile/family");
     },
   });
 

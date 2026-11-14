@@ -73,7 +73,7 @@ export function AccountScreen() {
               <Icon name="trash" size={iconSize.md} color={danger} />
             </View>
           }
-          onPress={() => router.push("/settings/delete-account")}
+          onPress={() => router.push("/profile/delete-account")}
         />
       </GroupedSection>
       {signOut.isError && (

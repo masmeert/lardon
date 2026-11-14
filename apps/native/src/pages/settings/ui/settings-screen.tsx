@@ -28,7 +28,7 @@ export function SettingsScreen() {
             isFirst
             leading={<MemberAvatar member={session.user} sizePt={56} />}
             accessory="chevron"
-            onPress={() => router.push("/settings/account")}
+            onPress={() => router.push("/profile/account")}
           />
         </GroupedSection>
       )}
@@ -39,7 +39,7 @@ export function SettingsScreen() {
             detail={family.memberCount === 1 ? "Just you" : `${family.memberCount} members`}
             isFirst
             accessory="chevron"
-            onPress={() => router.push("/settings/family")}
+            onPress={() => router.push("/profile/family")}
           />
         </GroupedSection>
       ) : (

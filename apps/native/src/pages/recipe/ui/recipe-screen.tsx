@@ -1,27 +1,33 @@
-import { recipeDetail } from "@lardon/recipes";
+import { recipeDetail, setVisibility } from "@lardon/recipes";
 import { onlineManager, useQuery } from "@tanstack/react-query";
-import { Schema } from "effect";
 import { Stack, router, useLocalSearchParams } from "expo-router";
-import { useState, useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 
-import { familiesQuery } from "#/entities/family";
-import { libraryFolders, libraryTags, scopeParams, useFamilyTables } from "#/entities/recipe";
+import { familiesQuery, useFamilyStores } from "#/entities/family";
+import {
+  IngredientControls,
+  IngredientRow,
+  RecipeCover,
+  RecipeHero,
+  RecipeSection,
+  ScalePanel,
+  StepRow,
+  libraryFolders,
+  libraryTags,
+  scopeParams,
+  useFamilyTables,
+  useRecipeScale,
+} from "#/entities/recipe";
 import { useOrganizeRecipes } from "#/features/organize-recipes";
 import { usePlanMeals } from "#/features/plan-meals";
+import { authClient } from "#/shared/auth";
 import { useThemeColors } from "#/shared/lib";
-import { usePreference } from "#/shared/preferences";
 import { EmptyState, FilterPill, InlineError, KeyboardDoneButton } from "#/shared/ui";
 
 import { useShareRecipe } from "../model/use-share-recipe";
 
-import { IngredientControls } from "./ingredient-controls";
-import { IngredientRow } from "./ingredient-row";
-import { RecipeHero } from "./recipe-hero";
 import { recipeMenu } from "./recipe-menu";
-import { RecipeSection } from "./recipe-section";
-import { type ScaleMode, ScalePanel } from "./scale-panel";
-import { StepRow } from "./step-row";
 
 export function RecipeScreen() {
   const { recipeId } = useLocalSearchParams<{ recipeId: string }>();
@@ -30,6 +36,8 @@ export function RecipeScreen() {
   const familyTables = useFamilyTables(families.map((family) => family.id));
   const organize = useOrganizeRecipes();
   const planMeals = usePlanMeals();
+  const familyStore = useFamilyStores();
+  const { data: session } = authClient.useSession();
   const share = useShareRecipe();
 
   const isOnline = useSyncExternalStore(
@@ -50,25 +58,10 @@ export function RecipeScreen() {
     },
   ].find((outcome) => outcome.isError)?.message;
 
-  const [scaleFactor, setScaleFactor] = useState(1);
-  const [isScaleOpen, setIsScaleOpen] = useState(false);
-  const [scaleMode, setScaleMode] = useState<ScaleMode>("amount");
-  const [scaledIngredientId, setScaledIngredientId] = useState<string | null>(null);
-
-  const [unitSystem, setUnitSystem] = usePreference(
-    "unitSystem",
-    Schema.Literals(["original", "metric", "imperial"]),
-    "original",
-  );
-
+  const scaling = useRecipeScale();
   const owner = familyTables.find(({ tables }) => tables.recipes?.[recipeId] !== undefined);
   const recipe = owner && recipeDetail(owner.tables, recipeId);
   const ingredientNames = recipe?.ingredients.map((ingredient) => ingredient.name) ?? [];
-  const isPicking = isScaleOpen && scaleMode === "ingredient";
-
-  const scaledIngredient = recipe?.ingredients.find(
-    (ingredient) => ingredient.id === scaledIngredientId,
-  );
 
   return (
     <>
@@ -109,8 +102,8 @@ export function RecipeScreen() {
                   share.pdf.mutate({
                     recipe,
                     familyId: owner.familyId,
-                    scale: scaleFactor,
-                    unitSystem,
+                    scale: scaling.factor,
+                    unitSystem: scaling.unitSystem,
                   })
                 }
               >
@@ -118,7 +111,13 @@ export function RecipeScreen() {
               </Stack.Toolbar.MenuAction>
               <Stack.Toolbar.MenuAction
                 icon="doc.on.doc"
-                onPress={() => share.copy.mutate({ recipe, scale: scaleFactor, unitSystem })}
+                onPress={() =>
+                  share.copy.mutate({
+                    recipe,
+                    scale: scaling.factor,
+                    unitSystem: scaling.unitSystem,
+                  })
+                }
               >
                 Copy Markdown
               </Stack.Toolbar.MenuAction>
@@ -138,6 +137,14 @@ export function RecipeScreen() {
               weekPlan: planMeals.weekPlan(),
               canPlan: owner.familyId === planMeals.planFamilyId,
               onPlan: (day) => planMeals.toggle(day, recipeId),
+              onVisibilityChange:
+                recipe.createdById === session?.user.id
+                  ? (visibility) => {
+                      const store = familyStore(owner.familyId);
+
+                      if (store) setVisibility(store, recipe.id, visibility);
+                    }
+                  : undefined,
               onDeleted: () => router.back(),
             })
           )}
@@ -161,7 +168,15 @@ export function RecipeScreen() {
             contentContainerClassName="pb-16"
           >
             <View className="px-4 pt-2">
-              <RecipeHero recipe={recipe} familyId={owner.familyId} scale={scaleFactor} />
+              <RecipeHero
+                recipe={recipe}
+                photo={
+                  recipe.imageKey && (
+                    <RecipeCover recipe={{ familyId: owner.familyId, imageKey: recipe.imageKey }} />
+                  )
+                }
+                scale={scaling.factor}
+              />
               {actionError && (
                 <View className="items-center pt-3">
                   <InlineError>{actionError}</InlineError>
@@ -176,33 +191,16 @@ export function RecipeScreen() {
                     isScalable={recipe.ingredients.some(
                       (ingredient) => ingredient.quantity !== undefined,
                     )}
-                    scaleFactor={scaleFactor}
-                    onScalePress={() => setIsScaleOpen(!isScaleOpen)}
-                    unitSystem={unitSystem}
-                    onUnitSystemChange={setUnitSystem}
+                    {...scaling.controls}
                   />
                 }
               >
-                {isScaleOpen && (
+                {scaling.isOpen && (
                   <ScalePanel
-                    servings={recipe.servings}
-                    factor={scaleFactor}
-                    onFactorChange={setScaleFactor}
-                    mode={scaleMode}
-                    onModeChange={setScaleMode}
-                    scaledIngredient={
-                      scaledIngredient?.quantity === undefined
-                        ? undefined
-                        : {
-                            name: scaledIngredient.name,
-                            quantity: scaledIngredient.quantity,
-                            unit: scaledIngredient.unit,
-                          }
-                    }
-                    onClear={() => {
-                      setScaleFactor(1);
-                      setScaledIngredientId(null);
-                    }}
+                    {...scaling.panel(
+                      recipe.servings,
+                      recipe.ingredients.find((ingredient) => ingredient.id === scaling.pickedKey),
+                    )}
                   />
                 )}
                 <View
@@ -213,12 +211,10 @@ export function RecipeScreen() {
                     <IngredientRow
                       key={ingredient.id}
                       ingredient={ingredient}
-                      scale={scaleFactor}
-                      unitSystem={unitSystem}
+                      scale={scaling.factor}
+                      unitSystem={scaling.unitSystem}
                       isFirst={index === 0}
-                      isPickable={isPicking}
-                      isPicked={isPicking && scaledIngredientId === ingredient.id}
-                      onPick={() => setScaledIngredientId(ingredient.id)}
+                      {...scaling.pick(ingredient.id)}
                     />
                   ))}
                 </View>

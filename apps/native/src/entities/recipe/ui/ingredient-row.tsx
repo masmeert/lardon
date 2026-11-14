@@ -1,4 +1,4 @@
-import { type RecipeDetail, type UnitSystem, formatAmount } from "@lardon/recipes";
+import { type UnitCode, type UnitSystem, formatAmount } from "@lardon/recipes";
 import { Pressable, Text } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
@@ -13,7 +13,7 @@ export function IngredientRow({
   isPicked,
   onPick,
 }: {
-  ingredient: RecipeDetail["ingredients"][number];
+  ingredient: { name: string; quantity?: number; unit?: UnitCode };
   scale: number;
   unitSystem: UnitSystem;
   isFirst: boolean;

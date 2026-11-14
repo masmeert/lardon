@@ -1,3 +1,4 @@
+import type { Visibility } from "@lardon/recipes";
 import { Stack, router } from "expo-router";
 import { Alert } from "react-native";
 
@@ -14,6 +15,7 @@ export function recipeMenu({
   weekPlan,
   canPlan,
   onPlan,
+  onVisibilityChange,
   onDeleted,
 }: {
   recipe: LibraryRecipe & {
@@ -27,6 +29,7 @@ export function recipeMenu({
   weekPlan: readonly { date: string; recipe: { id: string; title: string } }[];
   canPlan: boolean;
   onPlan: (day: string) => void;
+  onVisibilityChange: ((visibility: Visibility) => void) | undefined;
   onDeleted: () => void;
 }) {
   const { personalId, addTo, removeFrom, remove, move } = organize;
@@ -104,22 +107,40 @@ export function recipeMenu({
             Add to meal plan
           </Stack.Toolbar.MenuAction>
         )}
-        {familyName !== undefined && (
+        {(familyName !== undefined || onVisibilityChange) && (
           <Stack.Toolbar.Menu title="Shared with" icon="person.2">
-            <Stack.Toolbar.MenuAction
-              icon="person.2"
-              isOn={!isPrivate}
-              onPress={() => isPrivate && move.mutate({ recipes: [recipe], isPrivate: false })}
-            >
-              {familyName}
-            </Stack.Toolbar.MenuAction>
-            <Stack.Toolbar.MenuAction
-              icon="lock"
-              isOn={isPrivate}
-              onPress={() => !isPrivate && move.mutate({ recipes: [recipe], isPrivate: true })}
-            >
-              Only me
-            </Stack.Toolbar.MenuAction>
+            {familyName !== undefined && (
+              <Stack.Toolbar.Menu inline>
+                <Stack.Toolbar.MenuAction
+                  icon="person.2"
+                  isOn={!isPrivate}
+                  onPress={() => isPrivate && move.mutate({ recipes: [recipe], isPrivate: false })}
+                >
+                  {familyName}
+                </Stack.Toolbar.MenuAction>
+                <Stack.Toolbar.MenuAction
+                  icon="lock"
+                  isOn={isPrivate}
+                  onPress={() => !isPrivate && move.mutate({ recipes: [recipe], isPrivate: true })}
+                >
+                  Only me
+                </Stack.Toolbar.MenuAction>
+              </Stack.Toolbar.Menu>
+            )}
+            {onVisibilityChange && (
+              <Stack.Toolbar.Menu inline>
+                <Stack.Toolbar.MenuAction
+                  icon="person.crop.circle.badge.checkmark"
+                  isOn={recipe.visibility === "followers"}
+                  subtitle="Approved followers see it in Discover"
+                  onPress={() =>
+                    onVisibilityChange(recipe.visibility === "followers" ? "private" : "followers")
+                  }
+                >
+                  Followers
+                </Stack.Toolbar.MenuAction>
+              </Stack.Toolbar.Menu>
+            )}
           </Stack.Toolbar.Menu>
         )}
       </Stack.Toolbar.Menu>
