@@ -25,6 +25,7 @@ export default function AppLayout() {
           <Stack.Screen name="account/name" options={sheetOptions} />
           <Stack.Screen name="recipe/new" options={{ presentation: "modal" }} />
           <Stack.Screen name="recipe/[recipeId]/edit" options={{ presentation: "modal" }} />
+          <Stack.Screen name="plan/[date]" options={{ presentation: "modal", headerShown: true }} />
         </Stack>
       </Provider>
     </SessionCookieContext>
