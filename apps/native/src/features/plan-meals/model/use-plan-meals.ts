@@ -1,10 +1,11 @@
 import { clearMeal, planMeal } from "@lardon/recipes";
 import { useQuery } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
+import { Alert } from "react-native";
 
 import { familiesQuery, useFamilyStores } from "#/entities/family";
 import { libraryMealPlan, useFamilyTables } from "#/entities/recipe";
-import { addDays, calendarDay } from "#/shared/lib";
+import { addDays, calendarDay, weekdayName } from "#/shared/lib";
 
 export function usePlanMeals() {
   const familyStore = useFamilyStores();
@@ -54,6 +55,23 @@ export function usePlanMeals() {
     void Haptics.selectionAsync();
   }
 
+  function confirmRemove(date: string) {
+    const [meal] = mealsIn({ from: date, to: date });
+
+    if (!meal) return;
+
+    Alert.alert(
+      `Remove ${meal.recipe.title} from ${date === calendarDay(new Date()) ? "today" : weekdayName(date)}?`,
+      families.some((family) => !family.personal)
+        ? "It'll be removed for everyone in your family."
+        : undefined,
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Remove", style: "destructive", onPress: () => remove([date]) },
+      ],
+    );
+  }
+
   function weekPlan() {
     const today = calendarDay(new Date());
 
@@ -61,9 +79,9 @@ export function usePlanMeals() {
   }
 
   function toggle(date: string, recipeId: string) {
-    if (mealsIn({ from: date, to: date })[0]?.recipe.id === recipeId) remove([date]);
+    if (mealsIn({ from: date, to: date })[0]?.recipe.id === recipeId) confirmRemove(date);
     else plan(date, recipeId);
   }
 
-  return { planFamilyId, mealsIn, plan, move, remove, weekPlan, toggle };
+  return { planFamilyId, mealsIn, plan, move, remove, confirmRemove, weekPlan, toggle };
 }
