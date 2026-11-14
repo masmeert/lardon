@@ -104,7 +104,7 @@ export function MealPlanScreen() {
               meals={meals.filter((meal) => meal.date === day)}
               plannedDays={new Map(meals.map((meal) => [meal.date, meal.recipe.title]))}
               onMove={(target) => planMeals.move(day, target)}
-              onRemove={() => planMeals.remove([day])}
+              onRemove={() => planMeals.confirmRemove(day)}
             />
           )}
         />
