@@ -69,7 +69,7 @@ describe("share links", () => {
 
         expect(page.status).toBe(200);
         expect(page.headers.get("content-type")).toContain("text/html");
-        expect(html).toContain("<h1>Gaufres de Liège</h1>");
+        expect(html).toMatch(/<h1 [^>]+>Gaufres de Liège<\/h1>/);
         expect(html).toContain('<meta property="og:title" content="Gaufres de Liège"/>');
         expect(html).toContain(`<meta property="og:image" content="${link.url}/photo"/>`);
 

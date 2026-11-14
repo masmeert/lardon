@@ -1,8 +1,26 @@
-import type { ReactNode } from "react";
+import { colors } from "@lardon/brand";
+import type { CSSProperties, ReactNode } from "react";
 
 import { formatAmount, formatDuration, formatQuantity } from "./format";
 import type { RecipeSnapshot } from "./snapshot";
 import type { UnitSystem } from "./units";
+
+const heading: CSSProperties = {
+  margin: "32px 4px 12px",
+  fontSize: 17,
+  lineHeight: "22px",
+  fontWeight: 600,
+};
+
+const card: CSSProperties = {
+  margin: 0,
+  padding: "4px 16px",
+  background: colors.paper,
+  borderRadius: 18,
+  listStyle: "none",
+};
+
+const section: CSSProperties = { breakInside: "avoid" };
 
 export function RecipeDocument({
   recipe,
@@ -37,110 +55,113 @@ export function RecipeDocument({
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="color-scheme" content="light" />
         <title>{recipe.title}</title>
         {head}
-        <style
-          dangerouslySetInnerHTML={{
-            __html: `
-  :root { color-scheme: light; }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    background: #f2f2f7;
-    color: #000;
-    font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
-    -webkit-font-smoothing: antialiased;
-  }
-  main { max-width: 640px; margin: 0 auto; padding: 24px 20px 48px; }
-  .photo {
-    display: block;
-    width: 100%;
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
-    border: 4px solid #fff;
-    border-radius: 24px;
-    box-shadow: 0 0 1px rgba(34, 28, 24, 0.16), 0 1px 2px rgba(34, 28, 24, 0.08);
-  }
-  h1 { margin: 24px 4px 4px; font-size: 30px; line-height: 36px; font-weight: 700; }
-  .facts { margin: 0 4px; color: #6e6e73; }
-  h2 { margin: 32px 4px 12px; font-size: 17px; line-height: 22px; font-weight: 600; }
-  section { break-inside: avoid; page-break-inside: avoid; }
-  .card { margin: 0; padding: 4px 16px; background: #fff; border-radius: 18px; list-style: none; }
-  .ingredients li {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 10px 0;
-    break-inside: avoid;
-  }
-  .ingredients li + li { border-top: 1px solid #e5e5ea; }
-  .ingredients strong { color: #5a6a1f; font-weight: 600; white-space: nowrap; }
-  .steps { margin: 0; padding: 0; list-style: none; counter-reset: step; }
-  .steps li {
-    position: relative;
-    margin-bottom: 8px;
-    padding: 12px 16px 12px 50px;
-    background: #fff;
-    border-radius: 18px;
-    counter-increment: step;
-    break-inside: avoid;
-  }
-  .steps li::before {
-    content: counter(step);
-    position: absolute;
-    left: 16px;
-    top: 13px;
-    width: 22px;
-    height: 22px;
-    border-radius: 11px;
-    background: #f2f2f7;
-    color: #5a6a1f;
-    font-size: 13px;
-    font-weight: 700;
-    line-height: 22px;
-    text-align: center;
-  }
-  .notes { padding: 12px 16px; white-space: pre-wrap; }
-  footer { margin-top: 40px; color: #6e6e73; font-size: 14px; text-align: center; }
-  footer a { color: #5a6a1f; font-weight: 600; text-decoration: none; }
-  @page { margin: 14mm 0; }
-  @media print { body { background: #fff; } main { padding-top: 0; } .card, .steps li { background: #f2f2f7; } }
-`,
-          }}
-        />
       </head>
-      <body>
-        <main>
-          {photoUrl && <img className="photo" src={photoUrl} alt="" />}
-          <h1>{recipe.title}</h1>
-          {facts.length > 0 && <p className="facts">{facts.join(", ")}</p>}
+      <body
+        style={{
+          margin: 0,
+          background: colors.background,
+          color: colors.foreground,
+          font: '16px/1.45 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif',
+          WebkitFontSmoothing: "antialiased",
+        }}
+      >
+        <main style={{ maxWidth: 640, margin: "0 auto", padding: "24px 20px 48px" }}>
+          {photoUrl && (
+            <img
+              src={photoUrl}
+              alt=""
+              style={{
+                display: "block",
+                width: "100%",
+                aspectRatio: "4 / 3",
+                objectFit: "cover",
+                boxSizing: "border-box",
+                border: `4px solid ${colors.paper}`,
+                borderRadius: 24,
+                boxShadow: "0 0 1px rgba(34, 28, 24, 0.16), 0 1px 2px rgba(34, 28, 24, 0.08)",
+              }}
+            />
+          )}
+          <h1 style={{ margin: "24px 4px 4px", fontSize: 30, lineHeight: "36px", fontWeight: 700 }}>
+            {recipe.title}
+          </h1>
+          {facts.length > 0 && (
+            <p style={{ margin: "0 4px", color: colors.muted }}>{facts.join(", ")}</p>
+          )}
           {recipe.ingredients.length > 0 && (
-            <section>
-              <h2>Ingredients</h2>
-              <ul className="card ingredients">
+            <section style={section}>
+              <h2 style={heading}>Ingredients</h2>
+              <ul style={card}>
                 {recipe.ingredients.map((ingredient, index) => (
-                  <li key={index}>
+                  <li
+                    key={index}
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      gap: 12,
+                      padding: "10px 0",
+                      borderTop: index === 0 ? undefined : `1px solid ${colors.hairline}`,
+                      breakInside: "avoid",
+                    }}
+                  >
                     <span>{ingredient.name}</span>
-                    <strong>{formatAmount(ingredient, scale, unitSystem)}</strong>
+                    <strong style={{ color: colors.accent, fontWeight: 600, whiteSpace: "nowrap" }}>
+                      {formatAmount(ingredient, scale, unitSystem)}
+                    </strong>
                   </li>
                 ))}
               </ul>
             </section>
           )}
           {recipe.steps.length > 0 && (
-            <section>
-              <h2>Steps</h2>
-              <ol className="steps">
+            <section style={section}>
+              <h2 style={heading}>Steps</h2>
+              <ol style={{ margin: 0, padding: 0, listStyle: "none" }}>
                 {recipe.steps.map((step, index) => (
-                  <li key={index}>{step}</li>
+                  <li
+                    key={index}
+                    style={{
+                      display: "flex",
+                      gap: 12,
+                      marginBottom: 8,
+                      padding: "12px 16px",
+                      background: colors.paper,
+                      borderRadius: 18,
+                      breakInside: "avoid",
+                    }}
+                  >
+                    <span
+                      style={{
+                        flex: "none",
+                        width: 22,
+                        height: 22,
+                        marginTop: 1,
+                        borderRadius: 11,
+                        background: colors.background,
+                        color: colors.accent,
+                        fontSize: 13,
+                        fontWeight: 700,
+                        lineHeight: "22px",
+                        textAlign: "center",
+                      }}
+                    >
+                      {index + 1}
+                    </span>
+                    <span>{step}</span>
+                  </li>
                 ))}
               </ol>
             </section>
           )}
           {recipe.notes && (
-            <section>
-              <h2>Notes</h2>
-              <p className="card notes">{recipe.notes}</p>
+            <section style={section}>
+              <h2 style={heading}>Notes</h2>
+              <p style={{ ...card, padding: "12px 16px", whiteSpace: "pre-wrap" }}>
+                {recipe.notes}
+              </p>
             </section>
           )}
           {footer}

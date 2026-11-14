@@ -68,6 +68,7 @@ export function useShareRecipe() {
       const { uri } = await printToFileAsync({
         width: 595,
         height: 842,
+        margins: { top: 40, right: 0, bottom: 40, left: 0 },
         html: `<!doctype html>${renderToStaticMarkup(
           <RecipeDocument
             recipe={recipeSnapshot(recipe)}

@@ -11,6 +11,7 @@
     "test": "vp test run"
   },
   "dependencies": {
+    "@lardon/brand": "workspace:*",
     "effect": "catalog:",
     "fractional-indexing": "4.0.0",
     "tinybase": "10.1.0"

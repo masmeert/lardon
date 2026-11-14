@@ -1,3 +1,4 @@
+import { colors } from "@lardon/brand";
 import { RecipeDocument } from "@lardon/recipes/recipe-document";
 import type { RecipeSnapshot } from "@lardon/recipes/snapshot";
 
@@ -35,8 +36,15 @@ export function SharePage({
         </>
       }
       footer={
-        <footer>
-          Shared from <a href="https://lardon.app">Lardon</a>. This link works until{" "}
+        <footer style={{ marginTop: 40, color: colors.muted, fontSize: 14, textAlign: "center" }}>
+          Shared from{" "}
+          <a
+            href="https://lardon.app"
+            style={{ color: colors.accent, fontWeight: 600, textDecoration: "none" }}
+          >
+            Lardon
+          </a>
+          . This link works until{" "}
           {new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long" }).format(expiresAt)}.
         </footer>
       }

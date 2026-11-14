@@ -668,6 +668,9 @@ importers:
 
   packages/recipes:
     dependencies:
+      '@lardon/brand':
+        specifier: workspace:*
+        version: link:../brand
       effect:
         specifier: 4.1.4
         version: 4.1.4
