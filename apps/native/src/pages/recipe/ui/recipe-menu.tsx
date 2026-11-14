@@ -8,6 +8,7 @@ export function recipeMenu({
   recipe,
   folderNames,
   tagNames,
+  familyName,
   organize,
   onDeleted,
 }: {
@@ -17,10 +18,11 @@ export function recipeMenu({
   };
   folderNames: readonly string[];
   tagNames: readonly string[];
+  familyName: string | undefined;
   organize: ReturnType<typeof useOrganizeRecipes>;
   onDeleted: () => void;
 }) {
-  const { personalId, addTo, removeFrom, remove } = organize;
+  const { personalId, addTo, removeFrom, remove, move } = organize;
   const isPrivate = recipe.familyId === personalId;
 
   function isIn(owners: readonly { name: string }[], name: string) {
@@ -66,6 +68,24 @@ export function recipeMenu({
             </Stack.Toolbar.MenuAction>
           ))}
         </Stack.Toolbar.Menu>
+        {familyName !== undefined && (
+          <Stack.Toolbar.Menu title="Shared with" icon="person.2">
+            <Stack.Toolbar.MenuAction
+              icon="person.2"
+              isOn={!isPrivate}
+              onPress={() => isPrivate && move.mutate({ recipes: [recipe], isPrivate: false })}
+            >
+              {familyName}
+            </Stack.Toolbar.MenuAction>
+            <Stack.Toolbar.MenuAction
+              icon="lock"
+              isOn={isPrivate}
+              onPress={() => !isPrivate && move.mutate({ recipes: [recipe], isPrivate: true })}
+            >
+              Only me
+            </Stack.Toolbar.MenuAction>
+          </Stack.Toolbar.Menu>
+        )}
       </Stack.Toolbar.Menu>
       <Stack.Toolbar.MenuAction
         icon="trash"

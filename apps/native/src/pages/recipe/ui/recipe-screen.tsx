@@ -10,13 +10,12 @@ import { libraryFolders, libraryTags, scopeParams, useFamilyTables } from "#/ent
 import { useOrganizeRecipes } from "#/features/organize-recipes";
 import { useThemeColors } from "#/shared/lib";
 import { usePreference } from "#/shared/preferences";
-import { EmptyState, FilterPill, InlineError } from "#/shared/ui";
+import { EmptyState, FilterPill, InlineError, KeyboardDoneButton } from "#/shared/ui";
 
 import { useShareRecipe } from "../model/use-share-recipe";
 
 import { IngredientControls } from "./ingredient-controls";
 import { IngredientRow } from "./ingredient-row";
-import { KeyboardDoneButton } from "./keyboard-done-button";
 import { RecipeHero } from "./recipe-hero";
 import { recipeMenu } from "./recipe-menu";
 import { RecipeSection } from "./recipe-section";
@@ -36,13 +35,17 @@ export function RecipeScreen() {
     () => onlineManager.isOnline(),
   );
 
-  const shareError = [
+  const actionError = [
     {
       isError: share.link.isError,
       message: "Couldn't create the link. Check your connection and try again.",
     },
     { isError: share.pdf.isError, message: "Couldn't make the PDF. Try again." },
     { isError: share.copy.isError, message: "Couldn't copy the recipe. Try again." },
+    {
+      isError: organize.move.isError,
+      message: "Couldn't move this recipe. Check your connection and try again.",
+    },
   ].find((outcome) => outcome.isError)?.message;
 
   const [scaleFactor, setScaleFactor] = useState(1);
@@ -119,13 +122,20 @@ export function RecipeScreen() {
               </Stack.Toolbar.MenuAction>
             </Stack.Toolbar.Menu>
           )}
-          {recipeMenu({
-            recipe: { ...recipe, familyId: owner.familyId },
-            folderNames: libraryFolders(familyTables).map((folder) => folder.name),
-            tagNames: libraryTags(familyTables).map((tag) => tag.name),
-            organize,
-            onDeleted: () => router.back(),
-          })}
+          {organize.move.isPending ? (
+            <Stack.Toolbar.View>
+              <ActivityIndicator />
+            </Stack.Toolbar.View>
+          ) : (
+            recipeMenu({
+              recipe: { ...recipe, familyId: owner.familyId },
+              folderNames: libraryFolders(familyTables).map((folder) => folder.name),
+              tagNames: libraryTags(familyTables).map((tag) => tag.name),
+              familyName: families.find((family) => !family.personal)?.name,
+              organize,
+              onDeleted: () => router.back(),
+            })
+          )}
         </Stack.Toolbar>
       )}
       {!owner || !recipe ? (
@@ -147,9 +157,9 @@ export function RecipeScreen() {
           >
             <View className="px-4 pt-2">
               <RecipeHero recipe={recipe} familyId={owner.familyId} scale={scaleFactor} />
-              {shareError && (
+              {actionError && (
                 <View className="items-center pt-3">
-                  <InlineError>{shareError}</InlineError>
+                  <InlineError>{actionError}</InlineError>
                 </View>
               )}
             </View>
