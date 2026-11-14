@@ -159,3 +159,7 @@ export function mealPlan(content: Tables, range: { from: string; to: string }) {
 }
 
 export type PlannedMeal = ReturnType<typeof mealPlan>[number];
+
+export function savedCopyOf(content: Tables, publishedRecipeId: string) {
+  return readRows(content, "recipes").find((recipe) => recipe.savedFromId === publishedRecipeId);
+}

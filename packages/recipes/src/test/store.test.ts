@@ -18,7 +18,15 @@ import {
   saveRecipe,
   setVisibility,
 } from "../commands";
-import { collectionList, everyRecipe, mealPlan, recipeDetail, recipeList } from "../queries";
+import {
+  collectionList,
+  everyRecipe,
+  mealPlan,
+  recipeDetail,
+  recipeList,
+  savedCopyOf,
+} from "../queries";
+import { recipeSnapshot, snapshotDraft } from "../snapshot";
 import { createRecipeStore, isValidCell, isValidRowId, readRows } from "../tables";
 
 function draft(changes: Partial<RecipeDraft> = {}): RecipeDraft {
@@ -117,6 +125,36 @@ describe("tables", () => {
 });
 
 describe("recipes", () => {
+  it("saves someone else's snapshot as a new private recipe that remembers where it came from", () => {
+    const store = createRecipeStore();
+    const family = createRecipeStore();
+    const original = createRecipe(store, draft({ notes: "Use ripe tomatoes." }), "alice");
+    const snapshot = recipeSnapshot(recipeDetail(store.getTables(), original)!);
+
+    const copy = createRecipe(
+      store,
+      snapshotDraft(snapshot, "6f1c3a52-8f7d-4c3e-9a51-2b0d7e9c4a10.jpg"),
+      "bob",
+      "published-soup",
+    );
+
+    const saved = recipeDetail(store.getTables(), copy)!;
+
+    expect(recipeSnapshot(saved)).toEqual(snapshot);
+    expect(saved).toMatchObject({
+      createdById: "bob",
+      visibility: "private",
+      savedFromId: "published-soup",
+      imageKey: "6f1c3a52-8f7d-4c3e-9a51-2b0d7e9c4a10.jpg",
+    });
+    expect(savedCopyOf(store.getTables(), "published-soup")?.id).toBe(copy);
+    expect(savedCopyOf(store.getTables(), "published-stew")).toBeUndefined();
+
+    moveRecipe(store, family, copy, null);
+    expect(savedCopyOf(store.getTables(), "published-soup")).toBeUndefined();
+    expect(savedCopyOf(family.getTables(), "published-soup")?.id).toBe(copy);
+  });
+
   it("creates a private recipe with ordered, cleaned lines", () => {
     const store = createRecipeStore();
 
