@@ -131,4 +131,56 @@ describe("share links", () => {
         expect((yield* open(`/r/${token}`)).status).toBe(404);
       }),
     ));
+
+  it("hands back the same link while the recipe stays unchanged", () =>
+    runTest(
+      Effect.gen(function* () {
+        const database = yield* Database;
+        const images = yield* StoredImages;
+        const alice = yield* createUser("Alice");
+        const bob = yield* createUser("Bob");
+        const family = yield* alice.api.families.create({ payload: { name: "Meerts" } });
+        const invite = yield* alice.api.families.createInvite({ params: { familyId: family.id } });
+        yield* bob.api.families.join({ payload: { code: invite.code } });
+
+        const { imageKey } = yield* alice.api.images.upload({
+          params: { familyId: family.id },
+          payload: TINY_PNG,
+        });
+
+        const payload = { familyId: family.id, recipeId: "gaufres", recipe, imageKey };
+        const first = yield* alice.api.shares.create({ payload });
+        const token = first.url.split("/").at(-1)!;
+
+        yield* database.use((client) =>
+          client
+            .update(share)
+            .set({ expiresAt: new Date(Date.now() + 60 * 60 * 1000) })
+            .where(eq(share.token, token)),
+        );
+
+        const again = yield* alice.api.shares.create({ payload });
+
+        expect(again.url).toBe(first.url);
+        expect(again.expiresAt.getTime() - Date.now()).toBeGreaterThan(6.9 * 24 * 60 * 60 * 1000);
+        expect([...images.keys()].filter((key) => key.startsWith("shares/"))).toHaveLength(1);
+
+        const edited = yield* alice.api.shares.create({
+          payload: { ...payload, recipe: { ...recipe, servings: 6 } },
+        });
+
+        const { imageKey: newPhoto } = yield* alice.api.images.upload({
+          params: { familyId: family.id },
+          payload: TINY_PNG,
+        });
+
+        const rephotographed = yield* alice.api.shares.create({
+          payload: { ...payload, imageKey: newPhoto },
+        });
+
+        const fromBob = yield* bob.api.shares.create({ payload });
+
+        expect(new Set([first.url, edited.url, rephotographed.url, fromBob.url]).size).toBe(4);
+      }),
+    ));
 });

@@ -76,19 +76,19 @@ Recipes are plain lists: no sections. Not stored, on purpose: source URL, nutrit
 
 ### D1
 
-| Table                             | Columns                                                                                | Notes                                                                                                                            |
-| --------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `user`, `session`, `verification` | Managed by better-auth                                                                 | `session` keeps IP and user agent for a "your devices" list; the privacy policy says so                                          |
-| `account`                         | Managed by better-auth                                                                 | Google and Apple tokens aren't kept: we never call their APIs                                                                    |
-| `family`                          | `id`, `name`, `personalForUserId`, `createdAt`, `updatedAt`                            | `personalForUserId` is unique and set only on a personal family, so each account has exactly one, and it can't be shared or left |
-| `family_member`                   | `familyId`, `userId`, `role` (`owner` or `member`), `joinedAt`                         |                                                                                                                                  |
-| `family_invite`                   | `code`, `familyId`, `createdById`, `expiresAt`                                         | Reusable until it expires, 7 days after creation                                                                                 |
-| `share`                           | `token`, `recipeId`, `createdById`, `snapshot`, `imageKey`, `expiresAt`, `createdAt`   | Expires 7 days after creation                                                                                                    |
-| `profile`                         | `userId`, `username`, `bio`                                                            | Name and photo come from `user`                                                                                                  |
-| `follow`                          | `followerId`, `followeeId`, `status` (`pending` or `approved`), `createdAt`            |                                                                                                                                  |
-| `block`                           | `blockerId`, `blockedId`, `createdAt`                                                  |                                                                                                                                  |
-| `published_recipe`                | `recipeId`, `familyId`, `authorId`, `snapshot`, `imageKey`, `publishedAt`, `updatedAt` | Written only by the family's Durable Object                                                                                      |
-| `report`                          | `reporterId`, the reported user or recipe, `reason`, `createdAt`                       | Added with the report button                                                                                                     |
+| Table                             | Columns                                                                                                | Notes                                                                                                                            |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
+| `user`, `session`, `verification` | Managed by better-auth                                                                                 | `session` keeps IP and user agent for a "your devices" list; the privacy policy says so                                          |
+| `account`                         | Managed by better-auth                                                                                 | Google and Apple tokens aren't kept: we never call their APIs                                                                    |
+| `family`                          | `id`, `name`, `personalForUserId`, `createdAt`, `updatedAt`                                            | `personalForUserId` is unique and set only on a personal family, so each account has exactly one, and it can't be shared or left |
+| `family_member`                   | `familyId`, `userId`, `role` (`owner` or `member`), `joinedAt`                                         |                                                                                                                                  |
+| `family_invite`                   | `code`, `familyId`, `createdById`, `expiresAt`                                                         | Reusable until it expires, 7 days after creation                                                                                 |
+| `share`                           | `token`, `recipeId`, `createdById`, `snapshot`, `imageKey`, `sourceImageKey`, `expiresAt`, `createdAt` | Expires 7 days after creation                                                                                                    |
+| `profile`                         | `userId`, `username`, `bio`                                                                            | Name and photo come from `user`                                                                                                  |
+| `follow`                          | `followerId`, `followeeId`, `status` (`pending` or `approved`), `createdAt`                            |                                                                                                                                  |
+| `block`                           | `blockerId`, `blockedId`, `createdAt`                                                                  |                                                                                                                                  |
+| `published_recipe`                | `recipeId`, `familyId`, `authorId`, `snapshot`, `imageKey`, `publishedAt`, `updatedAt`                 | Written only by the family's Durable Object                                                                                      |
+| `report`                          | `reporterId`, the reported user or recipe, `reason`, `createdAt`                                       | Added with the report button                                                                                                     |
 
 ### R2
 
@@ -116,6 +116,7 @@ Never synced: library layout and sort order, and the unit system (original, metr
 **Share link**: "Share link" in the app's Share menu sends the recipe as it is now to `POST /api/shares`. It's disabled while offline.
 
 - The server checks membership of the recipe's family, then stores a snapshot in D1 with a random token that expires after 7 days. The duration is ours to set, not the user's.
+- Sharing the same recipe again hands back your existing link when nothing changed (same snapshot, same photo) and restarts its 7 days. An edit or a new photo gets a new link, and each person gets their own.
 - The page `lardon.app/r/<token>` is rendered by the Worker, with Open Graph tags so the link preview shows the title and photo. Its photo is the share's own copy, made when the link is created, and served through the share token.
 - After expiry, the page and its photo return a plain "This link has expired" page.
 - A daily cron trigger deletes expired shares and their photos.

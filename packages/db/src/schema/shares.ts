@@ -13,10 +13,14 @@ export const share = sqliteTable(
       .references(() => user.id, { onDelete: "cascade" }),
     snapshot: text("snapshot", { mode: "json" }).notNull(),
     imageKey: text("image_key"),
+    sourceImageKey: text("source_image_key"),
     expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
       .notNull(),
   },
-  (table) => [index("share_expiresAt_idx").on(table.expiresAt)],
+  (table) => [
+    index("share_expiresAt_idx").on(table.expiresAt),
+    index("share_createdById_recipeId_idx").on(table.createdById, table.recipeId),
+  ],
 );

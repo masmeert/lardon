@@ -1,5 +1,5 @@
 import { type ShareLink } from "@lardon/api";
-import { eq, isNotNull, lte } from "@lardon/db/orm";
+import { and, eq, gt, isNotNull, lte } from "@lardon/db/orm";
 import { share } from "@lardon/db/schema/shares";
 import { RecipeSnapshot } from "@lardon/recipes/snapshot";
 import { Clock, Context, Effect, Layer, Option, Schema } from "effect";
@@ -13,6 +13,8 @@ const SHARE_LIFETIME_MS = 7 * 24 * 60 * 60 * 1000;
 export const shareImagePrefix = "shares/";
 
 const decodeSnapshot = Schema.decodeUnknownOption(RecipeSnapshot);
+
+const isSameSnapshot = Schema.toEquivalence(RecipeSnapshot);
 
 function newToken() {
   return btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16))))
@@ -51,8 +53,40 @@ export class Shares extends Context.Service<
           create: Effect.fn("Shares.create")(function* (userId, input) {
             if (!(yield* families.isMember(userId, input.familyId))) return yield* missingFamily;
 
+            const nowMs = yield* Clock.currentTimeMillis;
+            const expiresAt = new Date(nowMs + SHARE_LIFETIME_MS);
+
+            const existing = yield* database.use((client) =>
+              client
+                .select()
+                .from(share)
+                .where(
+                  and(
+                    eq(share.createdById, userId),
+                    eq(share.recipeId, input.recipeId),
+                    gt(share.expiresAt, new Date(nowMs)),
+                  ),
+                ),
+            );
+
+            const unchanged = existing.find(
+              (row) =>
+                row.sourceImageKey === (input.imageKey ?? null) &&
+                (row.sourceImageKey === null || row.imageKey !== null) &&
+                Option.exists(decodeSnapshot(row.snapshot), (snapshot) =>
+                  isSameSnapshot(snapshot, input.recipe),
+                ),
+            );
+
+            if (unchanged) {
+              yield* database.use((client) =>
+                client.update(share).set({ expiresAt }).where(eq(share.token, unchanged.token)),
+              );
+
+              return { url: `${origin}/r/${unchanged.token}`, expiresAt };
+            }
+
             const token = newToken();
-            const expiresAt = new Date((yield* Clock.currentTimeMillis) + SHARE_LIFETIME_MS);
             const sharedImageKey = `${token}.${input.imageKey?.split(".")[1]}`;
 
             const isCopied =
@@ -69,6 +103,7 @@ export class Shares extends Context.Service<
                 createdById: userId,
                 snapshot: input.recipe,
                 imageKey: isCopied ? sharedImageKey : null,
+                sourceImageKey: input.imageKey ?? null,
                 expiresAt,
               }),
             );
