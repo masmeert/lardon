@@ -48,6 +48,7 @@ export const tables = {
     notes: Schema.optionalKey(text(20_000)),
     imageKey: Schema.optionalKey(ImageKey),
     visibility: Visibility,
+    savedFromId: Schema.optionalKey(Id),
     createdById: Id,
     createdAt: Millis,
     updatedAt: Millis,

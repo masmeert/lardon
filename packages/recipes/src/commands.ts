@@ -142,7 +142,7 @@ function writeRecipe(
   store: MergeableStore,
   recipeId: string,
   draft: RecipeDraft,
-  owner: { createdById: string; createdAt: number; visibility: Visibility },
+  owner: { createdById: string; createdAt: number; visibility: Visibility; savedFromId?: string },
 ) {
   const ingredientPositions = generateNKeysBetween(null, null, draft.ingredients.length);
   const stepPositions = generateNKeysBetween(null, null, draft.steps.length);
@@ -158,6 +158,7 @@ function writeRecipe(
       notes: draft.notes,
       imageKey: draft.imageKey,
       visibility: owner.visibility,
+      savedFromId: owner.savedFromId ?? null,
       createdById: owner.createdById,
       createdAt: owner.createdAt,
       updatedAt: Date.now(),
@@ -191,7 +192,12 @@ function writeRecipe(
   for (const folderId of draft.folderIds) writeLink(store, "folders", folderId, recipeId);
 }
 
-export function createRecipe(store: MergeableStore, draft: RecipeDraft, createdById: string) {
+export function createRecipe(
+  store: MergeableStore,
+  draft: RecipeDraft,
+  createdById: string,
+  savedFromId?: string,
+) {
   const recipeId = getUniqueId();
 
   store.transaction(() =>
@@ -199,6 +205,7 @@ export function createRecipe(store: MergeableStore, draft: RecipeDraft, createdB
       createdById,
       createdAt: Date.now(),
       visibility: "private",
+      savedFromId,
     }),
   );
 
