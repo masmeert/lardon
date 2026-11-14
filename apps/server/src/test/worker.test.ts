@@ -6,6 +6,7 @@ import { createWsSynchronizer } from "tinybase/synchronizers/synchronizer-ws-cli
 import { afterAll, beforeAll, describe, expect, it } from "vite-plus/test";
 import type { WebSocket } from "ws";
 
+import { PUBLISH_DELAY_MS } from "../published-recipes";
 import { startWorker, waitFor } from "./worker";
 
 const TINY_PNG = Uint8Array.from(
@@ -197,4 +198,75 @@ describe("the worker in workerd", () => {
     const left = await (await worker.images()).list({ prefix: `families/${familyId}/` });
     expect(left.objects).toEqual([]);
   });
+  it("publishes followers' recipes on the same alarm as the daily clean-up", async () => {
+    const {
+      accounts: [alice, bob],
+      familyId,
+    } = await familyOf(["alice", "bob"]);
+
+    for (const account of [alice!, bob!]) {
+      await worker.api(account.cookie)((client) =>
+        client.profiles.save({
+          payload: { username: `u${account.id.slice(0, 8).toLowerCase()}`, bio: "" },
+        }),
+      );
+    }
+
+    await worker.api(bob!.cookie)((client) =>
+      client.follows.follow({ payload: { userId: alice!.id } }),
+    );
+    await worker.api(alice!.cookie)((client) =>
+      client.follows.approve({ params: { userId: bob!.id } }),
+    );
+
+    const store = await worker.familyStore(familyId);
+    const aliceDevice = await device(alice!.cookie, familyId);
+    const { cleanUpAt } = await store.jobs();
+
+    expect(cleanUpAt! - Date.now()).toBeGreaterThan(DAY_MS - 60_000);
+
+    const feedTitles = async () =>
+      (await worker.api(bob!.cookie)((client) => client.feed.list({ query: {} }))).recipes.map(
+        (published) => published.recipe.title,
+      );
+
+    const recipeId = createRecipe(aliceDevice.store, { ...emptyDraft(), title: "Soup" }, alice!.id);
+    setVisibility(aliceDevice.store, recipeId, "followers");
+
+    const scheduled = await waitFor(async () => {
+      const jobs = await store.jobs();
+
+      return jobs.publishAt === undefined ? undefined : jobs;
+    });
+
+    expect(scheduled).toEqual({
+      cleanUpAt,
+      publishAt: scheduled.alarmAt,
+      alarmAt: scheduled.alarmAt,
+    });
+    expect(scheduled.alarmAt! - Date.now()).toBeLessThanOrEqual(PUBLISH_DELAY_MS);
+
+    await waitFor(async () => ((await feedTitles()).length > 0 ? true : undefined), 10_000);
+    expect(await feedTitles()).toEqual(["Soup"]);
+    expect(await store.jobs()).toEqual({ cleanUpAt, publishAt: undefined, alarmAt: cleanUpAt });
+
+    setVisibility(aliceDevice.store, recipeId, "private");
+    await waitFor(async () => ((await feedTitles()).length === 0 ? true : undefined), 10_000);
+
+    const cleanUpSoonAt = Date.now() + 300;
+    await store.schedule("cleanUpAt", cleanUpSoonAt);
+    setVisibility(aliceDevice.store, recipeId, "followers");
+    const startedAt = Date.now();
+
+    await waitFor(async () => ((await store.jobs()).publishAt === undefined ? undefined : true));
+    expect((await store.jobs()).alarmAt).toBe(cleanUpSoonAt);
+
+    await waitFor(async () => ((await feedTitles()).length > 0 ? true : undefined), 10_000);
+    expect(Date.now() - startedAt).toBeLessThan(PUBLISH_DELAY_MS);
+
+    const afterCleanUp = await store.jobs();
+    expect(afterCleanUp.publishAt).toBeUndefined();
+    expect(afterCleanUp.alarmAt).toBe(afterCleanUp.cleanUpAt);
+    expect(afterCleanUp.cleanUpAt! - Date.now()).toBeGreaterThan(DAY_MS - 60_000);
+  }, 30_000);
 });

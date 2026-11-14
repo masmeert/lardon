@@ -159,12 +159,16 @@ export async function startWorker() {
     });
   }
 
-  async function cleanUp(familyId: string, nowMs: number) {
+  async function familyStore(familyId: string) {
     const bindings = await miniflare.getBindings<{
       FAMILY_STORES: DurableObjectNamespace<FamilyStore>;
     }>();
 
-    await bindings.FAMILY_STORES.getByName(familyId).cleanUp(nowMs);
+    return bindings.FAMILY_STORES.getByName(familyId);
+  }
+
+  async function cleanUp(familyId: string, nowMs: number) {
+    await (await familyStore(familyId)).cleanUp(nowMs);
   }
 
   return {
@@ -174,16 +178,20 @@ export async function startWorker() {
     api,
     syncSocket,
     cleanUp,
+    familyStore,
     images: () => miniflare.getR2Bucket("IMAGES"),
     dispose: () => miniflare.dispose(),
   };
 }
 
-export async function waitFor<Value>(read: () => Value | undefined, timeoutMs = 5000) {
+export async function waitFor<Value>(
+  read: () => Value | undefined | Promise<Value | undefined>,
+  timeoutMs = 5000,
+) {
   const deadline = Date.now() + timeoutMs;
 
   while (Date.now() < deadline) {
-    const value = read();
+    const value = await read();
 
     if (value !== undefined) return value;
     await new Promise((resolve) => setTimeout(resolve, 20));

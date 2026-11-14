@@ -24,3 +24,9 @@ export const AuthorizationLive = Layer.effect(
     );
   }),
 );
+
+export function asCurrentUser<Success, Failure, Requirements>(
+  run: (userId: string) => Effect.Effect<Success, Failure, Requirements>,
+) {
+  return Effect.flatMap(CurrentUser, (user) => run(user.id));
+}

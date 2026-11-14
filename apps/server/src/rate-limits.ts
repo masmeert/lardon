@@ -28,7 +28,13 @@ export function rateLimitRuleFor(path: string): RateLimitRule | null {
     return "auth";
   }
 
-  if (path === "/api/families/join") return "sensitive";
+  if (
+    path === "/api/families/join" ||
+    path === "/api/follows" ||
+    (path.startsWith("/api/profiles/") && path !== "/api/profiles/me")
+  ) {
+    return "sensitive";
+  }
 
   if (path.startsWith("/api/")) return "api";
 

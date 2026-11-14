@@ -1,14 +1,9 @@
-import { Api, CurrentUser } from "@lardon/api";
+import { Api } from "@lardon/api";
 import { Effect } from "effect";
 import { HttpApiBuilder } from "effect/http-api";
 
 import { Families } from "../families";
-
-function asCurrentUser<Success, Failure, Requirements>(
-  run: (userId: string) => Effect.Effect<Success, Failure, Requirements>,
-) {
-  return Effect.flatMap(CurrentUser, (user) => run(user.id));
-}
+import { asCurrentUser } from "./authorization";
 
 export const FamiliesHandlers = HttpApiBuilder.group(
   Api,
