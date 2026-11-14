@@ -8,7 +8,9 @@ import { familiesQuery } from "#/entities/family";
 import { libraryFolders, libraryTags, useFamilyTables } from "#/entities/recipe";
 import { Button, ButtonLabel, FilterPill, TextBox } from "#/shared/ui";
 
-import { useRecipeEditor } from "../model/recipe-editor";
+import { useRecipeEditor } from "../../model/recipe-editor";
+
+import { FolderChoices } from "./folder-choices";
 
 const names = {
   folders: { noun: "folder", schema: FolderName, maxLength: 60 },
@@ -28,18 +30,28 @@ export function DraftCollectionScreen({ collection }: { collection: Collection }
   const query = search.trim();
   const chosen = collection === "folders" ? fields.folderNames : fields.tagNames;
 
-  const saved = (
-    collection === "folders" ? libraryFolders(familyTables) : libraryTags(familyTables)
-  ).map((owner) => owner.name);
+  const saved =
+    collection === "folders"
+      ? libraryFolders(familyTables).map((folder) => ({
+          name: folder.name,
+          recipeCount: folder.recipes.length,
+        }))
+      : libraryTags(familyTables);
 
-  const everyName = [
+  const everyOwner = [
     ...saved,
-    ...chosen.filter((name) => !saved.some((savedName) => isSame(savedName, name))),
+    ...chosen.flatMap((name) =>
+      saved.some((owner) => isSame(owner.name, name)) ? [] : [{ name, recipeCount: undefined }],
+    ),
   ];
 
-  const shown = everyName.filter((name) =>
-    name.toLocaleLowerCase().includes(query.toLocaleLowerCase()),
+  const shown = everyOwner.filter((owner) =>
+    owner.name.toLocaleLowerCase().includes(query.toLocaleLowerCase()),
   );
+
+  function isChosen(name: string) {
+    return chosen.some((chosenName) => isSame(chosenName, name));
+  }
 
   function choose(nextNames: readonly string[]) {
     change(collection === "folders" ? { folderNames: nextNames } : { tagNames: nextNames });
@@ -47,17 +59,15 @@ export function DraftCollectionScreen({ collection }: { collection: Collection }
 
   function toggle(name: string) {
     choose(
-      chosen.some((chosenName) => isSame(chosenName, name))
-        ? chosen.filter((chosenName) => !isSame(chosenName, name))
-        : [...chosen, name],
+      isChosen(name) ? chosen.filter((chosenName) => !isSame(chosenName, name)) : [...chosen, name],
     );
   }
 
   function add() {
     if (!Schema.is(schema)(query)) return;
-    const name = everyName.find((candidate) => isSame(candidate, query)) ?? query;
+    const name = everyOwner.find((owner) => isSame(owner.name, query))?.name ?? query;
 
-    if (!chosen.some((chosenName) => isSame(chosenName, name))) choose([...chosen, name]);
+    if (!isChosen(name)) choose([...chosen, name]);
     setSearch("");
   }
 
@@ -65,9 +75,9 @@ export function DraftCollectionScreen({ collection }: { collection: Collection }
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
       keyboardShouldPersistTaps="handled"
-      contentContainerClassName="gap-5 px-4 pt-4 pb-16"
+      contentContainerClassName="pt-4 pb-16"
     >
-      <View className="flex-row items-center gap-2">
+      <View className="flex-row items-center gap-2 px-4">
         <TextBox
           value={search}
           onChangeText={setSearch}
@@ -84,23 +94,25 @@ export function DraftCollectionScreen({ collection }: { collection: Collection }
           <ButtonLabel>Add</ButtonLabel>
         </Button>
       </View>
-      {shown.length > 0 ? (
-        <View className="flex-row flex-wrap gap-2">
-          {shown.map((name) => (
-            <FilterPill
-              key={name}
-              label={name}
-              isSelected={chosen.some((chosenName) => isSame(chosenName, name))}
-              onPress={() => toggle(name)}
-            />
-          ))}
-        </View>
-      ) : (
-        <Text className="text-center text-caption text-muted">
+      {shown.length === 0 ? (
+        <Text className="px-4 pt-5 text-center text-caption text-muted">
           {query
             ? `Add “${query}” as a new ${noun}.`
             : `No ${noun}s yet. Add your first one above.`}
         </Text>
+      ) : collection === "folders" ? (
+        <FolderChoices folders={shown} isChosen={isChosen} onToggle={toggle} />
+      ) : (
+        <View className="flex-row flex-wrap gap-2 px-4 pt-5">
+          {shown.map(({ name }) => (
+            <FilterPill
+              key={name}
+              label={name}
+              isSelected={isChosen(name)}
+              onPress={() => toggle(name)}
+            />
+          ))}
+        </View>
       )}
     </ScrollView>
   );

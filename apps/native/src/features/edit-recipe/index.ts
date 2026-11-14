@@ -10,7 +10,7 @@ export { uploadPhoto } from "./model/upload-photo";
 
 export { useConfirmDiscard } from "./model/use-confirm-discard";
 
-export { DraftCollectionScreen } from "./ui/draft-collection-screen";
+export { DraftCollectionScreen } from "./ui/draft-collection-screen/draft-collection-screen";
 
 export { RecipeEditorStack } from "./ui/recipe-editor-stack";
 
