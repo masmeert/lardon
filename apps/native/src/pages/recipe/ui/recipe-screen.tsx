@@ -88,7 +88,7 @@ export function RecipeScreen() {
           ) : (
             <Stack.Toolbar.Menu
               icon={share.copy.isSuccess ? "checkmark" : "square.and.arrow.up"}
-              accessibilityLabel={share.copy.isSuccess ? "Copied as Markdown" : "Share"}
+              accessibilityLabel={share.copy.isSuccess ? "Copied Markdown" : "Share"}
             >
               <Stack.Toolbar.MenuAction
                 icon="link"
@@ -96,7 +96,7 @@ export function RecipeScreen() {
                 subtitle={isOnline ? undefined : "Needs a connection"}
                 onPress={() => share.link.mutate({ recipe, familyId: owner.familyId })}
               >
-                Send a link
+                Share link
               </Stack.Toolbar.MenuAction>
               <Stack.Toolbar.MenuAction
                 icon="doc.richtext"
@@ -109,13 +109,13 @@ export function RecipeScreen() {
                   })
                 }
               >
-                Export as PDF
+                Share PDF
               </Stack.Toolbar.MenuAction>
               <Stack.Toolbar.MenuAction
                 icon="doc.on.doc"
                 onPress={() => share.copy.mutate({ recipe, scale: scaleFactor, unitSystem })}
               >
-                Copy as Markdown
+                Copy Markdown
               </Stack.Toolbar.MenuAction>
             </Stack.Toolbar.Menu>
           )}

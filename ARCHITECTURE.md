@@ -113,7 +113,7 @@ Never synced: library layout and sort order, and the unit system (original, metr
 
 ## Sharing
 
-**Share link**: "Send a link" in the app's Share menu sends the recipe as it is now to `POST /api/shares`. It's disabled while offline.
+**Share link**: "Share link" in the app's Share menu sends the recipe as it is now to `POST /api/shares`. It's disabled while offline.
 
 - The server checks membership of the recipe's family, then stores a snapshot in D1 with a random token that expires after 7 days. The duration is ours to set, not the user's.
 - The page `lardon.app/r/<token>` is rendered by the Worker, with Open Graph tags so the link preview shows the title and photo. Its photo is the share's own copy, made when the link is created, and served through the share token.
@@ -122,7 +122,7 @@ Never synced: library layout and sort order, and the unit system (original, metr
 
 Viewing a page doesn't use it up, so link previews are harmless.
 
-**PDF**: "Export as PDF" renders the same `RecipeDocument` component as the share page (`react-dom/server.edge`, the build that runs on Hermes) and prints it to an A4 file with `expo-print`, then hands it to the share sheet. It downloads the photo to embed it, and offline it leaves the photo out rather than failing.
+**PDF**: "Share PDF" renders the same `RecipeDocument` component as the share page (`react-dom/server.edge`, the build that runs on Hermes) and prints it to an A4 file with `expo-print`, then hands it to the share sheet. It downloads the photo to embed it, and offline it leaves the photo out rather than failing.
 
 ## Followers feed
 
