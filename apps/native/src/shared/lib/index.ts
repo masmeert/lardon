@@ -14,3 +14,5 @@ export {
   shortDate,
   weekdayName,
 } from "./calendar-day";
+
+export { useToday } from "./use-today";

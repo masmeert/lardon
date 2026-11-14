@@ -5,18 +5,16 @@ import { useState } from "react";
 import { ActivityIndicator, Alert, RefreshControl, Text, View } from "react-native";
 
 import { familiesQuery } from "#/entities/family";
-import { libraryMealPlan, useFamilyTables } from "#/entities/recipe";
 import { usePlanMeals } from "#/features/plan-meals";
-import { addDays, calendarDay, endOfWeek, iconSize, useThemeColors } from "#/shared/lib";
+import { addDays, endOfWeek, iconSize, useThemeColors, useToday } from "#/shared/lib";
 import { Button, ButtonLabel, Icon } from "#/shared/ui";
 
 import { DayCard } from "./day-card/day-card";
 
 export function MealPlanScreen() {
-  const today = calendarDay(new Date());
+  const today = useToday();
   const { accent, muted } = useThemeColors("accent", "muted");
   const { data: families = [], isPending } = useQuery(familiesQuery);
-  const familyTables = useFamilyTables(families.map((family) => family.id));
   const planMeals = usePlanMeals();
   const [pastWeeks, setPastWeeks] = useState(0);
   const [comingWeeks, setComingWeeks] = useState(2);
@@ -26,7 +24,7 @@ export function MealPlanScreen() {
     addDays(firstDay, offset),
   );
 
-  const meals = libraryMealPlan(familyTables, { from: firstDay, to: days.at(-1) ?? today });
+  const meals = planMeals.mealsIn({ from: firstDay, to: days.at(-1) ?? today });
 
   const weekMeals = meals.filter((meal) => meal.date >= today && meal.date <= endOfWeek(today));
 
@@ -41,13 +39,13 @@ export function MealPlanScreen() {
             onPress={() =>
               Alert.alert(
                 "Clear this week?",
-                `${weekMeals.length === 1 ? "1 planned meal" : `${weekMeals.length} planned meals`} ${endOfWeek(today) === today ? "for today" : "from today to Sunday"} will be removed from the plan.`,
+                `${weekMeals.length === 1 ? "1 planned meal" : `${weekMeals.length} planned meals`} ${endOfWeek(today) === today ? "for today" : "from today to Sunday"} will be removed${families.some((family) => !family.personal) ? " for everyone in your family" : " from the plan"}.`,
                 [
                   { text: "Cancel", style: "cancel" },
                   {
                     text: "Clear",
                     style: "destructive",
-                    onPress: () => planMeals.remove(weekMeals),
+                    onPress: () => planMeals.remove(weekMeals.map((meal) => meal.date)),
                   },
                 ],
               )
@@ -106,7 +104,7 @@ export function MealPlanScreen() {
               meals={meals.filter((meal) => meal.date === day)}
               plannedDays={new Map(meals.map((meal) => [meal.date, meal.recipe.title]))}
               onMove={(target) => planMeals.move(day, target)}
-              onRemove={() => planMeals.remove(meals.filter((meal) => meal.date === day))}
+              onRemove={() => planMeals.remove([day])}
             />
           )}
         />
