@@ -42,6 +42,8 @@ export { LardonLogo } from "./lardon-logo";
 
 export { LardonMark } from "./lardon-mark";
 
+export { NameSheet } from "./name-sheet";
+
 export { PhotoFrame } from "./photo-frame";
 
 export { RollingNumber } from "./rolling-number/rolling-number";
