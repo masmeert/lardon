@@ -80,7 +80,7 @@ export function DraftCollectionScreen({ collection }: { collection: Collection }
           clearButtonMode="while-editing"
           className="flex-1"
         />
-        <Button size="md" isDisabled={!query} onPress={add}>
+        <Button isDisabled={!query} onPress={add} className="h-13">
           <ButtonLabel>Add</ButtonLabel>
         </Button>
       </View>
