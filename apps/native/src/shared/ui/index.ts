@@ -36,6 +36,8 @@ export { InlineError } from "./inline-error";
 
 export { KeyboardDoneButton } from "./keyboard-done-button";
 
+export { KeyboardFooter } from "./keyboard-footer";
+
 export { LardonLogo } from "./lardon-logo";
 
 export { LardonMark } from "./lardon-mark";

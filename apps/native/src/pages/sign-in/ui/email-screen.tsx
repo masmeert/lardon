@@ -4,9 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Keyboard, Text, TextInput, View } from "react-native";
 
 import { authClient, Email } from "#/shared/auth";
-import { Button, ButtonLabel, InlineError, TextBox } from "#/shared/ui";
-
-import { KeyboardFooter } from "./keyboard-footer";
+import { Button, ButtonLabel, InlineError, KeyboardFooter, TextBox } from "#/shared/ui";
 
 export function EmailScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<Record<string, undefined>>>();
