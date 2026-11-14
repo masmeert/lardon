@@ -1,10 +1,10 @@
 import { type ComponentProps, type Ref, useState } from "react";
-import { Pressable, TextInput } from "react-native";
+import { TextInput, View } from "react-native";
 
-import { cn, iconSize, useThemeColors } from "#/shared/lib";
+import { cn, useThemeColors } from "#/shared/lib";
 
+import { ClearButton } from "./clear-button";
 import { Glass } from "./glass";
-import { Icon } from "./icon";
 
 export function TextBox({
   className,
@@ -45,15 +45,9 @@ export function TextBox({
         {...props}
       />
       {canClear && (
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Clear"
-          hitSlop={12}
-          onPress={() => props.onChangeText?.("")}
-          className="mr-4 size-5 items-center justify-center rounded-full bg-accent-soft"
-        >
-          <Icon name="xmark" size={iconSize.xs} color={accent} />
-        </Pressable>
+        <View className="mr-4">
+          <ClearButton onPress={() => props.onChangeText?.("")} />
+        </View>
       )}
     </Glass>
   );
