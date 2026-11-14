@@ -147,15 +147,15 @@ export function collectionList(content: Tables, collection: Collection) {
 }
 
 export function mealPlan(content: Tables, range: { from: string; to: string }) {
-  return readRows(content, "meals")
-    .flatMap((meal) => {
-      const recipe = readRow(content, "recipes", meal.recipeId);
+  return Object.keys(content.meals ?? {})
+    .filter((date) => range.from <= date && date <= range.to)
+    .sort()
+    .flatMap((date) => {
+      const meal = readRow(content, "meals", date);
+      const recipe = meal && readRow(content, "recipes", meal.recipeId);
 
-      return recipe && range.from <= meal.id && meal.id <= range.to
-        ? [{ date: meal.id, recipe }]
-        : [];
-    })
-    .sort((first, second) => (first.date < second.date ? -1 : 1));
+      return recipe ? [{ date, recipe }] : [];
+    });
 }
 
 export type PlannedMeal = ReturnType<typeof mealPlan>[number];

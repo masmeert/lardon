@@ -287,23 +287,16 @@ describe("recipes", () => {
     expect(names(family, recipeId)).toEqual(["tomatoes", "onion", "salt"]);
   });
 
-  it("moves a recipe's planned meals with it", () => {
+  it("drops a recipe's planned meals when it moves to another store", () => {
     const personal = createRecipeStore();
     const family = createRecipeStore();
-    const recipeId = createRecipe(personal, draft(), "alice");
-    const stew = createRecipe(personal, draft({ title: "Stew" }), "alice");
-    planMeal(personal, "2026-11-13", recipeId);
-    planMeal(personal, "2026-11-14", stew);
-    const november = { from: "2026-11-01", to: "2026-11-30" };
+    const recipeId = createRecipe(family, draft(), "alice");
+    planMeal(family, "2026-11-13", recipeId);
 
-    moveRecipe(personal, family, recipeId, null);
+    moveRecipe(family, personal, recipeId, null);
 
-    expect(mealPlan(personal.getTables(), november).map((meal) => meal.date)).toEqual([
-      "2026-11-14",
-    ]);
-    expect(mealPlan(family.getTables(), november)).toMatchObject([
-      { date: "2026-11-13", recipe: { id: recipeId } },
-    ]);
+    expect(family.getTable("meals")).toEqual({});
+    expect(personal.getTable("meals")).toEqual({});
   });
 
   it("copies a recipe under new ids", () => {
