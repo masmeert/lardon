@@ -1,24 +1,38 @@
 import type { ReactNode } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { cn } from "#/shared/lib";
+import { cn, iconSize, useThemeColors } from "#/shared/lib";
+
+import { Icon } from "./icon";
 
 export function GroupedRow({
   label,
   detail,
   tone = "default",
-  size = "md",
+  size = "lg",
   isFirst,
+  leading,
+  accessory,
+  accessibilityHint,
+  isDisabled = false,
+  onPress,
   children,
 }: {
   label: string;
   detail?: string;
-  tone?: "default" | "danger";
+  tone?: "default" | "accent" | "danger";
   size?: "md" | "lg";
   isFirst?: boolean;
+  leading?: ReactNode;
+  accessory?: "chevron" | "external";
+  accessibilityHint?: string;
+  isDisabled?: boolean;
+  onPress?: () => void;
   children?: ReactNode;
 }) {
-  return (
+  const { muted } = useThemeColors("muted");
+
+  const row = (
     <View className="pl-4">
       {!isFirst && <View style={{ height: StyleSheet.hairlineWidth }} className="bg-hairline" />}
       <View
@@ -27,10 +41,14 @@ export function GroupedRow({
           size === "md" ? "min-h-11" : "min-h-13",
         )}
       >
+        {leading}
         <View className="flex-1 gap-0.5">
           <Text
             numberOfLines={1}
-            className={cn("text-title", tone === "danger" ? "text-danger" : "text-foreground")}
+            className={cn(
+              "text-title",
+              { default: "text-foreground", accent: "text-accent", danger: "text-danger" }[tone],
+            )}
           >
             {label}
           </Text>
@@ -41,7 +59,29 @@ export function GroupedRow({
           )}
         </View>
         {children}
+        {accessory && (
+          <Icon
+            name={accessory === "chevron" ? "chevron.right" : "arrow.up.right"}
+            size={iconSize.sm}
+            color={muted}
+          />
+        )}
       </View>
     </View>
+  );
+
+  if (!onPress) return row;
+
+  return (
+    <Pressable
+      accessibilityRole={accessory === "external" ? "link" : "button"}
+      accessibilityHint={accessibilityHint}
+      accessibilityState={{ disabled: isDisabled }}
+      disabled={isDisabled}
+      onPress={onPress}
+      className={cn("active:bg-fill", isDisabled && "opacity-50")}
+    >
+      {row}
+    </Pressable>
   );
 }

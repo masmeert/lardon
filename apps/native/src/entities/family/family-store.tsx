@@ -17,7 +17,6 @@ import { familySocket } from "./family-socket";
 
 export function FamilyStore({ familyId }: { familyId: string }) {
   const queryClient = useQueryClient();
-  const isRemoved = useRef(false);
   const database = useRef<SQLiteDatabase>(undefined);
   const store = useCreateMergeableStore(createRecipeStore);
 
@@ -39,7 +38,11 @@ export function FamilyStore({ familyId }: { familyId: string }) {
     () => {
       database.current?.closeSync();
 
-      if (isRemoved.current) void deleteDatabaseAsync(familyDatabaseName(familyId));
+      const families = queryClient.getQueryData(familiesQuery.queryKey);
+
+      if (families && !families.some((family) => family.id === familyId)) {
+        void deleteDatabaseAsync(familyDatabaseName(familyId));
+      }
     },
     [familyId],
   );
@@ -50,10 +53,10 @@ export function FamilyStore({ familyId }: { familyId: string }) {
       const synchronizer = await createWsSynchronizer(
         store,
         // SAFETY: TinyBase documents reconnecting WebSockets as compatible with its synchronizer, which only uses send, close, readyState and event listeners.
-        familySocket(familyId, () => {
-          isRemoved.current = true;
-          void queryClient.invalidateQueries({ queryKey: familiesQuery.queryKey });
-        }) as never,
+        familySocket(
+          familyId,
+          () => void queryClient.invalidateQueries({ queryKey: familiesQuery.queryKey }),
+        ) as never,
         5,
       );
 

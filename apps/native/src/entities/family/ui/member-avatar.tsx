@@ -12,7 +12,7 @@ export function MemberAvatar({
   member,
   sizePt,
 }: {
-  member: { name: string; email: string; image: string | null };
+  member: { name: string; email: string; image?: string | null };
   sizePt: number;
 }) {
   return (
