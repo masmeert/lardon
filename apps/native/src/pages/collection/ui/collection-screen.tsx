@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Match, Schema } from "effect";
 import * as Haptics from "expo-haptics";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Stack, router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 
@@ -21,7 +21,7 @@ import {
   sortRecipes,
   useFamilyTables,
 } from "#/entities/recipe";
-import { useOrganizeRecipes } from "../model/use-organize-recipes";
+import { useOrganizeRecipes } from "#/features/organize-recipes";
 import { useThemeColors } from "#/shared/lib";
 import { usePreference } from "#/shared/preferences";
 import { CollectionList, EmptyState, InlineError, useListLayout } from "#/shared/ui";
@@ -184,7 +184,10 @@ export function CollectionScreen() {
           ) : undefined,
           facts: recipeFacts(recipe),
           isSelected: selectedKeys ? selectedKeys.has(recipeKey(recipe)) : undefined,
-          onPress: selectedKeys ? () => toggle(recipeKey(recipe)) : undefined,
+          onPress: selectedKeys
+            ? () => toggle(recipeKey(recipe))
+            : () =>
+                router.push({ pathname: "/recipe/[recipeId]", params: { recipeId: recipe.id } }),
           onLongPress: () => {
             void Haptics.selectionAsync();
             setSelectedKeys(new Set([...(selectedKeys ?? []), recipeKey(recipe)]));

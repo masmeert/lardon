@@ -2,7 +2,7 @@ import { Stack } from "expo-router";
 import { Alert } from "react-native";
 
 import type { LibraryRecipe, RecipeScope } from "#/entities/recipe";
-import type { useOrganizeRecipes } from "../model/use-organize-recipes";
+import type { useOrganizeRecipes } from "#/features/organize-recipes";
 
 export function selectionMenu({
   recipes,

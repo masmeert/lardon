@@ -20,6 +20,8 @@ export { Fan } from "./fan";
 
 export { FilterPill } from "./filter-pill";
 
+export { Glass } from "./glass";
+
 export { GoogleLogo } from "./google-logo";
 
 export { GroupedRow } from "./grouped-row";
