@@ -14,12 +14,14 @@ import { familiesQuery } from "#/entities/family";
 import { ownProfileQuery } from "#/entities/profile";
 import { apiErrorMessage, requestApi } from "#/shared/api";
 import { authClient } from "#/shared/auth";
+import { useThemeColors } from "#/shared/lib";
 import { GroupedSection, InlineError } from "#/shared/ui";
 
 import { FieldRow } from "./field-row";
 
 export function ProfileForm({ profile }: { profile: OwnProfile | null }) {
   const queryClient = useQueryClient();
+  const { accent } = useThemeColors("accent");
   const { data: session } = authClient.useSession();
   const savedName = session?.user.name ?? "";
   const [name, setName] = useState(savedName);
@@ -77,9 +79,14 @@ export function ProfileForm({ profile }: { profile: OwnProfile | null }) {
             <ActivityIndicator />
           </Stack.Toolbar.View>
         ) : (
-          <Stack.Toolbar.Button variant="done" disabled={!canSave} onPress={() => save.mutate()}>
-            {profile ? "Save" : "Create"}
-          </Stack.Toolbar.Button>
+          <Stack.Toolbar.Button
+            icon="checkmark"
+            variant="prominent"
+            tintColor={accent}
+            accessibilityLabel={profile ? "Save" : "Create profile"}
+            disabled={!canSave}
+            onPress={() => save.mutate()}
+          />
         )}
       </Stack.Toolbar>
       <GroupedSection
