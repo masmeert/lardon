@@ -54,7 +54,7 @@ export const server = Cloudflare.Worker("server", {
       : undefined,
   crons: ["17 4 * * *"],
   dev: {
-    port: 3000,
+    port: Number(process.env.SERVER_DEV_PORT ?? 3000),
   },
 });
 
