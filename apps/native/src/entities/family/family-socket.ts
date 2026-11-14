@@ -12,7 +12,7 @@ const ReactNativeWebSocket = WebSocket as new (
   options: { headers: Record<string, string> },
 ) => WebSocket;
 
-export function familySocket(familyId: string, onRemoved: () => void) {
+export function familySocket(familyId: string, checkMembership: () => void) {
   let cookie = "";
 
   class SessionWebSocket extends ReactNativeWebSocket {
@@ -31,11 +31,20 @@ export function familySocket(familyId: string, onRemoved: () => void) {
     { WebSocket: SessionWebSocket, maxReconnectionDelay: 30_000 },
   );
 
-  socket.addEventListener("close", (event) => {
-    if (!removedFromFamilyCodes.has(event.code)) return;
+  let wasOpen = false;
 
-    socket.close();
-    onRemoved();
+  socket.addEventListener("open", () => {
+    wasOpen = true;
+  });
+
+  socket.addEventListener("close", (event) => {
+    const isRemoved = removedFromFamilyCodes.has(event.code);
+
+    if (isRemoved) socket.close();
+
+    if (isRemoved || !wasOpen) checkMembership();
+
+    wasOpen = false;
   });
 
   return socket;
