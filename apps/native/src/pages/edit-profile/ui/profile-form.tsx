@@ -6,14 +6,17 @@ import {
 } from "@lardon/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { NotificationFeedbackType, notificationAsync } from "expo-haptics";
+import { Stack, router } from "expo-router";
 import { useRef, useState } from "react";
-import { Text, type TextInput, View } from "react-native";
+import { ActivityIndicator, type TextInput, View } from "react-native";
 
 import { familiesQuery } from "#/entities/family";
 import { ownProfileQuery } from "#/entities/profile";
 import { apiErrorMessage, requestApi } from "#/shared/api";
 import { authClient } from "#/shared/auth";
-import { Button, ButtonLabel, InlineError, TextBox } from "#/shared/ui";
+import { GroupedSection, InlineError } from "#/shared/ui";
+
+import { FieldRow } from "./field-row";
 
 export function ProfileForm({ profile }: { profile: OwnProfile | null }) {
   const queryClient = useQueryClient();
@@ -56,6 +59,7 @@ export function ProfileForm({ profile }: { profile: OwnProfile | null }) {
         ),
       );
       await notificationAsync(NotificationFeedbackType.Success);
+      router.back();
     },
   });
 
@@ -66,12 +70,28 @@ export function ProfileForm({ profile }: { profile: OwnProfile | null }) {
     !save.isPending;
 
   return (
-    <View className="gap-3 px-4 pt-6">
-      <View className="gap-2">
-        <Text accessibilityRole="header" className="pl-4 text-caption text-muted">
-          Name
-        </Text>
-        <TextBox
+    <>
+      <Stack.Toolbar placement="right">
+        {save.isPending ? (
+          <Stack.Toolbar.View>
+            <ActivityIndicator />
+          </Stack.Toolbar.View>
+        ) : (
+          <Stack.Toolbar.Button variant="done" disabled={!canSave} onPress={() => save.mutate()}>
+            {profile ? "Save" : "Create"}
+          </Stack.Toolbar.Button>
+        )}
+      </Stack.Toolbar>
+      <GroupedSection
+        footer={
+          username.length > 0 && username.length < USERNAME_MIN_LENGTH
+            ? `Usernames have at least ${USERNAME_MIN_LENGTH} characters.`
+            : "People find you only by your exact username."
+        }
+      >
+        <FieldRow
+          label="Name"
+          isFirst
           value={name}
           onChangeText={(text) => {
             setName(text);
@@ -82,17 +102,14 @@ export function ProfileForm({ profile }: { profile: OwnProfile | null }) {
           autoCapitalize="words"
           autoComplete="name"
           textContentType="name"
-          clearButtonMode="while-editing"
           returnKeyType="next"
           submitBehavior="submit"
           onSubmitEditing={() => usernameInput.current?.focus()}
         />
-      </View>
-      <View className="gap-2">
-        <Text accessibilityRole="header" className="pl-4 text-caption text-muted">
-          Username
-        </Text>
-        <TextBox
+        <FieldRow
+          ref={usernameInput}
+          label="Username"
+          prefix="@"
           value={username}
           onChangeText={(text) => {
             setUsername(
@@ -109,48 +126,35 @@ export function ProfileForm({ profile }: { profile: OwnProfile | null }) {
           autoCorrect={false}
           autoComplete="username-new"
           keyboardType="ascii-capable"
-          clearButtonMode="while-editing"
-          ref={usernameInput}
           returnKeyType="next"
           submitBehavior="submit"
           onSubmitEditing={() => bioInput.current?.focus()}
         />
-        <Text className="px-4 text-caption text-muted">
-          {`${USERNAME_MIN_LENGTH} to ${USERNAME_MAX_LENGTH} characters: letters, numbers, dots and underscores. People need it exactly to find you.`}
-        </Text>
-      </View>
-      <View className="gap-2">
-        <Text accessibilityRole="header" className="pl-4 text-caption text-muted">
-          Bio
-        </Text>
-        <TextBox
+        <FieldRow
+          ref={bioInput}
+          label="Bio"
           value={bio}
           onChangeText={(text) => {
             setBio(text);
             save.reset();
           }}
-          placeholder="What do you like to cook?"
+          placeholder="What you like to cook"
           maxLength={BIO_MAX_LENGTH}
           autoCapitalize="sentences"
-          clearButtonMode="while-editing"
-          ref={bioInput}
           returnKeyType="done"
           onSubmitEditing={() => canSave && save.mutate()}
         />
-      </View>
+      </GroupedSection>
       {save.isError && (
-        <InlineError>
-          {apiErrorMessage(
-            save.error,
-            "Couldn't save your profile. Check your connection and try again.",
-          )}
-        </InlineError>
+        <View className="items-start px-8 pt-3">
+          <InlineError>
+            {apiErrorMessage(
+              save.error,
+              "Couldn't save your profile. Check your connection and try again.",
+            )}
+          </InlineError>
+        </View>
       )}
-      <Button isDisabled={!canSave} isLoading={save.isPending} onPress={() => save.mutate()}>
-        <ButtonLabel>
-          {save.isSuccess && !isChanged ? "Saved" : profile ? "Save" : "Create profile"}
-        </ButtonLabel>
-      </Button>
-    </View>
+    </>
   );
 }
