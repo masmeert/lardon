@@ -21,7 +21,7 @@ import {
   sortRecipes,
   useFamilyTables,
 } from "#/entities/recipe";
-import { useOrganizeRecipes } from "#/features/organize-recipes";
+import { useOrganizeRecipes } from "../model/use-organize-recipes";
 import { useThemeColors } from "#/shared/lib";
 import { usePreference } from "#/shared/preferences";
 import { CollectionList, EmptyState, InlineError, useListLayout } from "#/shared/ui";

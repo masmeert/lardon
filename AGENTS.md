@@ -29,7 +29,7 @@
 <!--VITE PLUS START-->
 
 - Use `vp` (Vite+), never npm, pnpm or npx: `vp install` after pulling, `vp run <name>` for `package.json` scripts and `vite.config.ts` tasks (`vp <name>` is a built-in), `vpx <file>` to run a TypeScript file, `vp dlx` for one-off packages.
-- Before calling work done, run `vp check` and `vp test`. If the toolchain misbehaves, run `vp env doctor`.
+- Before calling work done, run `vp check`, `vp test` and `vp run --filter native steiger` (Feature-Sliced layers). If the toolchain misbehaves, run `vp env doctor`.
 - Docs: `node_modules/vite-plus/docs`.
 
 <!--VITE PLUS END-->

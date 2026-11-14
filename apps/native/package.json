@@ -10,7 +10,8 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "prebuild": "expo prebuild",
-    "env:generate": "varlock codegen"
+    "env:generate": "varlock codegen",
+    "steiger": "steiger ./src"
   },
   "dependencies": {
     "@better-auth/expo": "catalog:",
@@ -61,10 +62,12 @@
     "varlock": "catalog:"
   },
   "devDependencies": {
+    "@feature-sliced/steiger-plugin": "0.8.2",
     "@lardon/config": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "~19.3.0",
     "babel-preset-expo": "~58.0.16",
+    "steiger": "0.10.0",
     "typescript": "~6.0.3"
   }
 }

@@ -2,7 +2,7 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useState } from "react";
 
-import { LaunchReveal } from "#/_app/ui/launch-reveal";
+import { LaunchReveal } from "#/_app/entrypoint/launch-reveal";
 import { authClient } from "#/shared/auth";
 
 void SplashScreen.preventAutoHideAsync();
