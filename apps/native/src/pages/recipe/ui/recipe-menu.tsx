@@ -31,14 +31,6 @@ export function recipeMenu({
 
   return (
     <Stack.Toolbar.Menu icon="ellipsis" accessibilityLabel="More">
-      <Stack.Toolbar.MenuAction
-        icon="pencil"
-        onPress={() =>
-          router.push({ pathname: "/recipe/[recipeId]/edit", params: { recipeId: recipe.id } })
-        }
-      >
-        Edit recipe
-      </Stack.Toolbar.MenuAction>
       <Stack.Toolbar.Menu inline>
         <Stack.Toolbar.Menu title="Folders" icon="folder">
           {folderNames.length === 0 && (
@@ -95,6 +87,14 @@ export function recipeMenu({
           </Stack.Toolbar.Menu>
         )}
       </Stack.Toolbar.Menu>
+      <Stack.Toolbar.MenuAction
+        icon="pencil"
+        onPress={() =>
+          router.push({ pathname: "/recipe/[recipeId]/edit", params: { recipeId: recipe.id } })
+        }
+      >
+        Edit recipe
+      </Stack.Toolbar.MenuAction>
       <Stack.Toolbar.MenuAction
         icon="trash"
         destructive
