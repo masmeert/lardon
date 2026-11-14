@@ -11,10 +11,19 @@ export function useConfirmDiscard({ title, message }: { title: string; message: 
   const [isLeaving, setIsLeaving] = useState(false);
   const navigateAway = useRef<() => void>(undefined);
 
+  function leave(navigate: () => void) {
+    navigateAway.current = navigate;
+    setIsLeaving(true);
+  }
+
   usePreventRemove(!isLeaving && isChanged(base.fields, fields), ({ data }) =>
     Alert.alert(title, message, [
       { text: "Keep editing", style: "cancel" },
-      { text: "Discard", style: "destructive", onPress: () => navigation.dispatch(data.action) },
+      {
+        text: "Discard",
+        style: "destructive",
+        onPress: () => leave(() => navigation.dispatch(data.action)),
+      },
     ]),
   );
 
@@ -22,8 +31,5 @@ export function useConfirmDiscard({ title, message }: { title: string; message: 
     if (isLeaving) navigateAway.current?.();
   }, [isLeaving]);
 
-  return function leave(navigate: () => void) {
-    navigateAway.current = navigate;
-    setIsLeaving(true);
-  };
+  return leave;
 }
