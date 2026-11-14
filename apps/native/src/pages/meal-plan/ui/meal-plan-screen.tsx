@@ -8,7 +8,7 @@ import { familiesQuery } from "#/entities/family";
 import { libraryMealPlan, useFamilyTables } from "#/entities/recipe";
 import { usePlanMeals } from "#/features/plan-meals";
 import { addDays, calendarDay, endOfWeek, iconSize, useThemeColors } from "#/shared/lib";
-import { Icon } from "#/shared/ui";
+import { Button, ButtonLabel, Icon } from "#/shared/ui";
 
 import { DayCard } from "./day-card/day-card";
 
@@ -67,7 +67,16 @@ export function MealPlanScreen() {
           contentInsetAdjustmentBehavior="automatic"
           contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 64 }}
           ItemSeparatorComponent={() => <View className="h-3" />}
-          onEndReached={() => setComingWeeks(comingWeeks + 1)}
+          ListFooterComponent={
+            <Button
+              variant="secondary"
+              size="md"
+              className="mt-5 self-center"
+              onPress={() => setComingWeeks(comingWeeks + 2)}
+            >
+              <ButtonLabel>Show more days</ButtonLabel>
+            </Button>
+          }
           refreshControl={
             <RefreshControl
               refreshing={false}
