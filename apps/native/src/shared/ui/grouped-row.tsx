@@ -7,19 +7,26 @@ export function GroupedRow({
   label,
   detail,
   tone = "default",
+  size = "md",
   isFirst,
   children,
 }: {
   label: string;
   detail?: string;
   tone?: "default" | "danger";
+  size?: "md" | "lg";
   isFirst?: boolean;
   children?: ReactNode;
 }) {
   return (
     <View className="pl-4">
       {!isFirst && <View style={{ height: StyleSheet.hairlineWidth }} className="bg-hairline" />}
-      <View className="min-h-11 flex-row items-center gap-3 py-2.5 pr-4">
+      <View
+        className={cn(
+          "flex-row items-center gap-3 py-2.5 pr-4",
+          size === "md" ? "min-h-11" : "min-h-13",
+        )}
+      >
         <View className="flex-1 gap-0.5">
           <Text
             numberOfLines={1}

@@ -13,7 +13,7 @@ export function DragHandle({ label }: { label: string }) {
         accessible
         accessibilityLabel={label}
         accessibilityHint="Touch and hold, then drag to reorder"
-        className="h-11 w-8 items-center justify-center"
+        className="h-13 w-8 items-center justify-center"
       >
         <Icon name="line.3.horizontal" size={iconSize.lg} color={muted} />
       </View>

@@ -39,7 +39,7 @@ export function DraftDetails({
             onPress={() => router.push(href)}
             className="active:opacity-70"
           >
-            <GroupedRow label={label} isFirst={index === 0}>
+            <GroupedRow label={label} size="lg" isFirst={index === 0}>
               <Text numberOfLines={1} className="max-w-[60%] text-right text-title text-muted">
                 {names.join(", ") || "None"}
               </Text>
@@ -48,7 +48,7 @@ export function DraftDetails({
           </Pressable>
         ))}
         {familyName !== undefined && (
-          <GroupedRow label="Who can see it">
+          <GroupedRow label="Who can see it" size="lg">
             <Host ignoreSafeArea="all" matchContents>
               <Picker
                 selection={fields.isPrivate ? "private" : "family"}

@@ -1,11 +1,13 @@
+import { Button, Host, Label } from "@expo/ui/swift-ui";
+import { buttonStyle, controlSize, frame, tint } from "@expo/ui/swift-ui/modifiers";
 import { type ReactNode, type RefCallback, useRef } from "react";
-import { Pressable, StyleSheet, Text, type TextInput, View } from "react-native";
+import { StyleSheet, type TextInput, View } from "react-native";
 import type { KeyboardAwareScrollViewRef } from "react-native-keyboard-controller";
 import type { AnimatedRef } from "react-native-reanimated";
 import Sortable from "react-native-sortables";
 
-import { iconSize, useThemeColors } from "#/shared/lib";
-import { GroupedSection, Icon } from "#/shared/ui";
+import { useThemeColors } from "#/shared/lib";
+import { GroupedSection } from "#/shared/ui";
 
 export type LineControls<Line extends { id: string }> = {
   number: number;
@@ -97,19 +99,25 @@ export function DraftList<Line extends { id: string }>({
           </View>
         )}
       />
-      <Pressable
-        accessibilityRole="button"
-        onPress={() => insertAfter(undefined, newLine())}
-        className="pl-4 active:opacity-60"
-      >
+      <View className="pl-4">
         {lines.length > 0 && (
           <View style={{ height: StyleSheet.hairlineWidth }} className="bg-hairline" />
         )}
-        <View className="min-h-11 flex-row items-center gap-3 py-2.5 pr-4">
-          <Icon name="plus.circle.fill" size={iconSize.lg} color={accent} />
-          <Text className="text-title text-foreground">{`Add ${lineName}`}</Text>
-        </View>
-      </Pressable>
+      </View>
+      <View className="p-2.5">
+        <Host ignoreSafeArea="all" matchContents={{ vertical: true }} style={{ width: "100%" }}>
+          <Button
+            onPress={() => insertAfter(undefined, newLine())}
+            modifiers={[buttonStyle("bordered"), controlSize("large"), tint(accent)]}
+          >
+            <Label
+              title={`Add ${lineName}`}
+              systemImage="plus.circle.fill"
+              modifiers={[frame({ maxWidth: Infinity })]}
+            />
+          </Button>
+        </Host>
+      </View>
     </GroupedSection>
   );
 }

@@ -28,7 +28,7 @@ export function DraftFacts({
     <GroupedSection>
       {facts.map(({ key, label, isMinutes }, index) => (
         <Pressable key={key} accessible={false} onPress={() => inputs.current.get(key)?.focus()}>
-          <GroupedRow label={label} isFirst={index === 0}>
+          <GroupedRow label={label} size="lg" isFirst={index === 0}>
             <TextInput
               ref={(input) => {
                 if (input) inputs.current.set(key, input);
@@ -43,7 +43,7 @@ export function DraftFacts({
               accessibilityLabel={isMinutes ? `${label}, in minutes` : label}
               keyboardType="number-pad"
               maxLength={4}
-              className="min-w-20 p-0 text-right text-title text-accent"
+              className="min-w-20 p-0 text-right text-field text-accent"
             />
             {isMinutes && fields[key] && <Text className="-ml-2 text-title text-accent">min</Text>}
           </GroupedRow>

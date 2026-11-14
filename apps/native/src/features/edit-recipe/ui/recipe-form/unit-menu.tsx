@@ -59,7 +59,7 @@ export function UnitMenu({
             <View
               pointerEvents="none"
               accessibilityLabel={`Unit, ${unit ?? "none"}`}
-              className="min-h-11 flex-row items-center"
+              className="h-13 flex-row items-center"
             >
               <Text className={cn("text-title", unit ? "text-accent" : "text-muted")}>
                 {unit ?? "unit"}

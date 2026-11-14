@@ -12,7 +12,7 @@ export function RemoveLineButton({ label, onPress }: { label: string; onPress: (
       accessibilityLabel={label}
       hitSlop={10}
       onPress={onPress}
-      className="h-11 justify-center active:opacity-60"
+      className="h-13 justify-center active:opacity-60"
     >
       <Icon name="minus.circle.fill" size={iconSize.lg} color={danger} />
     </Pressable>

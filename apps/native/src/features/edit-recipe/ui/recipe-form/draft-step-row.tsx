@@ -1,5 +1,5 @@
 import type { DraftStep } from "@lardon/recipes";
-import { Text, TextInput, View } from "react-native";
+import { TextInput, View } from "react-native";
 
 import { useThemeColors } from "#/shared/lib";
 
@@ -20,11 +20,6 @@ export function DraftStepRow({
   return (
     <View className="flex-row items-start gap-3 pr-2">
       <RemoveLineButton label={`Remove step ${number}`} onPress={onRemove} />
-      <View className="h-11 justify-center">
-        <View className="size-5.5 items-center justify-center rounded-full bg-background shadow-rim">
-          <Text className="text-label font-bold text-accent">{number}</Text>
-        </View>
-      </View>
       <TextInput
         ref={inputRef}
         value={step.text}
@@ -39,7 +34,7 @@ export function DraftStepRow({
         accessibilityLabel={`Step ${number}`}
         selectionColor={accent}
         autoCapitalize="sentences"
-        className="min-h-11 flex-1 py-2.5 text-title text-foreground"
+        className="min-h-13 flex-1 py-3.75 text-title text-foreground"
       />
       <DragHandle label={`Move step ${number}`} />
     </View>

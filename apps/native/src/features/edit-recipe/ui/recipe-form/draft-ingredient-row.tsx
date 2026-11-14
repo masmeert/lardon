@@ -40,7 +40,7 @@ export function DraftIngredientRow({
         label={`Remove ${ingredient.name || "this ingredient"}`}
         onPress={onRemove}
       />
-      <View className="flex-row items-center gap-1.5">
+      <View className="flex-row items-center gap-1">
         <TextInput
           value={ingredient.amount}
           onChangeText={(amount) => onChange({ ...ingredient, amount: amountInput(amount) })}
@@ -53,7 +53,7 @@ export function DraftIngredientRow({
           submitBehavior="submit"
           onSubmitEditing={() => nameInput.current?.focus()}
           maxLength={4}
-          className="min-h-11 p-0 text-title font-semibold text-accent"
+          className="h-13 p-0 text-field text-accent"
         />
         <UnitMenu
           unit={ingredient.unit}
@@ -103,7 +103,7 @@ export function DraftIngredientRow({
         placeholderTextColor={muted}
         selectionColor={accent}
         autoCapitalize="none"
-        className="min-h-11 flex-1 py-2.5 text-title text-foreground"
+        className="min-h-13 flex-1 py-3.75 text-title text-foreground"
       />
       <DragHandle label={`Move ${ingredient.name || "ingredient"}`} />
     </View>

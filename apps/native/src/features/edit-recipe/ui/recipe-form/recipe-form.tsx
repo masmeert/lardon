@@ -43,8 +43,6 @@ export function RecipeForm({
   async function pickPhoto() {
     const picked = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
-      allowsEditing: true,
-      aspect: [4, 3],
     });
 
     const asset = picked.assets?.[0];
@@ -83,7 +81,7 @@ export function RecipeForm({
             maxLength={200}
             returnKeyType="done"
             autoCapitalize="sentences"
-            className="min-h-11 px-4 py-3 text-title font-semibold text-foreground"
+            className="h-13 px-4 text-field font-semibold text-foreground"
           />
         </GroupedSection>
         {error?.field === "title" && (
@@ -125,7 +123,7 @@ export function RecipeForm({
             maxLength={20_000}
             autoCapitalize="sentences"
             accessibilityLabel="Notes"
-            className="min-h-28 px-4 pt-3 pb-3 text-title text-foreground"
+            className="min-h-28 px-4 py-3.75 text-title text-foreground"
           />
         </GroupedSection>
         <DraftDetails
