@@ -135,7 +135,7 @@ export function RecipeScreen() {
               tagNames: libraryTags(familyTables).map((tag) => tag.name),
               familyName: families.find((family) => !family.personal)?.name,
               organize,
-              plannedDays: planMeals.plannedDays(recipeId),
+              weekPlan: planMeals.weekPlan(),
               onPlan: (day) => planMeals.toggle(day, { id: recipeId, familyId: owner.familyId }),
               onDeleted: () => router.back(),
             })

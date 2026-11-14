@@ -4,10 +4,6 @@ import type { FamilyTables } from "./library";
 
 export type LibraryMeal = PlannedMeal & { familyId: string };
 
-function orderKey(meal: LibraryMeal) {
-  return `${meal.date} ${meal.position} ${meal.id}`;
-}
-
 export function libraryMealPlan(
   familyTables: readonly FamilyTables[],
   range: { from: string; to: string },
@@ -16,5 +12,5 @@ export function libraryMealPlan(
     .flatMap(({ familyId, tables }) =>
       mealPlan(tables, range).map((meal) => ({ ...meal, familyId })),
     )
-    .sort((first, second) => (orderKey(first) < orderKey(second) ? -1 : 1));
+    .sort((first, second) => (first.date < second.date ? -1 : 1));
 }

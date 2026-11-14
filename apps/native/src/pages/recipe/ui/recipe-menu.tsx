@@ -11,7 +11,7 @@ export function recipeMenu({
   tagNames,
   familyName,
   organize,
-  plannedDays,
+  weekPlan,
   onPlan,
   onDeleted,
 }: {
@@ -23,7 +23,7 @@ export function recipeMenu({
   tagNames: readonly string[];
   familyName: string | undefined;
   organize: ReturnType<typeof useOrganizeRecipes>;
-  plannedDays: readonly string[];
+  weekPlan: readonly { date: string; recipe: { id: string; title: string } }[];
   onPlan: (day: string) => void;
   onDeleted: () => void;
 }) {
@@ -78,7 +78,14 @@ export function recipeMenu({
           {[...Array(7).keys()].map((offset) => (
             <Stack.Toolbar.MenuAction
               key={offset}
-              isOn={plannedDays.includes(addDays(today, offset))}
+              isOn={weekPlan.some(
+                (meal) => meal.date === addDays(today, offset) && meal.recipe.id === recipe.id,
+              )}
+              subtitle={
+                weekPlan.find(
+                  (meal) => meal.date === addDays(today, offset) && meal.recipe.id !== recipe.id,
+                )?.recipe.title
+              }
               onPress={() => onPlan(addDays(today, offset))}
             >
               {relativeDayName(addDays(today, offset), today)}

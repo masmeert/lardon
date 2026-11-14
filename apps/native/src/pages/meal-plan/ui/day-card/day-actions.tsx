@@ -1,36 +1,59 @@
-import { Button, Divider, HStack, Host, Image, Menu } from "@expo/ui/swift-ui";
-import { accessibilityLabel, buttonStyle, disabled, frame } from "@expo/ui/swift-ui/modifiers";
-import { Alert } from "react-native";
+import { Button, Host, Image, Menu, Text } from "@expo/ui/swift-ui";
+import { accessibilityLabel, buttonStyle, frame } from "@expo/ui/swift-ui/modifiers";
 
-import type { LibraryMeal } from "#/entities/recipe";
-import { addDays, relativeDayName, useThemeColors, weekdayName } from "#/shared/lib";
-
-import { MealMenu } from "./meal-menu";
+import { relativeDayName, useThemeColors, weekdayName } from "#/shared/lib";
 
 export function DayActions({
   day,
   today,
-  meals,
+  isPlanned,
+  moveDays,
+  plannedDays,
   onAdd,
   onMove,
   onRemove,
 }: {
   day: string;
   today: string;
-  meals: readonly LibraryMeal[];
+  isPlanned: boolean;
+  moveDays: readonly string[];
+  plannedDays: ReadonlyMap<string, string>;
   onAdd: () => void;
-  onMove: (meals: readonly LibraryMeal[], day: string) => void;
-  onRemove: (meals: readonly LibraryMeal[]) => void;
+  onMove: (target: string) => void;
+  onRemove: () => void;
 }) {
-  const { foreground, muted } = useThemeColors("foreground", "muted");
-
-  const moveDays = [...Array(8).keys()].flatMap((offset) =>
-    addDays(today, offset) === day ? [] : [addDays(today, offset)],
-  );
+  const { foreground } = useThemeColors("foreground");
 
   return (
     <Host ignoreSafeArea="all" matchContents>
-      <HStack spacing={4}>
+      {isPlanned ? (
+        <Menu
+          label={
+            <Image
+              systemName="ellipsis"
+              size={18}
+              color={foreground}
+              modifiers={[frame({ width: 36, height: 36 })]}
+            />
+          }
+          modifiers={[buttonStyle("borderless"), accessibilityLabel(`${weekdayName(day)} options`)]}
+        >
+          <Button label="Change recipe" systemImage="arrow.triangle.2.circlepath" onPress={onAdd} />
+          <Menu label="Move to" systemImage="calendar">
+            {moveDays.map((target) => (
+              <Button key={target} onPress={() => onMove(target)}>
+                {[
+                  relativeDayName(target, today),
+                  ...(plannedDays.has(target) ? [`Swap with ${plannedDays.get(target)}`] : []),
+                ].map((line) => (
+                  <Text key={line}>{line}</Text>
+                ))}
+              </Button>
+            ))}
+          </Menu>
+          <Button label="Remove" systemImage="trash" role="destructive" onPress={onRemove} />
+        </Menu>
+      ) : (
         <Button
           onPress={onAdd}
           modifiers={[buttonStyle("borderless"), accessibilityLabel(`Add to ${weekdayName(day)}`)]}
@@ -42,62 +65,7 @@ export function DayActions({
             modifiers={[frame({ width: 36, height: 36 })]}
           />
         </Button>
-        <Menu
-          label={
-            <Image
-              systemName="ellipsis"
-              size={18}
-              color={meals.length === 0 ? muted : foreground}
-              modifiers={[frame({ width: 36, height: 36 })]}
-            />
-          }
-          modifiers={[
-            buttonStyle("borderless"),
-            accessibilityLabel(`${weekdayName(day)} options`),
-            disabled(meals.length === 0),
-          ]}
-        >
-          {meals.map((meal) => (
-            <MealMenu
-              key={meal.id}
-              meal={meal}
-              moveDays={moveDays}
-              today={today}
-              onMove={(target) => onMove([meal], target)}
-              onRemove={() => onRemove([meal])}
-            />
-          ))}
-          <Divider />
-          {meals.length > 1 && (
-            <Menu label="Move all to" systemImage="calendar">
-              {moveDays.map((target) => (
-                <Button
-                  key={target}
-                  label={relativeDayName(target, today)}
-                  onPress={() => onMove(meals, target)}
-                />
-              ))}
-            </Menu>
-          )}
-          <Button
-            label="Clear day"
-            systemImage="trash"
-            role="destructive"
-            onPress={() =>
-              Alert.alert(
-                `Clear ${relativeDayName(day, today)}?`,
-                meals.length === 1
-                  ? "Its meal will be removed from the plan."
-                  : `Its ${meals.length} meals will be removed from the plan.`,
-                [
-                  { text: "Cancel", style: "cancel" },
-                  { text: "Clear", style: "destructive", onPress: () => onRemove(meals) },
-                ],
-              )
-            }
-          />
-        </Menu>
-      </HStack>
+      )}
     </Host>
   );
 }
