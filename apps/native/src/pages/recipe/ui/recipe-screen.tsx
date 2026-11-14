@@ -77,7 +77,10 @@ export function RecipeScreen() {
               <ActivityIndicator />
             </Stack.Toolbar.View>
           ) : (
-            <Stack.Toolbar.Menu icon="square.and.arrow.up" accessibilityLabel="Share">
+            <Stack.Toolbar.Menu
+              icon={share.copy.isSuccess ? "checkmark" : "square.and.arrow.up"}
+              accessibilityLabel={share.copy.isSuccess ? "Copied as Markdown" : "Share"}
+            >
               <Stack.Toolbar.MenuAction
                 icon="link"
                 disabled={!isOnline}
@@ -100,6 +103,13 @@ export function RecipeScreen() {
                 }
               >
                 Export as PDF
+              </Stack.Toolbar.MenuAction>
+              <Stack.Toolbar.MenuAction
+                icon="doc.on.doc"
+                subtitle="To paste into an assistant or a note"
+                onPress={() => share.copy.mutate({ recipe, scale: scaleFactor, unitSystem })}
+              >
+                Copy as Markdown
               </Stack.Toolbar.MenuAction>
             </Stack.Toolbar.Menu>
           )}
@@ -131,12 +141,14 @@ export function RecipeScreen() {
           >
             <View className="px-4 pt-2">
               <RecipeHero recipe={recipe} familyId={owner.familyId} scale={scaleFactor} />
-              {(share.link.isError || share.pdf.isError) && (
+              {(share.link.isError || share.pdf.isError || share.copy.isError) && (
                 <View className="items-center pt-3">
                   <InlineError>
                     {share.link.isError
                       ? "Couldn't create the link. Check your connection and try again."
-                      : "Couldn't make the PDF. Try again."}
+                      : share.pdf.isError
+                        ? "Couldn't make the PDF. Try again."
+                        : "Couldn't copy the recipe. Try again."}
                   </InlineError>
                 </View>
               )}

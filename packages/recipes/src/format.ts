@@ -50,3 +50,21 @@ export function formatAmount(
 
   return unit ? `${formatQuantity(quantity)} ${unit}` : formatQuantity(quantity);
 }
+
+export function formatFacts(
+  recipe: { servings?: number; prepMinutes?: number; cookMinutes?: number },
+  scale: number,
+) {
+  const totalMinutes = (recipe.prepMinutes ?? 0) + (recipe.cookMinutes ?? 0);
+
+  return [
+    totalMinutes > 0 ? formatDuration(totalMinutes) : null,
+    recipe.servings === undefined
+      ? scale === 1
+        ? null
+        : `${formatQuantity(scale)} times the recipe`
+      : recipe.servings * scale === 1
+        ? "1 serving"
+        : `${formatQuantity(recipe.servings * scale)} servings`,
+  ].filter((fact) => fact !== null);
+}

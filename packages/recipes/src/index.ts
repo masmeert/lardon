@@ -8,6 +8,8 @@ export * from "./queries";
 
 export * from "./recipe-document";
 
+export * from "./recipe-markdown";
+
 export * from "./snapshot";
 
 export * from "./step-text";

@@ -1,7 +1,7 @@
 import { colors } from "@lardon/brand";
 import type { CSSProperties, ReactNode } from "react";
 
-import { formatAmount, formatDuration, formatQuantity } from "./format";
+import { formatAmount, formatFacts } from "./format";
 import type { RecipeSnapshot } from "./snapshot";
 import type { UnitSystem } from "./units";
 
@@ -37,18 +37,7 @@ export function RecipeDocument({
   head?: ReactNode;
   footer?: ReactNode;
 }) {
-  const totalMinutes = (recipe.prepMinutes ?? 0) + (recipe.cookMinutes ?? 0);
-
-  const facts = [
-    totalMinutes > 0 ? formatDuration(totalMinutes) : null,
-    recipe.servings === undefined
-      ? scale === 1
-        ? null
-        : `${formatQuantity(scale)} times the recipe`
-      : recipe.servings * scale === 1
-        ? "1 serving"
-        : `${formatQuantity(recipe.servings * scale)} servings`,
-  ].filter((fact) => fact !== null);
+  const facts = formatFacts(recipe, scale);
 
   return (
     <html lang="en">

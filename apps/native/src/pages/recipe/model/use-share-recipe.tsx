@@ -2,10 +2,13 @@ import {
   type RecipeDetail,
   RecipeDocument,
   type UnitSystem,
+  recipeMarkdown,
   recipeSnapshot,
 } from "@lardon/recipes";
 import { useMutation } from "@tanstack/react-query";
+import { setStringAsync } from "expo-clipboard";
 import { File, Paths } from "expo-file-system";
+import { NotificationFeedbackType, notificationAsync } from "expo-haptics";
 import { printToFileAsync } from "expo-print";
 import { shareAsync } from "expo-sharing";
 import { renderToStaticMarkup } from "react-dom/server.edge";
@@ -88,5 +91,22 @@ export function useShareRecipe() {
     },
   });
 
-  return { link, pdf };
+  const copy = useMutation({
+    networkMode: "always",
+    mutationFn: async ({
+      recipe,
+      scale,
+      unitSystem,
+    }: {
+      recipe: RecipeDetail;
+      scale: number;
+      unitSystem: UnitSystem;
+    }) => {
+      await setStringAsync(recipeMarkdown(recipeSnapshot(recipe), scale, unitSystem));
+      await notificationAsync(NotificationFeedbackType.Success);
+    },
+    onSuccess: () => setTimeout(() => copy.reset(), 1500),
+  });
+
+  return { link, pdf, copy };
 }
