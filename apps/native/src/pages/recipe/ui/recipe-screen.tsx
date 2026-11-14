@@ -36,6 +36,15 @@ export function RecipeScreen() {
     () => onlineManager.isOnline(),
   );
 
+  const shareError = [
+    {
+      isError: share.link.isError,
+      message: "Couldn't create the link. Check your connection and try again.",
+    },
+    { isError: share.pdf.isError, message: "Couldn't make the PDF. Try again." },
+    { isError: share.copy.isError, message: "Couldn't copy the recipe. Try again." },
+  ].find((outcome) => outcome.isError)?.message;
+
   const [scaleFactor, setScaleFactor] = useState(1);
   const [isScaleOpen, setIsScaleOpen] = useState(false);
   const [scaleMode, setScaleMode] = useState<ScaleMode>("amount");
@@ -138,15 +147,9 @@ export function RecipeScreen() {
           >
             <View className="px-4 pt-2">
               <RecipeHero recipe={recipe} familyId={owner.familyId} scale={scaleFactor} />
-              {(share.link.isError || share.pdf.isError || share.copy.isError) && (
+              {shareError && (
                 <View className="items-center pt-3">
-                  <InlineError>
-                    {share.link.isError
-                      ? "Couldn't create the link. Check your connection and try again."
-                      : share.pdf.isError
-                        ? "Couldn't make the PDF. Try again."
-                        : "Couldn't copy the recipe. Try again."}
-                  </InlineError>
+                  <InlineError>{shareError}</InlineError>
                 </View>
               )}
             </View>
