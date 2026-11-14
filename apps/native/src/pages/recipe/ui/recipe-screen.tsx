@@ -90,7 +90,14 @@ export function RecipeScreen() {
               </Stack.Toolbar.MenuAction>
               <Stack.Toolbar.MenuAction
                 icon="doc.richtext"
-                onPress={() => share.pdf.mutate({ recipe, familyId: owner.familyId })}
+                onPress={() =>
+                  share.pdf.mutate({
+                    recipe,
+                    familyId: owner.familyId,
+                    scale: scaleFactor,
+                    unitSystem,
+                  })
+                }
               >
                 Export as PDF
               </Stack.Toolbar.MenuAction>

@@ -2,14 +2,19 @@ import type { ReactNode } from "react";
 
 import { formatAmount, formatDuration, formatQuantity } from "./format";
 import type { RecipeSnapshot } from "./snapshot";
+import type { UnitSystem } from "./units";
 
 export function RecipeDocument({
   recipe,
+  scale = 1,
+  unitSystem = "original",
   photoUrl,
   head,
   footer,
 }: {
   recipe: RecipeSnapshot;
+  scale?: number;
+  unitSystem?: UnitSystem;
   photoUrl?: string | null;
   head?: ReactNode;
   footer?: ReactNode;
@@ -19,10 +24,12 @@ export function RecipeDocument({
   const facts = [
     totalMinutes > 0 ? formatDuration(totalMinutes) : null,
     recipe.servings === undefined
-      ? null
-      : recipe.servings === 1
+      ? scale === 1
+        ? null
+        : `${formatQuantity(scale)} times the recipe`
+      : recipe.servings * scale === 1
         ? "1 serving"
-        : `${formatQuantity(recipe.servings)} servings`,
+        : `${formatQuantity(recipe.servings * scale)} servings`,
   ].filter((fact) => fact !== null);
 
   return (
@@ -57,6 +64,7 @@ export function RecipeDocument({
   h1 { margin: 24px 4px 4px; font-size: 30px; line-height: 36px; font-weight: 700; }
   .facts { margin: 0 4px; color: #6e6e73; }
   h2 { margin: 32px 4px 12px; font-size: 17px; line-height: 22px; font-weight: 600; }
+  section { break-inside: avoid; page-break-inside: avoid; }
   .card { margin: 0; padding: 4px 16px; background: #fff; border-radius: 18px; list-style: none; }
   .ingredients li {
     display: flex;
@@ -107,33 +115,33 @@ export function RecipeDocument({
           <h1>{recipe.title}</h1>
           {facts.length > 0 && <p className="facts">{facts.join(", ")}</p>}
           {recipe.ingredients.length > 0 && (
-            <>
+            <section>
               <h2>Ingredients</h2>
               <ul className="card ingredients">
                 {recipe.ingredients.map((ingredient, index) => (
                   <li key={index}>
                     <span>{ingredient.name}</span>
-                    <strong>{formatAmount(ingredient, 1, "original")}</strong>
+                    <strong>{formatAmount(ingredient, scale, unitSystem)}</strong>
                   </li>
                 ))}
               </ul>
-            </>
+            </section>
           )}
           {recipe.steps.length > 0 && (
-            <>
+            <section>
               <h2>Steps</h2>
               <ol className="steps">
                 {recipe.steps.map((step, index) => (
                   <li key={index}>{step}</li>
                 ))}
               </ol>
-            </>
+            </section>
           )}
           {recipe.notes && (
-            <>
+            <section>
               <h2>Notes</h2>
               <p className="card notes">{recipe.notes}</p>
-            </>
+            </section>
           )}
           {footer}
         </main>

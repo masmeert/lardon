@@ -32,6 +32,23 @@ describe("RecipeDocument", () => {
     expect(html).toContain('font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Inter"');
   });
 
+  it("scales amounts and servings and converts units", () => {
+    const html = renderToStaticMarkup(
+      <RecipeDocument recipe={recipe} scale={2.5} unitSystem="imperial" />,
+    );
+
+    expect(html).toContain('<p class="facts">1 h, 15 servings</p>');
+    expect(html).toContain("<li><span>apples</span><strong>2¾ lb</strong></li>");
+  });
+
+  it("says how much a recipe without servings was scaled", () => {
+    const html = renderToStaticMarkup(
+      <RecipeDocument recipe={{ ...recipe, servings: undefined }} scale={2.5} />,
+    );
+
+    expect(html).toContain('<p class="facts">1 h, 2½ times the recipe</p>');
+  });
+
   it("leaves out empty sections", () => {
     const html = renderToStaticMarkup(
       <RecipeDocument recipe={{ title: "Toast", ingredients: [], steps: [] }} />,

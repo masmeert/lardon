@@ -1,4 +1,9 @@
-import { type RecipeDetail, RecipeDocument, recipeSnapshot } from "@lardon/recipes";
+import {
+  type RecipeDetail,
+  RecipeDocument,
+  type UnitSystem,
+  recipeSnapshot,
+} from "@lardon/recipes";
 import { useMutation } from "@tanstack/react-query";
 import { File, Paths } from "expo-file-system";
 import { printToFileAsync } from "expo-print";
@@ -45,7 +50,17 @@ export function useShareRecipe() {
 
   const pdf = useMutation({
     networkMode: "always",
-    mutationFn: async ({ recipe, familyId }: { recipe: RecipeDetail; familyId: string }) => {
+    mutationFn: async ({
+      recipe,
+      familyId,
+      scale,
+      unitSystem,
+    }: {
+      recipe: RecipeDetail;
+      familyId: string;
+      scale: number;
+      unitSystem: UnitSystem;
+    }) => {
       const photoUrl = recipe.imageKey
         ? await photoDataUrl(familyId, recipe.imageKey).catch(() => null)
         : null;
@@ -54,7 +69,12 @@ export function useShareRecipe() {
         width: 595,
         height: 842,
         html: `<!doctype html>${renderToStaticMarkup(
-          <RecipeDocument recipe={recipeSnapshot(recipe)} photoUrl={photoUrl} />,
+          <RecipeDocument
+            recipe={recipeSnapshot(recipe)}
+            scale={scale}
+            unitSystem={unitSystem}
+            photoUrl={photoUrl}
+          />,
         )}`,
       });
 
