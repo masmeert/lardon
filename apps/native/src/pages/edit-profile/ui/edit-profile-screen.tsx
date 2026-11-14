@@ -43,7 +43,6 @@ export function EditProfileScreen() {
           contentInsetAdjustmentBehavior="automatic"
           keyboardDismissMode="on-drag"
           keyboardShouldPersistTaps="handled"
-          automaticallyAdjustKeyboardInsets
           contentContainerClassName="pb-16"
         >
           <ProfileForm profile={profile.data} />
