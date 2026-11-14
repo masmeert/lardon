@@ -8,6 +8,7 @@ import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { familiesQuery } from "#/entities/family";
 import { libraryFolders, libraryTags, scopeParams, useFamilyTables } from "#/entities/recipe";
 import { useOrganizeRecipes } from "#/features/organize-recipes";
+import { usePlanMeals } from "#/features/plan-meals";
 import { useThemeColors } from "#/shared/lib";
 import { usePreference } from "#/shared/preferences";
 import { EmptyState, FilterPill, InlineError, KeyboardDoneButton } from "#/shared/ui";
@@ -28,6 +29,7 @@ export function RecipeScreen() {
   const { data: families = [], isPending } = useQuery(familiesQuery);
   const familyTables = useFamilyTables(families.map((family) => family.id));
   const organize = useOrganizeRecipes();
+  const planMeals = usePlanMeals();
   const share = useShareRecipe();
 
   const isOnline = useSyncExternalStore(
@@ -133,6 +135,8 @@ export function RecipeScreen() {
               tagNames: libraryTags(familyTables).map((tag) => tag.name),
               familyName: families.find((family) => !family.personal)?.name,
               organize,
+              plannedDays: planMeals.plannedDays(recipeId),
+              onPlan: (day) => planMeals.toggle(day, { id: recipeId, familyId: owner.familyId }),
               onDeleted: () => router.back(),
             })
           )}
