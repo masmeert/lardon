@@ -493,7 +493,7 @@ export function moveRecipe(
     });
   }
 
-  target.transaction(() => {
+  target.transaction(() =>
     writeRecipe(
       target,
       recipeId,
@@ -504,12 +504,8 @@ export function moveRecipe(
         folderIds: sameNameIn("folders", draft.folderIds),
       },
       recipe,
-    );
-
-    for (const meal of readRows(sourceContent, "meals")) {
-      if (meal.recipeId === recipeId) planMeal(target, meal.id, recipeId);
-    }
-  });
+    ),
+  );
   deleteRecipes(source, [recipeId]);
 
   return true;
