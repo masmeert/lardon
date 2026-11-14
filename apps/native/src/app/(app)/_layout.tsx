@@ -23,6 +23,7 @@ export default function AppLayout() {
           <Stack.Screen name="family/join" options={sheetOptions} />
           <Stack.Screen name="family/rename" options={sheetOptions} />
           <Stack.Screen name="account/name" options={sheetOptions} />
+          <Stack.Screen name="people/search" options={sheetOptions} />
           <Stack.Screen name="recipe/new" options={{ presentation: "modal" }} />
           <Stack.Screen name="recipe/[recipeId]/edit" options={{ presentation: "modal" }} />
           <Stack.Screen name="plan/[date]" options={{ presentation: "modal", headerShown: true }} />

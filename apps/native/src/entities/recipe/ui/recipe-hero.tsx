@@ -1,17 +1,17 @@
-import { type RecipeDetail, formatDuration, formatQuantity } from "@lardon/recipes";
+import { formatDuration, formatQuantity } from "@lardon/recipes";
+import type { ReactNode } from "react";
 import { Text, View } from "react-native";
 
-import { RecipeCover } from "#/entities/recipe";
 import { iconSize, useThemeColors } from "#/shared/lib";
 import { Glass, Icon, type IconName, LardonMark, PhotoFrame } from "#/shared/ui";
 
 export function RecipeHero({
   recipe,
-  familyId,
+  photo,
   scale,
 }: {
-  recipe: RecipeDetail;
-  familyId: string;
+  recipe: { servings?: number; prepMinutes?: number; cookMinutes?: number };
+  photo: ReactNode;
   scale: number;
 }) {
   const { accent, white } = useThemeColors("accent", "white");
@@ -36,11 +36,7 @@ export function RecipeHero({
         style={{ borderCurve: "continuous" }}
         className="flex-1 items-center justify-center overflow-hidden rounded-[20px] bg-placeholder"
       >
-        {recipe.imageKey ? (
-          <RecipeCover recipe={{ familyId, imageKey: recipe.imageKey }} />
-        ) : (
-          <LardonMark width={120} color={white} />
-        )}
+        {photo ?? <LardonMark width={120} color={white} />}
         {facts.length > 0 && (
           <View className="absolute inset-x-0 bottom-3.5 items-center">
             <View className="flex-row items-center rounded-full px-4.5 py-3">

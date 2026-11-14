@@ -16,3 +16,5 @@ export {
 } from "./calendar-day";
 
 export { useToday } from "./use-today";
+
+export { timeAgo } from "./time-ago";

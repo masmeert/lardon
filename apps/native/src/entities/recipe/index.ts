@@ -35,6 +35,24 @@ export { recipeFacts } from "./model/recipe-facts";
 
 export { RecipeCover } from "./ui/recipe-cover";
 
+export { RecipeHero } from "./ui/recipe-hero";
+
+export { FeedCover } from "./ui/feed-cover";
+
+export { feedQuery, feedRecipeQuery } from "./model/feed-queries";
+
+export { useRecipeScale } from "./model/use-recipe-scale";
+
+export { RecipeSection } from "./ui/recipe-section";
+
+export { IngredientControls } from "./ui/ingredient-controls";
+
+export { IngredientRow } from "./ui/ingredient-row";
+
+export { type ScaleMode, ScalePanel } from "./ui/scale-panel";
+
+export { StepRow } from "./ui/step-row";
+
 export { RecipeThumbnail } from "./ui/recipe-thumbnail";
 
 export { useFamilyTables } from "./use-family-tables";

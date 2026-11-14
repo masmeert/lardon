@@ -3,7 +3,7 @@ import { Stack } from "expo-router";
 import { TabStack } from "#/_app/nav/tab-stack";
 import { useThemeColors } from "#/shared/lib";
 
-export default function SettingsLayout() {
+export default function ProfileLayout() {
   const { foreground } = useThemeColors("foreground");
 
   const options = {
@@ -17,7 +17,8 @@ export default function SettingsLayout() {
   } as const;
 
   return (
-    <TabStack title="Settings">
+    <TabStack title="Profile">
+      <Stack.Screen name="settings" options={{ ...options, title: "Settings" }} />
       <Stack.Screen name="account" options={{ ...options, title: "Account" }} />
       <Stack.Screen name="family" options={{ ...options, title: "Family" }} />
       <Stack.Screen
