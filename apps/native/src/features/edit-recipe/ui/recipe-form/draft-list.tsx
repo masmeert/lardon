@@ -33,7 +33,7 @@ export function DraftList<Line extends { id: string }>({
   scrollRef: AnimatedRef<KeyboardAwareScrollViewRef>;
   renderLine: (line: Line, controls: LineControls<Line>) => ReactNode;
 }) {
-  const { accent } = useThemeColors("accent");
+  const { white } = useThemeColors("white");
   const inputs = useRef(new Map<string, TextInput>());
   const focusNextId = useRef<string | null>(null);
 
@@ -103,8 +103,8 @@ export function DraftList<Line extends { id: string }>({
         )}
       </View>
       <View className="p-2.5">
-        <Button variant="secondary" onPress={() => insertAfter(undefined, newLine())}>
-          <Icon name="plus.circle.fill" size={iconSize.lg} color={accent} />
+        <Button onPress={() => insertAfter(undefined, newLine())}>
+          <Icon name="plus.circle.fill" size={iconSize.lg} color={white} />
           <ButtonLabel>{`Add ${lineName}`}</ButtonLabel>
         </Button>
       </View>
