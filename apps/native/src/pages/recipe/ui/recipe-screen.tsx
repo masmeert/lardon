@@ -130,7 +130,7 @@ export function RecipeScreen() {
             contentContainerClassName="pb-16"
           >
             <View className="px-4 pt-2">
-              <RecipeHero recipe={recipe} familyId={owner.familyId} />
+              <RecipeHero recipe={recipe} familyId={owner.familyId} scale={scaleFactor} />
               {(share.link.isError || share.pdf.isError) && (
                 <View className="items-center pt-3">
                   <InlineError>

@@ -5,7 +5,15 @@ import { RecipeCover } from "#/entities/recipe";
 import { iconSize, useThemeColors } from "#/shared/lib";
 import { Glass, Icon, type IconName, LardonMark, PhotoFrame } from "#/shared/ui";
 
-export function RecipeHero({ recipe, familyId }: { recipe: RecipeDetail; familyId: string }) {
+export function RecipeHero({
+  recipe,
+  familyId,
+  scale,
+}: {
+  recipe: RecipeDetail;
+  familyId: string;
+  scale: number;
+}) {
   const { accent, white } = useThemeColors("accent", "white");
   const totalMinutes = (recipe.prepMinutes ?? 0) + (recipe.cookMinutes ?? 0);
   const facts: { icon: IconName; label: string }[] = [];
@@ -15,7 +23,10 @@ export function RecipeHero({ recipe, familyId }: { recipe: RecipeDetail; familyI
   if (recipe.servings !== undefined) {
     facts.push({
       icon: "person.2",
-      label: recipe.servings === 1 ? "1 serving" : `${formatQuantity(recipe.servings)} servings`,
+      label:
+        recipe.servings * scale === 1
+          ? "1 serving"
+          : `${formatQuantity(recipe.servings * scale)} servings`,
     });
   }
 
