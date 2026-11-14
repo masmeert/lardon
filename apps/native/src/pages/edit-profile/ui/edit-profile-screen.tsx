@@ -1,9 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { Stack, router } from "expo-router";
-import { ActivityIndicator, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, ScrollView, Text } from "react-native";
 
-import { PersonAvatar, connectionQueries, ownProfileQuery } from "#/entities/profile";
-import { authClient } from "#/shared/auth";
+import { connectionQueries, ownProfileQuery } from "#/entities/profile";
 import { useThemeColors } from "#/shared/lib";
 import { EmptyState, GroupedRow, GroupedSection, KeyboardDoneButton } from "#/shared/ui";
 
@@ -11,7 +10,6 @@ import { ProfileForm } from "./profile-form";
 
 export function EditProfileScreen() {
   const { background, foreground } = useThemeColors("background", "foreground");
-  const { data: session } = authClient.useSession();
   const profile = useQuery(ownProfileQuery);
   const blocked = useQuery({ ...connectionQueries.blocked, enabled: Boolean(profile.data) });
 
@@ -48,23 +46,9 @@ export function EditProfileScreen() {
           automaticallyAdjustKeyboardInsets
           contentContainerClassName="pb-16"
         >
-          <View className="items-center pt-2">
-            <PersonAvatar
-              person={{
-                name: session?.user.name ?? "",
-                username: profile.data?.username ?? "?",
-                image: session?.user.image ?? null,
-              }}
-              sizePt={84}
-              cornerRadiusPt={24}
-            />
-          </View>
           <ProfileForm profile={profile.data} />
-          {profile.data ? (
-            <GroupedSection
-              title="Privacy"
-              footer="Nothing on Lardon is public. People find you only by your exact username, and only followers you approve see the recipes you share with followers."
-            >
+          {profile.data && (
+            <GroupedSection footer="Only followers you approve see the recipes you share with them.">
               <GroupedRow
                 label="Blocked people"
                 isFirst
@@ -76,11 +60,6 @@ export function EditProfileScreen() {
                 )}
               </GroupedRow>
             </GroupedSection>
-          ) : (
-            <Text className="px-8 pt-4 text-caption text-muted">
-              Nothing on Lardon is public. People find you only by your exact username, and only
-              followers you approve see the recipes you share with followers.
-            </Text>
           )}
         </ScrollView>
       )}
