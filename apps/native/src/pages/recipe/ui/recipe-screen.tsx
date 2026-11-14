@@ -84,9 +84,7 @@ export function RecipeScreen() {
               <Stack.Toolbar.MenuAction
                 icon="link"
                 disabled={!isOnline}
-                subtitle={
-                  isOnline ? "Anyone with the link can see it for 7 days" : "Needs a connection"
-                }
+                subtitle={isOnline ? undefined : "Needs a connection"}
                 onPress={() => share.link.mutate({ recipe, familyId: owner.familyId })}
               >
                 Send a link
@@ -106,7 +104,6 @@ export function RecipeScreen() {
               </Stack.Toolbar.MenuAction>
               <Stack.Toolbar.MenuAction
                 icon="doc.on.doc"
-                subtitle="To paste into an assistant or a note"
                 onPress={() => share.copy.mutate({ recipe, scale: scaleFactor, unitSystem })}
               >
                 Copy as Markdown
