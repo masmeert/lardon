@@ -2,7 +2,7 @@ import { router } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
 import type { LibraryMeal } from "#/entities/recipe";
-import { cn, shortDate, weekdayName } from "#/shared/lib";
+import { addDays, cn, shortDate, weekdayName } from "#/shared/lib";
 
 import { DayActions } from "./day-actions";
 import { MealRow } from "./meal-row";
@@ -11,15 +11,21 @@ export function DayCard({
   day,
   today,
   meals,
+  plannedDays,
   onMove,
   onRemove,
 }: {
   day: string;
   today: string;
   meals: readonly LibraryMeal[];
-  onMove: (meals: readonly LibraryMeal[], day: string) => void;
-  onRemove: (meals: readonly LibraryMeal[]) => void;
+  plannedDays: ReadonlyMap<string, string>;
+  onMove: (target: string) => void;
+  onRemove: () => void;
 }) {
+  const moveDays = [...Array(8).keys()].flatMap((offset) =>
+    addDays(today, offset) === day ? [] : [addDays(today, offset)],
+  );
+
   return (
     <View
       style={{ borderCurve: "continuous" }}
@@ -41,22 +47,24 @@ export function DayCard({
         <DayActions
           day={day}
           today={today}
-          meals={meals}
+          isPlanned={meals.length > 0}
+          moveDays={moveDays}
+          plannedDays={plannedDays}
           onAdd={() => router.push({ pathname: "/plan/[date]", params: { date: day } })}
           onMove={onMove}
           onRemove={onRemove}
         />
       </View>
-      <View style={{ height: StyleSheet.hairlineWidth }} className="ml-4 bg-hairline" />
-      <View className="py-1">
-        {meals.length === 0 ? (
-          <View className="h-[68px] justify-center px-4">
-            <Text className="text-body text-muted">Nothing planned</Text>
+      {meals.length > 0 && (
+        <>
+          <View style={{ height: StyleSheet.hairlineWidth }} className="ml-4 bg-hairline" />
+          <View className="py-1">
+            {meals.map((meal, index) => (
+              <MealRow key={meal.familyId} meal={meal} isFirst={index === 0} />
+            ))}
           </View>
-        ) : (
-          meals.map((meal, index) => <MealRow key={meal.id} meal={meal} isFirst={index === 0} />)
-        )}
-      </View>
+        </>
+      )}
     </View>
   );
 }

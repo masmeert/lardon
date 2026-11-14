@@ -1,4 +1,4 @@
-import { moveMeal, planMeal, removeMeals } from "@lardon/recipes";
+import { clearMeal, planMeal } from "@lardon/recipes";
 import { useQuery } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 
@@ -11,8 +11,24 @@ export function usePlanMeals() {
   const { data: families = [] } = useQuery(familiesQuery);
   const familyTables = useFamilyTables(families.map((family) => family.id));
 
-  function lastPosition(date: string) {
-    return libraryMealPlan(familyTables, { from: date, to: date }).at(-1)?.position ?? null;
+  function mealsOn(date: string) {
+    return libraryMealPlan(familyTables, { from: date, to: date });
+  }
+
+  function remove(meals: readonly LibraryMeal[]) {
+    for (const meal of meals) {
+      const store = familyStore(meal.familyId);
+
+      if (store) clearMeal(store, meal.date);
+    }
+  }
+
+  function place(meals: readonly LibraryMeal[], date: string) {
+    for (const meal of meals) {
+      const store = familyStore(meal.familyId);
+
+      if (store) planMeal(store, date, meal.recipe.id);
+    }
   }
 
   function plan(date: string, recipe: { id: string; familyId: string }) {
@@ -20,48 +36,33 @@ export function usePlanMeals() {
 
     if (!store) return false;
 
-    planMeal(store, date, recipe.id, lastPosition(date));
+    remove(mealsOn(date));
+    planMeal(store, date, recipe.id);
     void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
     return true;
   }
 
-  function move(meals: readonly LibraryMeal[], date: string) {
-    let after = lastPosition(date);
+  function move(from: string, to: string) {
+    const moving = mealsOn(from);
+    const staying = mealsOn(to);
 
-    for (const meal of meals) {
-      const store = familyStore(meal.familyId);
-
-      if (store) after = moveMeal(store, meal.id, date, after);
-    }
-
+    remove([...moving, ...staying]);
+    place(moving, to);
+    place(staying, from);
     void Haptics.selectionAsync();
   }
 
-  function remove(meals: readonly LibraryMeal[]) {
-    for (const meal of meals) {
-      const store = familyStore(meal.familyId);
-
-      if (store) removeMeals(store, [meal.id]);
-    }
-  }
-
-  function mealsOf(recipeId: string, range: { from: string; to: string }) {
-    return libraryMealPlan(familyTables, range).filter((meal) => meal.recipe.id === recipeId);
-  }
-
-  function plannedDays(recipeId: string) {
+  function weekPlan() {
     const today = calendarDay(new Date());
 
-    return mealsOf(recipeId, { from: today, to: addDays(today, 6) }).map((meal) => meal.date);
+    return libraryMealPlan(familyTables, { from: today, to: addDays(today, 6) });
   }
 
   function toggle(date: string, recipe: { id: string; familyId: string }) {
-    const planned = mealsOf(recipe.id, { from: date, to: date });
-
-    if (planned.length > 0) remove(planned);
+    if (mealsOn(date).some((meal) => meal.recipe.id === recipe.id)) remove(mealsOn(date));
     else plan(date, recipe);
   }
 
-  return { plan, move, remove, plannedDays, toggle };
+  return { plan, move, remove, weekPlan, toggle };
 }
