@@ -3,66 +3,67 @@ import { useQuery } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 
 import { familiesQuery, useFamilyStores } from "#/entities/family";
-import { type LibraryMeal, libraryMealPlan, useFamilyTables } from "#/entities/recipe";
+import { libraryMealPlan, useFamilyTables } from "#/entities/recipe";
 import { addDays, calendarDay } from "#/shared/lib";
 
 export function usePlanMeals() {
   const familyStore = useFamilyStores();
   const { data: families = [] } = useQuery(familiesQuery);
-  const familyTables = useFamilyTables(families.map((family) => family.id));
 
-  function mealsOn(date: string) {
-    return libraryMealPlan(familyTables, { from: date, to: date });
+  const planFamilyId =
+    families.find((family) => !family.personal)?.id ??
+    families.find((family) => family.personal)?.id;
+
+  const familyTables = useFamilyTables(planFamilyId === undefined ? [] : [planFamilyId]);
+  const store = planFamilyId === undefined ? undefined : familyStore(planFamilyId);
+
+  function mealsIn(range: { from: string; to: string }) {
+    return libraryMealPlan(familyTables, range);
   }
 
-  function remove(meals: readonly LibraryMeal[]) {
-    for (const meal of meals) {
-      const store = familyStore(meal.familyId);
-
-      if (store) clearMeal(store, meal.date);
-    }
-  }
-
-  function place(meals: readonly LibraryMeal[], date: string) {
-    for (const meal of meals) {
-      const store = familyStore(meal.familyId);
-
-      if (store) planMeal(store, date, meal.recipe.id);
-    }
-  }
-
-  function plan(date: string, recipe: { id: string; familyId: string }) {
-    const store = familyStore(recipe.familyId);
-
+  function plan(date: string, recipeId: string) {
     if (!store) return false;
 
-    remove(mealsOn(date));
-    planMeal(store, date, recipe.id);
+    planMeal(store, date, recipeId);
     void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
     return true;
   }
 
   function move(from: string, to: string) {
-    const moving = mealsOn(from);
-    const staying = mealsOn(to);
+    const [moving] = mealsIn({ from, to: from });
+    const [staying] = mealsIn({ from: to, to });
 
-    remove([...moving, ...staying]);
-    place(moving, to);
-    place(staying, from);
+    if (!store || !moving) return;
+
+    store.transaction(() => {
+      planMeal(store, to, moving.recipe.id);
+
+      if (staying) planMeal(store, from, staying.recipe.id);
+      else clearMeal(store, from);
+    });
+    void Haptics.selectionAsync();
+  }
+
+  function remove(dates: readonly string[]) {
+    if (!store) return;
+
+    store.transaction(() => {
+      for (const date of dates) clearMeal(store, date);
+    });
     void Haptics.selectionAsync();
   }
 
   function weekPlan() {
     const today = calendarDay(new Date());
 
-    return libraryMealPlan(familyTables, { from: today, to: addDays(today, 6) });
+    return mealsIn({ from: today, to: addDays(today, 6) });
   }
 
-  function toggle(date: string, recipe: { id: string; familyId: string }) {
-    if (mealsOn(date).some((meal) => meal.recipe.id === recipe.id)) remove(mealsOn(date));
-    else plan(date, recipe);
+  function toggle(date: string, recipeId: string) {
+    if (mealsIn({ from: date, to: date })[0]?.recipe.id === recipeId) remove([date]);
+    else plan(date, recipeId);
   }
 
-  return { plan, move, remove, weekPlan, toggle };
+  return { planFamilyId, mealsIn, plan, move, remove, weekPlan, toggle };
 }

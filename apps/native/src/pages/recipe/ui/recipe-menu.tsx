@@ -12,6 +12,7 @@ export function recipeMenu({
   familyName,
   organize,
   weekPlan,
+  canPlan,
   onPlan,
   onDeleted,
 }: {
@@ -24,6 +25,7 @@ export function recipeMenu({
   familyName: string | undefined;
   organize: ReturnType<typeof useOrganizeRecipes>;
   weekPlan: readonly { date: string; recipe: { id: string; title: string } }[];
+  canPlan: boolean;
   onPlan: (day: string) => void;
   onDeleted: () => void;
 }) {
@@ -74,24 +76,34 @@ export function recipeMenu({
             </Stack.Toolbar.MenuAction>
           ))}
         </Stack.Toolbar.Menu>
-        <Stack.Toolbar.Menu title="Add to meal plan" icon="calendar.badge.plus">
-          {[...Array(7).keys()].map((offset) => (
-            <Stack.Toolbar.MenuAction
-              key={offset}
-              isOn={weekPlan.some(
-                (meal) => meal.date === addDays(today, offset) && meal.recipe.id === recipe.id,
-              )}
-              subtitle={
-                weekPlan.find(
-                  (meal) => meal.date === addDays(today, offset) && meal.recipe.id !== recipe.id,
-                )?.recipe.title
-              }
-              onPress={() => onPlan(addDays(today, offset))}
-            >
-              {relativeDayName(addDays(today, offset), today)}
-            </Stack.Toolbar.MenuAction>
-          ))}
-        </Stack.Toolbar.Menu>
+        {canPlan ? (
+          <Stack.Toolbar.Menu title="Add to meal plan" icon="calendar.badge.plus">
+            {[...Array(7).keys()].map((offset) => (
+              <Stack.Toolbar.MenuAction
+                key={offset}
+                isOn={weekPlan.some(
+                  (meal) => meal.date === addDays(today, offset) && meal.recipe.id === recipe.id,
+                )}
+                subtitle={
+                  weekPlan.find(
+                    (meal) => meal.date === addDays(today, offset) && meal.recipe.id !== recipe.id,
+                  )?.recipe.title
+                }
+                onPress={() => onPlan(addDays(today, offset))}
+              >
+                {relativeDayName(addDays(today, offset), today)}
+              </Stack.Toolbar.MenuAction>
+            ))}
+          </Stack.Toolbar.Menu>
+        ) : (
+          <Stack.Toolbar.MenuAction
+            icon="calendar.badge.plus"
+            disabled
+            subtitle="Share it with your family first"
+          >
+            Add to meal plan
+          </Stack.Toolbar.MenuAction>
+        )}
         {familyName !== undefined && (
           <Stack.Toolbar.Menu title="Shared with" icon="person.2">
             <Stack.Toolbar.MenuAction

@@ -2,7 +2,7 @@ import { router } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
 import type { LibraryMeal } from "#/entities/recipe";
-import { addDays, cn, shortDate, weekdayName } from "#/shared/lib";
+import { cn, shortDate, weekdayName } from "#/shared/lib";
 
 import { DayActions } from "./day-actions";
 import { MealRow } from "./meal-row";
@@ -22,10 +22,6 @@ export function DayCard({
   onMove: (target: string) => void;
   onRemove: () => void;
 }) {
-  const moveDays = [...Array(8).keys()].flatMap((offset) =>
-    addDays(today, offset) === day ? [] : [addDays(today, offset)],
-  );
-
   return (
     <View
       style={{ borderCurve: "continuous" }}
@@ -48,7 +44,6 @@ export function DayCard({
           day={day}
           today={today}
           isPlanned={meals.length > 0}
-          moveDays={moveDays}
           plannedDays={plannedDays}
           onAdd={() => router.push({ pathname: "/plan/[date]", params: { date: day } })}
           onMove={onMove}

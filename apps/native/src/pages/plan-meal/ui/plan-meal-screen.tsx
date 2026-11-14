@@ -6,11 +6,12 @@ import { ActivityIndicator, View } from "react-native";
 import { familiesQuery } from "#/entities/family";
 import { RecipeCover, recipeFacts, scopedRecipes, useFamilyTables } from "#/entities/recipe";
 import { usePlanMeals } from "#/features/plan-meals";
-import { calendarDay, relativeDayName, useThemeColors } from "#/shared/lib";
+import { relativeDayName, useThemeColors, useToday } from "#/shared/lib";
 import { CollectionList, EmptyState, InlineError } from "#/shared/ui";
 
 export function PlanMealScreen() {
   const { date } = useLocalSearchParams<{ date: string }>();
+  const today = useToday();
   const { accent, foreground, background } = useThemeColors("accent", "foreground", "background");
   const { data: families = [], isPending } = useQuery(familiesQuery);
   const familyTables = useFamilyTables(families.map((family) => family.id));
@@ -22,7 +23,7 @@ export function PlanMealScreen() {
     <>
       <Stack.Screen
         options={{
-          title: relativeDayName(date, calendarDay(new Date())),
+          title: relativeDayName(date, today),
           headerTintColor: foreground,
           headerShadowVisible: false,
           contentStyle: { backgroundColor: background },
@@ -43,7 +44,11 @@ export function PlanMealScreen() {
         </View>
       )}
       <CollectionList
-        items={scopedRecipes(familyTables, { kind: "all" }, search).map((recipe) => ({
+        items={scopedRecipes(
+          familyTables.filter(({ familyId }) => familyId === planMeals.planFamilyId),
+          { kind: "all" },
+          search,
+        ).map((recipe) => ({
           key: `${recipe.familyId}:${recipe.id}`,
           title: recipe.title,
           photo: recipe.imageKey ? (
@@ -51,7 +56,7 @@ export function PlanMealScreen() {
           ) : undefined,
           facts: recipeFacts(recipe),
           onPress: () => {
-            if (planMeals.plan(date, recipe)) router.back();
+            if (planMeals.plan(date, recipe.id)) router.back();
             else setHasFailed(true);
           },
         }))}
@@ -61,8 +66,12 @@ export function PlanMealScreen() {
           ) : search.trim() === "" ? (
             <EmptyState
               icon="book"
-              title="No recipes yet"
-              description="Add recipes from the Recipes tab, then plan them here."
+              title="No recipes to plan yet"
+              description={
+                families.some((family) => !family.personal)
+                  ? "Only family recipes can be planned. Share a recipe with your family from its menu."
+                  : "Add recipes from the Recipes tab, then plan them here."
+              }
             />
           ) : (
             <EmptyState

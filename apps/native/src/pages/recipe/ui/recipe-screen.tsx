@@ -136,7 +136,8 @@ export function RecipeScreen() {
               familyName: families.find((family) => !family.personal)?.name,
               organize,
               weekPlan: planMeals.weekPlan(),
-              onPlan: (day) => planMeals.toggle(day, { id: recipeId, familyId: owner.familyId }),
+              canPlan: owner.familyId === planMeals.planFamilyId,
+              onPlan: (day) => planMeals.toggle(day, recipeId),
               onDeleted: () => router.back(),
             })
           )}
