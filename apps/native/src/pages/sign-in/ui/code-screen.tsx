@@ -12,9 +12,14 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { authClient, describeSignInCodeError } from "#/shared/auth";
-import { Button, ButtonLabel, CodeInput, InlineError, RollingNumber } from "#/shared/ui";
-
-import { KeyboardFooter } from "./keyboard-footer";
+import {
+  Button,
+  ButtonLabel,
+  CodeInput,
+  InlineError,
+  KeyboardFooter,
+  RollingNumber,
+} from "#/shared/ui";
 
 export function CodeScreen() {
   const { email } = useLocalSearchParams<{ email: string }>();
