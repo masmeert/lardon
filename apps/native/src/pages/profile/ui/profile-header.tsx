@@ -46,16 +46,12 @@ export function ProfileHeader({
               <ProfileStat
                 label={profile.followerCount === 1 ? "follower" : "followers"}
                 value={profile.followerCount}
-                onPress={
-                  profile.isSelf ? () => router.push("/public-profile/followers") : undefined
-                }
+                onPress={profile.isSelf ? () => router.push("/edit-profile/followers") : undefined}
               />
               <ProfileStat
                 label="following"
                 value={profile.followingCount}
-                onPress={
-                  profile.isSelf ? () => router.push("/public-profile/following") : undefined
-                }
+                onPress={profile.isSelf ? () => router.push("/edit-profile/following") : undefined}
               />
             </View>
           )}

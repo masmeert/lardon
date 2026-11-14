@@ -45,7 +45,7 @@ export function OwnProfileScreen() {
               action={{
                 label: "Choose a username",
                 icon: "at",
-                onPress: () => router.push("/public-profile"),
+                onPress: () => router.push("/edit-profile"),
               }}
             />
           )}

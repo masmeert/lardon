@@ -58,7 +58,7 @@ export function ProfileBody({
           <Stack.Toolbar.Button
             icon="pencil"
             accessibilityLabel="Edit profile"
-            onPress={() => router.push("/public-profile")}
+            onPress={() => router.push("/edit-profile")}
           />
           {showsSettings && (
             <Stack.Toolbar.Button
