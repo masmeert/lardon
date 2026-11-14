@@ -2,6 +2,8 @@ export { Button } from "./button/button";
 
 export { ButtonLabel } from "./button/button-label";
 
+export { ClearButton } from "./clear-button";
+
 export { CodeInput } from "./code-input";
 
 export { CollectionList } from "./collection-list/collection-list";
