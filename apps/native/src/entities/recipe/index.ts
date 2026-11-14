@@ -6,6 +6,8 @@ export {
   scopedRecipes,
 } from "./model/library";
 
+export { type LibraryMeal, libraryMealPlan } from "./model/meal-plan";
+
 export {
   type RecipeFilters,
   type ServingsRange,
