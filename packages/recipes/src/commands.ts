@@ -37,13 +37,7 @@ export type RecipeDraft = {
   folderIds: readonly string[];
 };
 
-const childTables = [
-  "ingredients",
-  "steps",
-  "recipeTags",
-  "recipeFolders",
-  "plannedMeals",
-] as const;
+const childTables = ["ingredients", "steps", "recipeTags", "recipeFolders", "meals"] as const;
 
 type CellValue = Cell | null;
 
@@ -512,10 +506,8 @@ export function moveRecipe(
       recipe,
     );
 
-    for (const meal of readRows(sourceContent, "plannedMeals")) {
-      if (meal.recipeId !== recipeId) continue;
-      const { id, ...row } = meal;
-      target.setRow("plannedMeals", id, row);
+    for (const meal of readRows(sourceContent, "meals")) {
+      if (meal.recipeId === recipeId) planMeal(target, meal.id, recipeId);
     }
   });
   deleteRecipes(source, [recipeId]);
@@ -582,40 +574,12 @@ export function removeFromCollection(
   });
 }
 
-export function planMeal(
-  store: MergeableStore,
-  date: string,
-  recipeId: string,
-  after: string | null,
-) {
-  const mealId = getUniqueId();
-  const position = generateKeyBetween(after, null);
-  store.setRow("plannedMeals", mealId, { date, position, recipeId });
-
-  return { mealId, position };
+export function planMeal(store: MergeableStore, date: string, recipeId: string) {
+  store.setRow("meals", date, { recipeId });
 }
 
-export function moveMeal(
-  store: MergeableStore,
-  mealId: string,
-  date: string,
-  after: string | null,
-) {
-  if (!store.hasRow("plannedMeals", mealId)) return after;
-  const position = generateKeyBetween(after, null);
-
-  store.transaction(() => {
-    store.setCell("plannedMeals", mealId, "date", date);
-    store.setCell("plannedMeals", mealId, "position", position);
-  });
-
-  return position;
-}
-
-export function removeMeals(store: MergeableStore, mealIds: readonly string[]) {
-  store.transaction(() => {
-    for (const mealId of mealIds) store.delRow("plannedMeals", mealId);
-  });
+export function clearMeal(store: MergeableStore, date: string) {
+  store.delRow("meals", date);
 }
 
 export function cleanUp(store: MergeableStore) {
