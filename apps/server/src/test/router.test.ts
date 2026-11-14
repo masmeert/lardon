@@ -66,4 +66,25 @@ describe("router", () => {
       await dispose();
     }
   });
+
+  it("rate limits username lookups and follow requests, not your own profile", async () => {
+    const { handler, dispose } = testWebHandler();
+
+    try {
+      const lookups = ["alice", "bob", "carol"].map((username) =>
+        request(`/api/profiles/${username}`),
+      );
+
+      const statuses = [];
+
+      for (const lookup of [...lookups, request("/api/follows", { method: "POST" })]) {
+        statuses.push((await handler(lookup)).status);
+      }
+
+      expect(statuses).toEqual([401, 401, 401, 429]);
+      expect((await handler(request("/api/profiles/me"))).status).toBe(401);
+    } finally {
+      await dispose();
+    }
+  });
 });

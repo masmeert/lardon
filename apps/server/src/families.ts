@@ -10,6 +10,7 @@ import {
 import { and, asc, eq, gt, isNull, ne, sql } from "@lardon/db/orm";
 import { user } from "@lardon/db/schema/auth";
 import { family, familyInvite, familyMember } from "@lardon/db/schema/families";
+import { publishedRecipe } from "@lardon/db/schema/followers";
 import { Clock, Context, Effect, Layer } from "effect";
 
 import { Database } from "./database";
@@ -26,6 +27,10 @@ const missingMember = new NotFound({ message: "This person isn't a member of the
 
 function membershipOf(familyId: string, userId: string) {
   return and(eq(familyMember.familyId, familyId), eq(familyMember.userId, userId));
+}
+
+function publishedBy(familyId: string, userId: string) {
+  return and(eq(publishedRecipe.familyId, familyId), eq(publishedRecipe.authorId, userId));
 }
 
 export class Families extends Context.Service<
@@ -223,11 +228,15 @@ export class Families extends Context.Service<
                 .set({ role: "owner" })
                 .where(membershipOf(familyId, successor.userId)),
               client.delete(familyMember).where(membershipOf(familyId, userId)),
+              client.delete(publishedRecipe).where(publishedBy(familyId, userId)),
             ]),
           );
         } else {
           yield* database.use((client) =>
-            client.delete(familyMember).where(membershipOf(familyId, userId)),
+            client.batch([
+              client.delete(familyMember).where(membershipOf(familyId, userId)),
+              client.delete(publishedRecipe).where(publishedBy(familyId, userId)),
+            ]),
           );
         }
 
@@ -387,8 +396,11 @@ export class Families extends Context.Service<
 
           yield* requireOwner(familyId, userId);
 
-          const [removed] = yield* database.use((client) =>
-            client.delete(familyMember).where(membershipOf(familyId, memberId)).returning(),
+          const [[removed]] = yield* database.use((client) =>
+            client.batch([
+              client.delete(familyMember).where(membershipOf(familyId, memberId)).returning(),
+              client.delete(publishedRecipe).where(publishedBy(familyId, memberId)),
+            ]),
           );
 
           if (!removed) {

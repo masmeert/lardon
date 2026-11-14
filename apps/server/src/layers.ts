@@ -9,10 +9,13 @@ import { Authentication } from "./authentication";
 import { Database } from "./database";
 import { ENV } from "./env.server";
 import { Families } from "./families";
+import { Feed } from "./feed";
+import { Follows } from "./follows";
 import { FamilyStores, inEuropeanUnion } from "./family-stores";
 import { AppRoutes } from "./http/app";
 import { ImageStorage } from "./image-storage";
 import { Mailer } from "./mailer";
+import { Profiles } from "./profiles";
 import { RateLimits } from "./rate-limits";
 import { Shares } from "./shares";
 
@@ -58,6 +61,9 @@ const ServicesLive = Layer.effect(
     );
   }),
 ).pipe(
+  Layer.provideMerge(Feed.layer),
+  Layer.provideMerge(Follows.layer),
+  Layer.provideMerge(Profiles.layer),
   Layer.provideMerge(Shares.layer(ENV.SHARE_ORIGIN)),
   Layer.provideMerge(Families.layer),
   Layer.provideMerge(InfrastructureLive),

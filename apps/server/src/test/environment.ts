@@ -9,10 +9,13 @@ import { HttpApiMiddleware, HttpApiTest } from "effect/http-api";
 import { Authentication } from "../authentication";
 import { Database } from "../database";
 import { Families } from "../families";
+import { Feed } from "../feed";
+import { Follows } from "../follows";
 import { FamilyStores } from "../family-stores";
 import { ApiHandlers } from "../http/api";
 import { ImageStorage } from "../image-storage";
 import { AppRoutes } from "../http/app";
+import { Profiles } from "../profiles";
 import { RateLimits } from "../rate-limits";
 import { Shares } from "../shares";
 
@@ -145,7 +148,10 @@ const RateLimitsTest = Layer.effect(
 
 export const TEST_SHARE_ORIGIN = "https://lardon.test";
 
-export const TestServices = Shares.layer(TEST_SHARE_ORIGIN).pipe(
+export const TestServices = Feed.layer.pipe(
+  Layer.provideMerge(Follows.layer),
+  Layer.provideMerge(Profiles.layer),
+  Layer.provideMerge(Shares.layer(TEST_SHARE_ORIGIN)),
   Layer.provideMerge(Families.layer),
   Layer.provideMerge(
     Layer.mergeAll(AuthenticationTest, RateLimitsTest, FamilyStoresTest, ImageStorageTest),
@@ -176,9 +182,16 @@ export function signedInAs(userId: string | null) {
 }
 
 export const clientFor = Effect.fn("clientFor")(function* (userId: string | null) {
-  return yield* HttpApiTest.groups(Api, ["system", "account", "families", "images", "shares"]).pipe(
-    Effect.provide(signedInAs(userId)),
-  );
+  return yield* HttpApiTest.groups(Api, [
+    "system",
+    "account",
+    "families",
+    "images",
+    "shares",
+    "profiles",
+    "follows",
+    "feed",
+  ]).pipe(Effect.provide(signedInAs(userId)));
 });
 
 export const createUser = Effect.fn("createUser")(function* (name: string) {
