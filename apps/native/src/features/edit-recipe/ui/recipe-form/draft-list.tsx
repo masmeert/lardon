@@ -1,13 +1,11 @@
-import { Button, Host, Label } from "@expo/ui/swift-ui";
-import { buttonStyle, controlSize, frame, tint } from "@expo/ui/swift-ui/modifiers";
 import { type ReactNode, type RefCallback, useRef } from "react";
 import { StyleSheet, type TextInput, View } from "react-native";
 import type { KeyboardAwareScrollViewRef } from "react-native-keyboard-controller";
 import type { AnimatedRef } from "react-native-reanimated";
 import Sortable from "react-native-sortables";
 
-import { useThemeColors } from "#/shared/lib";
-import { GroupedSection } from "#/shared/ui";
+import { iconSize, useThemeColors } from "#/shared/lib";
+import { Button, ButtonLabel, GroupedSection, Icon } from "#/shared/ui";
 
 export type LineControls<Line extends { id: string }> = {
   number: number;
@@ -105,18 +103,10 @@ export function DraftList<Line extends { id: string }>({
         )}
       </View>
       <View className="p-2.5">
-        <Host ignoreSafeArea="all" matchContents={{ vertical: true }} style={{ width: "100%" }}>
-          <Button
-            onPress={() => insertAfter(undefined, newLine())}
-            modifiers={[buttonStyle("bordered"), controlSize("large"), tint(accent)]}
-          >
-            <Label
-              title={`Add ${lineName}`}
-              systemImage="plus.circle.fill"
-              modifiers={[frame({ maxWidth: Infinity })]}
-            />
-          </Button>
-        </Host>
+        <Button variant="secondary" onPress={() => insertAfter(undefined, newLine())}>
+          <Icon name="plus.circle.fill" size={iconSize.lg} color={accent} />
+          <ButtonLabel>{`Add ${lineName}`}</ButtonLabel>
+        </Button>
       </View>
     </GroupedSection>
   );

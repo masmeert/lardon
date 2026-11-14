@@ -59,9 +59,16 @@ export function UnitMenu({
             <View
               pointerEvents="none"
               accessibilityLabel={`Unit, ${unit ?? "none"}`}
-              className="h-13 flex-row items-center"
+              style={{ borderCurve: "continuous" }}
+              className="h-8 min-w-14 items-center justify-center rounded-r-inner bg-fill px-2"
             >
-              <Text className={cn("text-title", unit ? "text-accent" : "text-muted")}>
+              <Text
+                numberOfLines={1}
+                className={cn(
+                  "text-field",
+                  unit ? "font-semibold text-accent" : "font-medium text-muted",
+                )}
+              >
                 {unit ?? "unit"}
               </Text>
             </View>
