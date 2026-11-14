@@ -146,11 +146,17 @@ export function collectionList(content: Tables, collection: Collection) {
     .sort(byName);
 }
 
-export function mealPlan(content: Tables, dates: readonly string[]) {
-  return dates.flatMap((date) => {
-    const meal = readRow(content, "meals", date);
-    const recipe = meal && readRow(content, "recipes", meal.recipeId);
+export function mealPlan(content: Tables, range: { from: string; to: string }) {
+  return readRows(content, "plannedMeals")
+    .filter((meal) => range.from <= meal.date && meal.date <= range.to)
+    .flatMap((meal) => {
+      const recipe = readRow(content, "recipes", meal.recipeId);
 
-    return meal && recipe ? [{ date, recipe, servings: meal.servings }] : [];
-  });
+      return recipe ? [{ id: meal.id, date: meal.date, position: meal.position, recipe }] : [];
+    })
+    .sort((first, second) =>
+      first.date === second.date ? byPosition(first, second) : first.date < second.date ? -1 : 1,
+    );
 }
+
+export type PlannedMeal = ReturnType<typeof mealPlan>[number];

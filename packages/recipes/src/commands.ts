@@ -37,7 +37,13 @@ export type RecipeDraft = {
   folderIds: readonly string[];
 };
 
-const childTables = ["ingredients", "steps", "recipeTags", "recipeFolders", "meals"] as const;
+const childTables = [
+  "ingredients",
+  "steps",
+  "recipeTags",
+  "recipeFolders",
+  "plannedMeals",
+] as const;
 
 type CellValue = Cell | null;
 
@@ -493,7 +499,7 @@ export function moveRecipe(
     });
   }
 
-  target.transaction(() =>
+  target.transaction(() => {
     writeRecipe(
       target,
       recipeId,
@@ -504,8 +510,14 @@ export function moveRecipe(
         folderIds: sameNameIn("folders", draft.folderIds),
       },
       recipe,
-    ),
-  );
+    );
+
+    for (const meal of readRows(sourceContent, "plannedMeals")) {
+      if (meal.recipeId !== recipeId) continue;
+      const { id, ...row } = meal;
+      target.setRow("plannedMeals", id, row);
+    }
+  });
   deleteRecipes(source, [recipeId]);
 
   return true;
@@ -573,13 +585,37 @@ export function removeFromCollection(
 export function planMeal(
   store: MergeableStore,
   date: string,
-  meal: { recipeId: string; servings: number | null },
+  recipeId: string,
+  after: string | null,
 ) {
-  store.setRow("meals", date, { recipeId: meal.recipeId, servings: meal.servings });
+  const mealId = getUniqueId();
+  const position = generateKeyBetween(after, null);
+  store.setRow("plannedMeals", mealId, { date, position, recipeId });
+
+  return { mealId, position };
 }
 
-export function clearMeal(store: MergeableStore, date: string) {
-  store.delRow("meals", date);
+export function moveMeal(
+  store: MergeableStore,
+  mealId: string,
+  date: string,
+  after: string | null,
+) {
+  if (!store.hasRow("plannedMeals", mealId)) return after;
+  const position = generateKeyBetween(after, null);
+
+  store.transaction(() => {
+    store.setCell("plannedMeals", mealId, "date", date);
+    store.setCell("plannedMeals", mealId, "position", position);
+  });
+
+  return position;
+}
+
+export function removeMeals(store: MergeableStore, mealIds: readonly string[]) {
+  store.transaction(() => {
+    for (const mealId of mealIds) store.delRow("plannedMeals", mealId);
+  });
 }
 
 export function cleanUp(store: MergeableStore) {

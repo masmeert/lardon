@@ -5,16 +5,17 @@ import {
   type RecipeDraft,
   addToCollection,
   cleanUp,
-  clearMeal,
   copyRecipe,
   createCollection,
   createRecipe,
   deleteCollection,
   deleteRecipes,
   emptyDraft,
+  moveMeal,
   moveRecipe,
   planMeal,
   recipeDraft,
+  removeMeals,
   saveRecipe,
   setVisibility,
 } from "../commands";
@@ -92,9 +93,11 @@ describe("tables", () => {
     expect(isValidCell("ingredients", "salt", "unit", "bucket")).toBe(false);
     expect(isValidCell("recipeTags", "tag:soup", "recipeId", "soup")).toBe(true);
     expect(isValidCell("recipeTags", "tag:soup", "recipeId", "stew")).toBe(false);
-    expect(isValidCell("meals", "2026-11-13", "recipeId", "soup")).toBe(true);
-    expect(isValidRowId("meals", "2026-02-30")).toBe(false);
-    expect(isValidRowId("meals", "tomorrow")).toBe(false);
+    expect(isValidCell("plannedMeals", "dinner", "date", "2026-11-13")).toBe(true);
+    expect(isValidCell("plannedMeals", "dinner", "date", "2026-02-30")).toBe(false);
+    expect(isValidCell("plannedMeals", "dinner", "date", "tomorrow")).toBe(false);
+    expect(isValidCell("plannedMeals", "dinner", "servings", 4)).toBe(false);
+    expect(isValidCell("meals", "2026-11-13", "recipeId", "soup")).toBe(false);
     expect(isValidRowId("recipes", "a:b")).toBe(false);
     expect(isValidRowId("users", "alice")).toBe(false);
   });
@@ -226,7 +229,7 @@ describe("recipes", () => {
     const recipeId = createRecipe(store, draft(), "alice");
     const tagId = createCollection(store, "tags", "Soup");
     addToCollection(store, "tags", tagId, [recipeId]);
-    planMeal(store, "2026-11-13", { recipeId, servings: null });
+    planMeal(store, "2026-11-13", recipeId, null);
 
     deleteRecipes(store, [recipeId]);
 
@@ -284,6 +287,27 @@ describe("recipes", () => {
       folders: [{ id: winterId, name: "winter" }],
     });
     expect(names(family, recipeId)).toEqual(["tomatoes", "onion", "salt"]);
+  });
+
+  it("moves a recipe's planned meals with it, under the same ids", () => {
+    const personal = createRecipeStore();
+    const family = createRecipeStore();
+    const recipeId = createRecipe(personal, draft(), "alice");
+    const soup = createRecipe(personal, draft({ title: "Soup" }), "alice");
+    const { mealId } = planMeal(personal, "2026-11-13", recipeId, null);
+    const { mealId: soupMealId } = planMeal(personal, "2026-11-14", soup, null);
+    const november = { from: "2026-11-01", to: "2026-11-30" };
+
+    moveRecipe(personal, family, recipeId, null);
+
+    expect(mealPlan(personal.getTables(), november).map((meal) => meal.id)).toEqual([soupMealId]);
+    expect(mealPlan(family.getTables(), november)).toMatchObject([
+      { id: mealId, date: "2026-11-13", recipe: { id: recipeId } },
+    ]);
+
+    moveRecipe(family, personal, recipeId, null);
+    expect(family.getTable("plannedMeals")).toEqual({});
+    expect(personal.getRow("plannedMeals", mealId)).toMatchObject({ recipeId });
   });
 
   it("copies a recipe under new ids", () => {
@@ -354,32 +378,57 @@ describe("tags and folders", () => {
 });
 
 describe("meal plan", () => {
-  it("keeps one meal per day, the later choice winning across devices", async () => {
+  it("plans several recipes a day, in the order they were added", () => {
+    const store = createRecipeStore();
+    const soup = createRecipe(store, draft(), "alice");
+    const stew = createRecipe(store, draft({ title: "Stew" }), "alice");
+    const { position } = planMeal(store, "2026-11-13", soup, null);
+    planMeal(store, "2026-11-13", stew, position);
+    planMeal(store, "2026-11-12", stew, null);
+    planMeal(store, "2026-11-20", soup, null);
+
+    expect(
+      mealPlan(store.getTables(), { from: "2026-11-12", to: "2026-11-14" }).map((meal) => [
+        meal.date,
+        meal.recipe.title,
+      ]),
+    ).toEqual([
+      ["2026-11-12", "Stew"],
+      ["2026-11-13", "Tomato soup"],
+      ["2026-11-13", "Stew"],
+    ]);
+  });
+
+  it("moves and removes meals, merging across devices", () => {
     const phone = createRecipeStore();
     const soup = createRecipe(phone, draft(), "alice");
-    const stew = createRecipe(phone, draft({ title: "Stew" }), "alice");
+    const { mealId } = planMeal(phone, "2026-11-13", soup, null);
     const tablet = createRecipeStore();
     tablet.merge(phone);
 
-    planMeal(phone, "2026-11-13", { recipeId: soup, servings: 2 });
-    await new Promise((resolve) => setTimeout(resolve, 5));
-    planMeal(tablet, "2026-11-13", { recipeId: stew, servings: null });
-    planMeal(tablet, "2026-11-14", { recipeId: soup, servings: null });
-    phone.merge(tablet);
+    expect(moveMeal(phone, mealId, "2026-11-15", "a0")).toBe("a1");
+    expect(moveMeal(phone, "missing", "2026-11-15", "a1")).toBe("a1");
+    tablet.merge(phone);
 
-    expect(
-      mealPlan(phone.getTables(), ["2026-11-12", "2026-11-13", "2026-11-14"]).map((meal) => [
-        meal.date,
-        meal.recipe.title,
-        meal.servings,
-      ]),
-    ).toEqual([
-      ["2026-11-13", "Stew", null],
-      ["2026-11-14", "Tomato soup", null],
+    expect(mealPlan(tablet.getTables(), { from: "2026-11-13", to: "2026-11-15" })).toMatchObject([
+      { id: mealId, date: "2026-11-15", position: "a1" },
     ]);
 
-    clearMeal(phone, "2026-11-14");
-    deleteRecipes(phone, [stew]);
-    expect(mealPlan(phone.getTables(), ["2026-11-13", "2026-11-14"])).toEqual([]);
+    removeMeals(tablet, [mealId]);
+    phone.merge(tablet);
+    expect(phone.getTable("plannedMeals")).toEqual({});
+  });
+
+  it("hides and cleans up meals whose recipe is gone", () => {
+    const store = createRecipeStore();
+    store.setRow("plannedMeals", "orphan", {
+      date: "2026-11-13",
+      position: "a0",
+      recipeId: "gone",
+    });
+
+    expect(mealPlan(store.getTables(), { from: "2026-11-13", to: "2026-11-13" })).toEqual([]);
+    expect(cleanUp(store)).toBe(1);
+    expect(store.getTable("plannedMeals")).toEqual({});
   });
 });

@@ -64,7 +64,17 @@ export const tables = {
   recipeTags: Schema.Struct({ recipeId: Id, tagId: Id }),
   folders: Schema.Struct({ name: FolderName }),
   recipeFolders: Schema.Struct({ recipeId: Id, folderId: Id }),
-  meals: Schema.Struct({ recipeId: Id, servings: Schema.NullOr(Servings) }),
+  plannedMeals: Schema.Struct({
+    date: Schema.String.check(
+      Schema.makeFilter(
+        (date: string) =>
+          /^\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])$/.test(date) &&
+          new Date(`${date}T00:00:00Z`).toISOString().startsWith(date),
+      ),
+    ),
+    position: Position,
+    recipeId: Id,
+  }),
 };
 
 export type TableId = keyof typeof tables;
@@ -89,13 +99,6 @@ export function linkId(ownerId: string, recipeId: string) {
 }
 
 export function isValidRowId(tableId: string, rowId: string) {
-  if (tableId === "meals") {
-    return (
-      /^\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])$/.test(rowId) &&
-      new Date(`${rowId}T00:00:00Z`).toISOString().startsWith(rowId)
-    );
-  }
-
   if (linkTables.has(tableId)) {
     const [ownerId = "", recipeId = "", ...rest] = rowId.split(":");
 
