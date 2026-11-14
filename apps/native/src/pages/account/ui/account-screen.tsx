@@ -22,17 +22,7 @@ export function AccountScreen() {
         </Text>
       </View>
       <GroupedSection>
-        <GroupedRow
-          label="Name"
-          isFirst
-          accessory="chevron"
-          onPress={() => router.push("/account/name")}
-        >
-          <Text numberOfLines={1} className="shrink text-title text-muted">
-            {session.user.name}
-          </Text>
-        </GroupedRow>
-        <GroupedRow label="Email">
+        <GroupedRow label="Email" isFirst>
           <Text numberOfLines={1} className="shrink text-title text-muted">
             {session.user.email}
           </Text>
