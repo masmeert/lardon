@@ -3,6 +3,7 @@ import { Alert } from "react-native";
 
 import type { LibraryRecipe } from "#/entities/recipe";
 import type { useOrganizeRecipes } from "#/features/organize-recipes";
+import { addDays, calendarDay, relativeDayName } from "#/shared/lib";
 
 export function recipeMenu({
   recipe,
@@ -10,6 +11,8 @@ export function recipeMenu({
   tagNames,
   familyName,
   organize,
+  plannedDays,
+  onPlan,
   onDeleted,
 }: {
   recipe: LibraryRecipe & {
@@ -20,10 +23,13 @@ export function recipeMenu({
   tagNames: readonly string[];
   familyName: string | undefined;
   organize: ReturnType<typeof useOrganizeRecipes>;
+  plannedDays: readonly string[];
+  onPlan: (day: string) => void;
   onDeleted: () => void;
 }) {
   const { personalId, addTo, removeFrom, remove, move } = organize;
   const isPrivate = recipe.familyId === personalId;
+  const today = calendarDay(new Date());
 
   function isIn(owners: readonly { name: string }[], name: string) {
     return owners.some((owner) => owner.name.toLocaleLowerCase() === name.toLocaleLowerCase());
@@ -65,6 +71,17 @@ export function recipeMenu({
               }
             >
               {name}
+            </Stack.Toolbar.MenuAction>
+          ))}
+        </Stack.Toolbar.Menu>
+        <Stack.Toolbar.Menu title="Add to meal plan" icon="calendar.badge.plus">
+          {[...Array(7).keys()].map((offset) => (
+            <Stack.Toolbar.MenuAction
+              key={offset}
+              isOn={plannedDays.includes(addDays(today, offset))}
+              onPress={() => onPlan(addDays(today, offset))}
+            >
+              {relativeDayName(addDays(today, offset), today)}
             </Stack.Toolbar.MenuAction>
           ))}
         </Stack.Toolbar.Menu>
