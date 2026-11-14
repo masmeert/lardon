@@ -11,6 +11,7 @@ const config = getDefaultConfig(__dirname);
 
 config.cacheVersion = createHash("sha256")
   .update(process.env.APP_ENV ?? "development")
+  .update(process.env.EXPO_PUBLIC_SERVER_URL ?? "")
   .update(readFileSync(path.join(__dirname, ".env.schema"), "utf8"))
   .digest("hex");
 
