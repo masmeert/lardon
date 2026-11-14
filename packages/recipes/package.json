@@ -4,6 +4,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./recipe-document": "./src/recipe-document.tsx",
     "./*": "./src/*.ts"
   },
   "scripts": {
@@ -16,7 +17,14 @@
   },
   "devDependencies": {
     "@lardon/config": "workspace:*",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
     "typescript": "^6.0.3",
     "vite-plus": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "19.3.0"
   }
 }

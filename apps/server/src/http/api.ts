@@ -5,6 +5,7 @@ import { HttpApiBuilder } from "effect/http-api";
 import { AuthorizationLive } from "./authorization";
 import { FamiliesHandlers } from "./families";
 import { ImagesHandlers } from "./images";
+import { SharesHandlers } from "./shares";
 import { AccountHandlers, SystemHandlers } from "./system";
 
 export const ApiHandlers = Layer.mergeAll(
@@ -12,6 +13,7 @@ export const ApiHandlers = Layer.mergeAll(
   AccountHandlers,
   FamiliesHandlers,
   ImagesHandlers,
+  SharesHandlers,
 ).pipe(Layer.provideMerge(AuthorizationLive));
 
 export const ApiRoutes = HttpApiBuilder.layer(Api, { openapiPath: "/api/openapi.json" }).pipe(

@@ -1,11 +1,15 @@
 import { colors } from "@lardon/brand";
+import { Heading, Text } from "react-email";
 
-import { EmailLayout } from "./email-layout";
+import { EmailLayout } from "../components/email-layout";
 
-export function SignInCodeEmail({ code }: { code: string }) {
+export default function SignInCodeEmail({ code }: { code: string }) {
   return (
-    <EmailLayout title="Your Lardon sign-in code">
-      <h1
+    <EmailLayout
+      title="Your Lardon sign-in code"
+      preview={`${code} is your code. It expires in 5 minutes.`}
+    >
+      <Heading
         style={{
           margin: 0,
           color: colors.foreground,
@@ -16,13 +20,15 @@ export function SignInCodeEmail({ code }: { code: string }) {
         }}
       >
         Your sign-in code
-      </h1>
-      <p style={{ margin: "12px 0 0" }}>Enter this code in the Lardon app to sign in.</p>
-      <p
+      </Heading>
+      <Text style={{ margin: "12px 0 0", fontSize: 15 }}>
+        Enter this code in the Lardon app to sign in.
+      </Text>
+      <Text
         style={{
           margin: "24px 0 0",
           padding: "20px 0 20px 0.2em",
-          backgroundColor: "#ffffff",
+          backgroundColor: colors.paper,
           border: `1px solid ${colors.hairline}`,
           borderRadius: 16,
           textAlign: "center",
@@ -35,10 +41,12 @@ export function SignInCodeEmail({ code }: { code: string }) {
         }}
       >
         {code}
-      </p>
-      <p style={{ margin: "24px 0 0" }}>
+      </Text>
+      <Text style={{ margin: "24px 0 0", fontSize: 15 }}>
         It expires in 5 minutes. If you didn't ask for it, you can ignore this email.
-      </p>
+      </Text>
     </EmailLayout>
   );
 }
+
+SignInCodeEmail.PreviewProps = { code: "482913" };

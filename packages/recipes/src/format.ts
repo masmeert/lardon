@@ -1,5 +1,4 @@
-import type { RecipeDetail } from "./queries";
-import { type UnitSystem, convertAmount } from "./units";
+import { type UnitCode, type UnitSystem, convertAmount } from "./units";
 
 const fractions: readonly (readonly [number, string])[] = [
   [1 / 8, "⅛"],
@@ -37,7 +36,7 @@ export function formatDuration(minutes: number) {
 }
 
 export function formatAmount(
-  ingredient: RecipeDetail["ingredients"][number],
+  ingredient: { quantity?: number; unit?: UnitCode },
   scale: number,
   unitSystem: UnitSystem,
 ) {
@@ -50,30 +49,4 @@ export function formatAmount(
   );
 
   return unit ? `${formatQuantity(quantity)} ${unit}` : formatQuantity(quantity);
-}
-
-export function recipeText(recipe: RecipeDetail) {
-  const totalMinutes = (recipe.prepMinutes ?? 0) + (recipe.cookMinutes ?? 0);
-
-  const facts = [
-    recipe.servings === undefined ? null : `Serves ${formatQuantity(recipe.servings)}`,
-    totalMinutes > 0 ? formatDuration(totalMinutes) : null,
-  ].filter((fact) => fact !== null);
-
-  return [
-    [recipe.title, facts.join(", ")].filter(Boolean).join("\n"),
-    recipe.ingredients.length > 0 &&
-      [
-        "Ingredients",
-        ...recipe.ingredients.map(
-          (ingredient) =>
-            `• ${[formatAmount(ingredient, 1, "original"), ingredient.name].filter(Boolean).join(" ")}`,
-        ),
-      ].join("\n"),
-    recipe.steps.length > 0 &&
-      ["Steps", ...recipe.steps.map((step, index) => `${index + 1}. ${step.text}`)].join("\n"),
-    recipe.notes && `Notes\n${recipe.notes}`,
-  ]
-    .filter(Boolean)
-    .join("\n\n");
 }

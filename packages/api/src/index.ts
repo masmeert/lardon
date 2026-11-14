@@ -8,4 +8,6 @@ export * from "./families";
 
 export * from "./images";
 
+export * from "./shares";
+
 export * from "./system";

@@ -6,6 +6,10 @@ export * from "./ingredient-line";
 
 export * from "./queries";
 
+export * from "./recipe-document";
+
+export * from "./snapshot";
+
 export * from "./step-text";
 
 export * from "./tables";

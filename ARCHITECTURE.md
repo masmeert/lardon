@@ -83,7 +83,7 @@ Recipes are plain lists: no sections. Not stored, on purpose: source URL, nutrit
 | `family`                          | `id`, `name`, `personalForUserId`, `createdAt`, `updatedAt`                            | `personalForUserId` is unique and set only on a personal family, so each account has exactly one, and it can't be shared or left |
 | `family_member`                   | `familyId`, `userId`, `role` (`owner` or `member`), `joinedAt`                         |                                                                                                                                  |
 | `family_invite`                   | `code`, `familyId`, `createdById`, `expiresAt`                                         | Reusable until it expires, 7 days after creation                                                                                 |
-| `share`                           | `token`, `recipeId`, `createdById`, `snapshot`, `expiresAt`, `createdAt`               | Expires 7 days after creation                                                                                                    |
+| `share`                           | `token`, `recipeId`, `createdById`, `snapshot`, `imageKey`, `expiresAt`, `createdAt`   | Expires 7 days after creation                                                                                                    |
 | `profile`                         | `userId`, `username`, `bio`                                                            | Name and photo come from `user`                                                                                                  |
 | `follow`                          | `followerId`, `followeeId`, `status` (`pending` or `approved`), `createdAt`            |                                                                                                                                  |
 | `block`                           | `blockerId`, `blockedId`, `createdAt`                                                  |                                                                                                                                  |
@@ -113,7 +113,7 @@ Never synced: library layout and sort order, and the unit system (original, metr
 
 ## Sharing
 
-**Share link**: "Share" in the app sends the recipe as it is now to `POST /shares`.
+**Share link**: "Send a link" in the app's Share menu sends the recipe as it is now to `POST /api/shares`. It's disabled while offline.
 
 - The server checks membership of the recipe's family, then stores a snapshot in D1 with a random token that expires after 7 days. The duration is ours to set, not the user's.
 - The page `lardon.app/r/<token>` is rendered by the Worker, with Open Graph tags so the link preview shows the title and photo. Its photo is the share's own copy, made when the link is created, and served through the share token.
@@ -122,7 +122,7 @@ Never synced: library layout and sort order, and the unit system (original, metr
 
 Viewing a page doesn't use it up, so link previews are harmless.
 
-**PDF**: rendered on the device from local data with `expo-print` and handed to the share sheet. It works offline and involves no server.
+**PDF**: "Export as PDF" renders the same `RecipeDocument` component as the share page (`react-dom/server.edge`, the build that runs on Hermes) and prints it to an A4 file with `expo-print`, then hands it to the share sheet. It downloads the photo to embed it, and offline it leaves the photo out rather than failing.
 
 ## Followers feed
 
@@ -173,13 +173,14 @@ The marketing site stays a static Astro build.
 
 ## Packages
 
-| Package            | Holds                                                                                                                                                |
-| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `packages/recipes` | Effect schemas, the derived TinyBase schema, commands (functions over a store), queries, units, ingredient parsing. Shared by the app and the server |
-| `packages/api`     | The `HttpApi` definition and its errors, shared by the server and the generated client                                                               |
-| `packages/auth`    | better-auth setup                                                                                                                                    |
-| `packages/db`      | Drizzle schema and migrations for D1                                                                                                                 |
-| `packages/infra`   | Alchemy stack                                                                                                                                        |
+| Package            | Holds                                                                                                                                                                                                       |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `packages/recipes` | Effect schemas, the derived TinyBase schema, commands (functions over a store), queries, units, ingredient parsing, and the `RecipeDocument` used by share pages and PDFs. Shared by the app and the server |
+| `packages/emails`  | React Email templates, each with its subject and generated plain text. `vp run dev` there opens the preview on port 3030                                                                                    |
+| `packages/api`     | The `HttpApi` definition and its errors, shared by the server and the generated client                                                                                                                      |
+| `packages/auth`    | better-auth setup                                                                                                                                                                                           |
+| `packages/db`      | Drizzle schema and migrations for D1                                                                                                                                                                        |
+| `packages/infra`   | Alchemy stack                                                                                                                                                                                               |
 
 ## Safety nets
 

@@ -64,6 +64,7 @@ export async function startWorker() {
       CORS_ORIGIN: appOrigin,
       BETTER_AUTH_SECRET: "a-test-secret-that-is-at-least-32-characters",
       BETTER_AUTH_URL: appOrigin,
+      SHARE_ORIGIN: appOrigin,
       GOOGLE_CLIENT_ID: "",
       GOOGLE_CLIENT_SECRET: "",
       APPLE_BUNDLE_ID: "",

@@ -4,6 +4,7 @@ import { HttpRouter, HttpServerRequest, HttpServerResponse } from "effect/http";
 import { Authentication } from "../authentication";
 import { RateLimits, clientKey, rateLimitRuleFor, tooManyRequestsResponse } from "../rate-limits";
 import { ApiRoutes } from "./api";
+import { SharePageRoutes } from "./share-pages";
 
 const AuthRoutes = Layer.unwrap(
   Effect.gen(function* () {
@@ -40,4 +41,10 @@ const RateLimitMiddleware = HttpRouter.middleware(
   { global: true },
 );
 
-export const AppRoutes = Layer.mergeAll(ApiRoutes, AuthRoutes, HomeRoute, RateLimitMiddleware);
+export const AppRoutes = Layer.mergeAll(
+  ApiRoutes,
+  AuthRoutes,
+  SharePageRoutes,
+  HomeRoute,
+  RateLimitMiddleware,
+);

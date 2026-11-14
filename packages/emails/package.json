@@ -1,0 +1,25 @@
+{
+  "name": "@lardon/emails",
+  "license": "PolyForm-Strict-1.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "dev": "email dev --dir src/templates --port 3030",
+    "test": "vp test run"
+  },
+  "dependencies": {
+    "@lardon/brand": "workspace:*",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-email": "6.11.12"
+  },
+  "devDependencies": {
+    "@lardon/config": "workspace:*",
+    "@react-email/ui": "6.11.12",
+    "@types/react": "19.3.0",
+    "typescript": "^6.0.3",
+    "vite-plus": "catalog:"
+  }
+}

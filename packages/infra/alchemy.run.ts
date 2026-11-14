@@ -24,6 +24,8 @@ export const server = Cloudflare.Worker("server", {
     CORS_ORIGIN: Config.String("CORS_ORIGIN"),
     BETTER_AUTH_SECRET: Config.Redacted("BETTER_AUTH_SECRET"),
     BETTER_AUTH_URL: Cloudflare.Worker.URL,
+    SHARE_ORIGIN:
+      process.env.APP_ENV === "production" ? "https://lardon.app" : Cloudflare.Worker.URL,
     GOOGLE_CLIENT_ID: Config.String("GOOGLE_CLIENT_ID").pipe(Config.withDefault("")),
     GOOGLE_CLIENT_SECRET: Config.Redacted("GOOGLE_CLIENT_SECRET").pipe(
       Config.withDefault(Redacted.make("")),
@@ -46,6 +48,11 @@ export const server = Cloudflare.Worker("server", {
     }),
   },
   domain: process.env.APP_ENV === "production" ? "api.lardon.app" : undefined,
+  routes:
+    process.env.APP_ENV === "production"
+      ? [{ pattern: "lardon.app/r/*", zoneName: "lardon.app" }]
+      : undefined,
+  crons: ["17 4 * * *"],
   dev: {
     port: 3000,
   },

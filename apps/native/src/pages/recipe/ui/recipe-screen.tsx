@@ -1,16 +1,18 @@
-import { recipeDetail, recipeText } from "@lardon/recipes";
-import { useQuery } from "@tanstack/react-query";
+import { recipeDetail } from "@lardon/recipes";
+import { onlineManager, useQuery } from "@tanstack/react-query";
 import { Schema } from "effect";
 import { Stack, router, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
-import { ActivityIndicator, ScrollView, Share, Text, View } from "react-native";
+import { useState, useSyncExternalStore } from "react";
+import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 
 import { familiesQuery } from "#/entities/family";
 import { libraryFolders, libraryTags, scopeParams, useFamilyTables } from "#/entities/recipe";
 import { useOrganizeRecipes } from "#/features/organize-recipes";
 import { useThemeColors } from "#/shared/lib";
 import { usePreference } from "#/shared/preferences";
-import { EmptyState, FilterPill } from "#/shared/ui";
+import { EmptyState, FilterPill, InlineError } from "#/shared/ui";
+
+import { useShareRecipe } from "../model/use-share-recipe";
 
 import { IngredientControls } from "./ingredient-controls";
 import { IngredientRow } from "./ingredient-row";
@@ -27,6 +29,13 @@ export function RecipeScreen() {
   const { data: families = [], isPending } = useQuery(familiesQuery);
   const familyTables = useFamilyTables(families.map((family) => family.id));
   const organize = useOrganizeRecipes();
+  const share = useShareRecipe();
+
+  const isOnline = useSyncExternalStore(
+    (onChange) => onlineManager.subscribe(onChange),
+    () => onlineManager.isOnline(),
+  );
+
   const [scaleFactor, setScaleFactor] = useState(1);
   const [isScaleOpen, setIsScaleOpen] = useState(false);
   const [scaleMode, setScaleMode] = useState<ScaleMode>("amount");
@@ -63,11 +72,30 @@ export function RecipeScreen() {
       />
       {owner && recipe && (
         <Stack.Toolbar placement="right">
-          <Stack.Toolbar.Button
-            icon="square.and.arrow.up"
-            accessibilityLabel="Share"
-            onPress={() => void Share.share({ message: recipeText(recipe) })}
-          />
+          {share.link.isPending || share.pdf.isPending ? (
+            <Stack.Toolbar.View>
+              <ActivityIndicator />
+            </Stack.Toolbar.View>
+          ) : (
+            <Stack.Toolbar.Menu icon="square.and.arrow.up" accessibilityLabel="Share">
+              <Stack.Toolbar.MenuAction
+                icon="link"
+                disabled={!isOnline}
+                subtitle={
+                  isOnline ? "Anyone with the link can see it for 7 days" : "Needs a connection"
+                }
+                onPress={() => share.link.mutate({ recipe, familyId: owner.familyId })}
+              >
+                Send a link
+              </Stack.Toolbar.MenuAction>
+              <Stack.Toolbar.MenuAction
+                icon="doc.richtext"
+                onPress={() => share.pdf.mutate({ recipe, familyId: owner.familyId })}
+              >
+                Export as PDF
+              </Stack.Toolbar.MenuAction>
+            </Stack.Toolbar.Menu>
+          )}
           {recipeMenu({
             recipe: { ...recipe, familyId: owner.familyId },
             folderNames: libraryFolders(familyTables).map((folder) => folder.name),
@@ -96,6 +124,15 @@ export function RecipeScreen() {
           >
             <View className="px-4 pt-2">
               <RecipeHero recipe={recipe} familyId={owner.familyId} />
+              {(share.link.isError || share.pdf.isError) && (
+                <View className="items-center pt-3">
+                  <InlineError>
+                    {share.link.isError
+                      ? "Couldn't create the link. Check your connection and try again."
+                      : "Couldn't make the PDF. Try again."}
+                  </InlineError>
+                </View>
+              )}
             </View>
             {recipe.ingredients.length > 0 && (
               <RecipeSection

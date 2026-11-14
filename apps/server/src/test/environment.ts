@@ -14,6 +14,7 @@ import { ApiHandlers } from "../http/api";
 import { ImageStorage } from "../image-storage";
 import { AppRoutes } from "../http/app";
 import { RateLimits } from "../rate-limits";
+import { Shares } from "../shares";
 
 export class RateLimitCounts extends Context.Service<RateLimitCounts, Map<string, number>>()(
   "lardon/server/test/RateLimitCounts",
@@ -142,7 +143,10 @@ const RateLimitsTest = Layer.effect(
   }),
 );
 
-export const TestServices = Families.layer.pipe(
+export const TEST_SHARE_ORIGIN = "https://lardon.test";
+
+export const TestServices = Shares.layer(TEST_SHARE_ORIGIN).pipe(
+  Layer.provideMerge(Families.layer),
   Layer.provideMerge(
     Layer.mergeAll(AuthenticationTest, RateLimitsTest, FamilyStoresTest, ImageStorageTest),
   ),
@@ -172,7 +176,7 @@ export function signedInAs(userId: string | null) {
 }
 
 export const clientFor = Effect.fn("clientFor")(function* (userId: string | null) {
-  return yield* HttpApiTest.groups(Api, ["system", "account", "families", "images"]).pipe(
+  return yield* HttpApiTest.groups(Api, ["system", "account", "families", "images", "shares"]).pipe(
     Effect.provide(signedInAs(userId)),
   );
 });
