@@ -71,6 +71,24 @@ describe("write rules", () => {
     expect(change("alice", "createdById", "alice")).toBe(true);
   });
 
+  it("never lets anyone take over a recipe by deleting its creator", () => {
+    const taken = createRecipe(store, { ...emptyDraft(), title: "Stew" }, "alice");
+
+    expect(change("bob", "createdById", undefined, taken)).toBe(true);
+    store.delCell("recipes", taken, "createdById");
+
+    expect(change("bob", "createdById", "bob", taken)).toBe(false);
+    expect(change("bob", "visibility", "followers", taken)).toBe(false);
+    expect(change("alice", "createdById", "alice", taken)).toBe(false);
+  });
+
+  it("accepts a creator that arrives after the rest of a new recipe", () => {
+    store.setCell("recipes", "late-recipe", "title", "Soup");
+
+    expect(change("bob", "createdById", "bob", "late-recipe")).toBe(true);
+    expect(change("bob", "visibility", "followers", "late-recipe")).toBe(true);
+  });
+
   it("rejects invalid cells and accepts deletions", () => {
     expect(change("alice", "title", " ")).toBe(false);
     expect(change("alice", "servings", -1)).toBe(false);
